@@ -1,0 +1,111 @@
+{
+  "id": "hadith_corpus_search",
+  "name": "Hadith Corpus & Connections Search",
+  "meta": {
+    "description": "Full-text search across 60,000+ hadiths, cross-collection parallel hadiths (50k links), and thematic families.",
+    "manifest": {
+      "title": "Hadith Corpus & Connections Search",
+      "author": "Hadith Project",
+      "author_url": "https://github.com/hadith-ksa",
+      "version": "1.0.0",
+      "description": "Full-text search across 60,000+ hadiths, cross-collection parallel hadiths (50k links), and thematic families."
+    }
+  },
+  "specs": [
+    {
+      "name": "search_hadith_corpus",
+      "description": "Search 60,000+ hadiths across collections using normalized, tashkeel-insensitive matching.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Arabic keywords or phrase to search (e.g. 'كسفت الشمس')."
+          },
+          "book": {
+            "type": "string",
+            "default": "all",
+            "description": "Target collection ('bukhari', 'muslim', 'abudawud', etc.) or 'all'."
+          },
+          "limit": {
+            "type": "integer",
+            "default": 5,
+            "description": "Maximum number of hadiths to return."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "get_hadith_by_number",
+      "description": "Fetch full hadith text by canonical book and hadith number with local cache and CDN fallback.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "book": {
+            "type": "string",
+            "description": "Collection name: 'bukhari', 'muslim', 'tirmidhi', 'abudawud', 'nasai', 'ibnmajah', 'malik'."
+          },
+          "hadith_number": {
+            "type": "integer",
+            "description": "Canonical Hadith number (> 0)."
+          },
+          "language": {
+            "type": "string",
+            "default": "ar",
+            "description": "'ar' for Arabic, 'en' for English."
+          }
+        },
+        "required": [
+          "book",
+          "hadith_number"
+        ]
+      }
+    },
+    {
+      "name": "get_hadith_connections",
+      "description": "Discover parallel hadiths (Turuq & Shawahid) across 17 Hadith collections with shared keywords and similarity scores.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "book": {
+            "type": "string",
+            "description": "Collection name of source hadith."
+          },
+          "hadith_number": {
+            "type": "integer",
+            "description": "Number of the source hadith."
+          },
+          "limit": {
+            "type": "integer",
+            "default": 5,
+            "description": "Maximum parallel connections to return."
+          }
+        },
+        "required": [
+          "book",
+          "hadith_number"
+        ]
+      }
+    },
+    {
+      "name": "get_thematic_family",
+      "description": "Explore thematic Hadith families (e.g. 'prayer', 'knowledge', 'creation', 'guidance') and their lexical roots.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "family_id_or_keyword": {
+            "type": "string",
+            "description": "Family identifier or keyword (e.g. 'prayer', 'worship')."
+          }
+        },
+        "required": [
+          "family_id_or_keyword"
+        ]
+      }
+    }
+  ],
+  "content": "\"\"\"\ntitle: Hadith Corpus & Connections Search Tool\nauthor: Hadith Project\nauthor_url: https://github.com/hadith-ksa\nversion: 1.0.0\ndescription: Autonomous full-text search across 60,000+ hadiths, cross-collection parallel hadiths, and thematic family topics.\n\"\"\"\n\nimport os\nimport re\nimport json\nimport sqlite3\nimport urllib.request\nimport urllib.error\nfrom typing import Optional, Dict, Any, List\nfrom pydantic import BaseModel, Field\n\nclass Tools:\n    class Valves(BaseModel):\n        DB_PATH: str = Field(\n            default=r\"c:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\hadith_rijal.db\",\n            description=\"Absolute path to hadith_rijal.db containing the hadith corpus and cross-hadith connections.\"\n        )\n        ITQAN_DATA_DIR: str = Field(\n            default=r\"c:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\itqan-repo\\app\\data\",\n            description=\"Directory containing Itqan datasets.\"\n        )\n        REQUEST_TIMEOUT: int = Field(\n            default=10,\n            description=\"Network request timeout in seconds.\"\n        )\n\n    def __init__(self):\n        self.valves = self.Valves()\n\n    SYSTEM_INSTRUCTIONS = \"\"\"\n    # HADITH CORPUS & CROSS-REFERENCE GUIDELINES:\n    1. Search & Retrieval:\n       - When searching for hadith text without an exact number, use `search_hadith_corpus` first with key words (diacritics are handled automatically).\n       - When the user asks for a specific hadith (e.g., \"Sahih al-Bukhari #1051\" or \"Muslim #94\"), use `get_hadith_by_number`.\n    2. Parallel Narrations (Turuq & Shawahid):\n       - After finding a hadith, use `get_hadith_connections` to discover parallel narrations across other canonical collections (e.g. Bukhari parallel to Muslim, Abu Dawud, Tirmidhi, etc.).\n       - Point out shared keywords and topic families to give the user a comprehensive multi-book perspective.\n    3. Thematic Families:\n       - When the user inquires about a broader subject (e.g. 'prayer', 'creation', 'knowledge', 'zakat'), use `get_thematic_family` to reveal the lexical roots and associated hadith counts.\n    \"\"\"\n\n    def _normalize_text(self, text: str) -> str:\n        if not text:\n            return \"\"\n        t = re.sub(r'[\\u064B-\\u065F\\u0670\\u0610-\\u061A\\u06D6-\\u06ED]', '', text)\n        t = t.replace('\\u0640', '')\n        t = re.sub(r'[إأآٱ]', 'ا', t)\n        t = re.sub(r'ة', 'ه', t)\n        t = re.sub(r'ى', 'ي', t)\n        return t.strip()\n\n    def search_hadith_corpus(self, query: str, book: str = \"all\", limit: int = 5) -> str:\n        \"\"\"\n        Search 60,000+ hadiths across collections using normalized, tashkeel-insensitive matching.\n        \n        :param query: Arabic keywords or phrase to search (e.g. 'كسفت الشمس' or 'انما الاعمال بالنيات').\n        :param book: Target collection (e.g. 'bukhari', 'muslim', 'abudawud', 'tirmidhi', 'nasai', 'ibnmajah', 'malik') or 'all'.\n        :param limit: Maximum number of hadiths to return (default: 5).\n        :return: JSON formatted results containing book, hadith_id, Arabic text preview, and English narration if available.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": f\"Database not found at {self.valves.DB_PATH}\"}, ensure_ascii=False)\n\n        norm_query = self._normalize_text(query)\n        if not norm_query:\n            return json.dumps({\"error\": \"Search query cannot be empty.\"}, ensure_ascii=False)\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            conn.create_function(\"NORM_AR\", 1, self._normalize_text)\n            cur = conn.cursor()\n\n            sql = \"\"\"\n                SELECT book, chapter, hadith_id, id_in_book, arabic_text, english_narrator, english_text\n                FROM hadiths\n                WHERE NORM_AR(arabic_text) LIKE ?\n            \"\"\"\n            params = [f\"%{norm_query}%\"]\n\n            if book and book.lower() != \"all\":\n                sql += \" AND LOWER(book) = ?\"\n                params.append(book.lower().strip())\n\n            sql += \" LIMIT ?\"\n            params.append(max(1, min(limit, 20)))\n\n            cur.execute(sql, params)\n            rows = cur.fetchall()\n            conn.close()\n\n            results = []\n            for r in rows:\n                results.append({\n                    \"book\": r[0],\n                    \"chapter\": r[1],\n                    \"hadith_number\": r[2],\n                    \"id_in_book\": r[3],\n                    \"arabic_text\": r[4],\n                    \"english_narrator\": r[5] or \"\",\n                    \"english_text\": r[6] or \"\"\n                })\n\n            return json.dumps({\n                \"query\": query,\n                \"book\": book,\n                \"matches_count\": len(results),\n                \"results\": results\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Search failed: {str(e)}\"}, ensure_ascii=False)\n\n    def get_hadith_by_number(self, book: str, hadith_number: int, language: str = \"ar\") -> str:\n        \"\"\"\n        Fetch full hadith text by canonical book and hadith number with local cache and CDN fallback.\n        \n        :param book: Collection name: 'bukhari', 'muslim', 'tirmidhi', 'abudawud', 'nasai', 'ibnmajah', 'malik'.\n        :param hadith_number: Canonical Hadith number (must be > 0).\n        :param language: 'ar' for Arabic, 'en' for English translation.\n        :return: JSON formatted hadith details.\n        \"\"\"\n        book = book.lower().strip()\n        hadith_number = int(hadith_number)\n        if hadith_number <= 0:\n            return json.dumps({\"error\": \"hadith_number must be greater than 0\"}, ensure_ascii=False)\n\n        # 1. Local Database Lookup\n        if os.path.exists(self.valves.DB_PATH):\n            try:\n                conn = sqlite3.connect(self.valves.DB_PATH)\n                cur = conn.cursor()\n                cur.execute(\n                    \"SELECT book, chapter, hadith_id, arabic_text, english_narrator, english_text FROM hadiths WHERE LOWER(book)=? AND hadith_id=? LIMIT 1\",\n                    (book, hadith_number)\n                )\n                row = cur.fetchone()\n                conn.close()\n                if row:\n                    ar_text = row[3] or \"\"\n                    en_text = row[5] or \"\"\n                    if language == \"en\" and en_text.strip():\n                        return json.dumps({\n                            \"source\": \"local_db\",\n                            \"book\": row[0],\n                            \"chapter\": row[1],\n                            \"hadith_number\": row[2],\n                            \"narrator\": row[4],\n                            \"text\": en_text,\n                            \"language\": \"en\"\n                        }, ensure_ascii=False)\n                    elif language == \"ar\" and ar_text.strip():\n                        return json.dumps({\n                            \"source\": \"local_db\",\n                            \"book\": row[0],\n                            \"chapter\": row[1],\n                            \"hadith_number\": row[2],\n                            \"narrator\": row[4],\n                            \"text\": ar_text,\n                            \"language\": \"ar\"\n                        }, ensure_ascii=False)\n            except Exception:\n                pass\n\n        # 2. CDN Fallback\n        prefix = \"ara-\" if language == \"ar\" else \"eng-\"\n        url = f\"https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/{prefix}{book}/{hadith_number}.json\"\n\n        try:\n            req = urllib.request.Request(url, headers={\"User-Agent\": \"HadithApp/1.0\"})\n            with urllib.request.urlopen(req, timeout=self.valves.REQUEST_TIMEOUT) as resp:\n                data = json.loads(resp.read().decode(\"utf-8\"))\n                hadith_data = data.get(\"hadiths\", [{}])[0]\n                text = hadith_data.get(\"text\", \"\")\n\n                # Cache back to local DB if available\n                if os.path.exists(self.valves.DB_PATH) and text:\n                    try:\n                        conn = sqlite3.connect(self.valves.DB_PATH)\n                        cur = conn.cursor()\n                        if language == \"ar\":\n                            cur.execute(\n                                \"INSERT OR REPLACE INTO hadiths (book, chapter, hadith_id, id_in_book, arabic_text, english_narrator, english_text) \"\n                                \"VALUES (?, ?, ?, ?, ?, COALESCE((SELECT english_narrator FROM hadiths WHERE LOWER(book)=? AND hadith_id=?), ''), COALESCE((SELECT english_text FROM hadiths WHERE LOWER(book)=? AND hadith_id=?), ''))\",\n                                (book, 0, hadith_number, hadith_number, text, book, hadith_number, book, hadith_number)\n                            )\n                        else:\n                            cur.execute(\n                                \"INSERT OR REPLACE INTO hadiths (book, chapter, hadith_id, id_in_book, arabic_text, english_narrator, english_text) \"\n                                \"VALUES (?, ?, ?, ?, COALESCE((SELECT arabic_text FROM hadiths WHERE LOWER(book)=? AND hadith_id=?), ''), '', ?)\",\n                                (book, 0, hadith_number, hadith_number, book, hadith_number, text)\n                            )\n                        conn.commit()\n                        conn.close()\n                    except Exception:\n                        pass\n\n                return json.dumps({\n                    \"source\": \"cdn_api\",\n                    \"book\": book,\n                    \"hadith_number\": hadith_number,\n                    \"text\": text,\n                    \"language\": language\n                }, ensure_ascii=False)\n        except Exception as e:\n            return json.dumps({\"error\": f\"Failed to retrieve hadith {book} #{hadith_number}: {str(e)}\"}, ensure_ascii=False)\n\n    def get_hadith_connections(self, book: str, hadith_number: int, limit: int = 5) -> str:\n        \"\"\"\n        Discover parallel hadiths (Turuq & Shawahid) across 17 Hadith collections with shared keywords and similarity scores.\n        \n        :param book: Collection name of the source hadith (e.g. 'bukhari', 'muslim', 'abudawud').\n        :param hadith_number: Number of the source hadith.\n        :param limit: Maximum parallel connections to return (default: 5).\n        :return: JSON formatted list of connected parallel hadiths.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        book = book.lower().strip()\n        hadith_number = int(hadith_number)\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            # Bidirectional query: find hadiths where our hadith is either source or target\n            cur.execute(\"\"\"\n                SELECT target_hadith_id, target_book, target_num, similarity_score, shared_terms, shared_families\n                FROM hadith_connections\n                WHERE source_book = ? AND source_num = ?\n                UNION\n                SELECT source_hadith_id, source_book, source_num, similarity_score, shared_terms, shared_families\n                FROM hadith_connections\n                WHERE target_book = ? AND target_num = ?\n                ORDER BY similarity_score DESC\n                LIMIT ?\n            \"\"\", (book, hadith_number, book, hadith_number, limit))\n            rows = cur.fetchall()\n            conn.close()\n\n            connections = []\n            for r in rows:\n                connections.append({\n                    \"target_id\": r[0],\n                    \"target_book\": r[1],\n                    \"target_number\": r[2],\n                    \"similarity_score\": r[3],\n                    \"shared_terms\": json.loads(r[4]) if r[4] else [],\n                    \"thematic_families\": json.loads(r[5]) if r[5] else []\n                })\n\n            return json.dumps({\n                \"source\": f\"{book}:{hadith_number}\",\n                \"parallel_hadiths_count\": len(connections),\n                \"connections\": connections\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Failed to fetch connections: {str(e)}\"}, ensure_ascii=False)\n\n    def get_thematic_family(self, family_id_or_keyword: str) -> str:\n        \"\"\"\n        Explore thematic Hadith families (e.g. 'prayer', 'knowledge', 'creation', 'guidance') and their lexical roots.\n        \n        :param family_id_or_keyword: Family identifier (e.g. 'prayer') or Arabic/English title keyword.\n        :return: JSON details of the thematic family, root statistics, and book occurrences.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        query = family_id_or_keyword.lower().strip()\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            cur.execute(\"\"\"\n                SELECT family_id, name_ar, name_en, meaning, root_count, ayah_count, hadith_count, roots_json, book_breakdown_json\n                FROM hadith_families\n                WHERE family_id = ? OR name_ar LIKE ? OR meaning LIKE ?\n                LIMIT 1\n            \"\"\", (query, f\"%{query}%\", f\"%{query}%\"))\n            row = cur.fetchone()\n            conn.close()\n\n            if not row:\n                return json.dumps({\"message\": f\"No thematic family found matching '{family_id_or_keyword}'.\"}, ensure_ascii=False)\n\n            return json.dumps({\n                \"family_id\": row[0],\n                \"name_ar\": row[1],\n                \"name_en\": row[2],\n                \"meaning\": row[3],\n                \"root_count\": row[4],\n                \"ayah_count\": row[5],\n                \"hadith_count\": row[6],\n                \"sample_roots\": json.loads(row[7])[:15] if row[7] else [],\n                \"book_breakdown\": json.loads(row[8]) if row[8] else {}\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Failed to query family: {str(e)}\"}, ensure_ascii=False)\n"
+}

@@ -1,0 +1,91 @@
+{
+  "id": "hadith_sharh_vocab",
+  "name": "Hadith Sharh & Gharib Vocab",
+  "meta": {
+    "description": "Comprehensive Hadith commentary (Sharh) from HadeethEnc combined with classical Gharib al-Hadith vocabulary lexicon (33k+ definitions) and Lane's Lexicon root etymology.",
+    "manifest": {
+      "title": "Hadith Sharh & Gharib Vocab",
+      "author": "Hadith Project",
+      "author_url": "https://github.com/hadith-ksa",
+      "version": "1.0.0",
+      "description": "Comprehensive Hadith commentary (Sharh) from HadeethEnc combined with classical Gharib al-Hadith vocabulary lexicon (33k+ definitions) and Lane's Lexicon root etymology."
+    }
+  },
+  "specs": [
+    {
+      "name": "get_hadith_explanation",
+      "description": "Search HadeethEnc to retrieve detailed hadith commentary (Sharh), vocabulary meanings, and derived benefits.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Keywords or text of the hadith."
+          },
+          "language": {
+            "type": "string",
+            "default": "ar",
+            "description": "'ar' for Arabic, 'en' for English."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "lookup_gharib_word",
+      "description": "Look up a rare or difficult hadith word in the Gharib al-Hadith lexicon (33k+ definitions) with root and morphological analysis.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "word": {
+            "type": "string",
+            "description": "Arabic word to look up (e.g. 'عسعس', 'كسفت')."
+          }
+        },
+        "required": [
+          "word"
+        ]
+      }
+    },
+    {
+      "name": "lookup_root_lexicon",
+      "description": "Look up classical Arabic root etymology and comprehensive Lane's Lexicon definition.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "root": {
+            "type": "string",
+            "description": "3-letter Arabic root (e.g. 'خسف', 'سلم')."
+          }
+        },
+        "required": [
+          "root"
+        ]
+      }
+    },
+    {
+      "name": "search_vocab_meaning",
+      "description": "Search the vocabulary lexicon using English concepts/terms via full-text search (FTS5).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "english_concept": {
+            "type": "string",
+            "description": "English keyword or concept to search (e.g. 'slave', 'eclipse')."
+          },
+          "limit": {
+            "type": "integer",
+            "default": 5,
+            "description": "Maximum entries to return."
+          }
+        },
+        "required": [
+          "english_concept"
+        ]
+      }
+    }
+  ],
+  "content": "\"\"\"\ntitle: Hadith Sharh & Gharib Vocab Tool\nauthor: Hadith Project\nauthor_url: https://github.com/hadith-ksa\nversion: 1.0.0\ndescription: Comprehensive Hadith commentary (Sharh) from HadeethEnc combined with classical Gharib al-Hadith vocabulary lexicon (33k+ definitions) and Lane's Lexicon root etymology.\n\"\"\"\n\nimport os\nimport re\nimport json\nimport sqlite3\nimport urllib.request\nimport urllib.parse\nimport urllib.error\nfrom typing import Dict, Any, List, Optional\nfrom pydantic import BaseModel, Field\n\nclass Tools:\n    class Valves(BaseModel):\n        DB_PATH: str = Field(\n            default=r\"c:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\hadith_rijal.db\",\n            description=\"Path to hadith_rijal.db containing hadith_vocab and hadith_roots.\"\n        )\n        REQUEST_TIMEOUT: int = Field(\n            default=15,\n            description=\"Network request timeout in seconds.\"\n        )\n\n    def __init__(self):\n        self.valves = self.Valves()\n\n    SYSTEM_INSTRUCTIONS = \"\"\"\n    # HADITH SHARH & GHARIB AL-HADITH GUIDELINES:\n    1. Distinction between Sharh and Gharib:\n       - Sharh (شرح الحديث): General meaning, legal deductions (fiqh), moral lessons, and context of the hadith. Use `get_hadith_explanation`.\n       - Gharib al-Hadith (غريب الحديث): Precise lexical, morphological, and etymological definitions of uncommon or archaic words used in the Prophetic tongue. Use `lookup_gharib_word` and `lookup_root_lexicon`.\n    2. When analyzing hadith words:\n       - Provide the root (الجذر), part of speech, classical gloss, and how classical lexicographers (e.g. Ibn al-Athir in *Al-Nihayah*, Ibn Manzur in *Lisan al-Arab*) defined it.\n    3. Structural formatting:\n       - Present the general explanation first, followed by a dedicated 'غريب الحديث والألفاظ' (Vocabulary Breakdown) section with word -> root -> classical meaning.\n    \"\"\"\n\n    def _normalize_arabic(self, text: str) -> str:\n        if not text:\n            return \"\"\n        t = re.sub(r'[\\u064B-\\u065F\\u0670\\u0610-\\u061A\\u06D6-\\u06ED]', '', text)\n        t = t.replace('\\u0640', '')\n        t = re.sub(r'[إأآٱ]', 'ا', t)\n        t = re.sub(r'ة', 'ه', t)\n        t = re.sub(r'ى', 'ي', t)\n        return t.strip()\n\n    def get_hadith_explanation(self, query: str, language: str = \"ar\") -> str:\n        \"\"\"\n        Search HadeethEnc to retrieve detailed hadith commentary (Sharh), vocabulary meanings, and derived benefits.\n        \n        :param query: Part of the hadith text or keywords to find explanation for.\n        :param language: Language code ('ar' for Arabic, 'en' for English, 'fr', 'ur', etc. Default: 'ar').\n        :return: JSON formatted commentary, vocabulary words, benefits, and references.\n        \"\"\"\n        search_url = f\"https://hadeethenc.com/api/v1/hadeeths/list/?language={language}&page=1&per_page=1\"\n        try:\n            req = urllib.request.Request(\n                f\"https://hadeethenc.com/api/v1/hadeeths/list/?language={language}&page=1&per_page=5\",\n                headers={\"User-Agent\": \"HadithApp/1.0\"}\n            )\n            with urllib.request.urlopen(req, timeout=self.valves.REQUEST_TIMEOUT) as resp:\n                data = json.loads(resp.read().decode(\"utf-8\"))\n                hadeeths = data.get(\"data\", [])\n                if not hadeeths:\n                    return json.dumps({\"message\": f\"No explanation found on HadeethEnc for: {query}\"}, ensure_ascii=False)\n\n                matched_id = None\n                norm_q = self._normalize_arabic(query)\n                for h in hadeeths:\n                    title = self._normalize_arabic(h.get(\"title\", \"\"))\n                    if norm_q in title or any(word in title for word in norm_q.split()):\n                        matched_id = h.get(\"id\")\n                        break\n\n                if not matched_id and hadeeths:\n                    matched_id = hadeeths[0].get(\"id\")\n\n                # Fetch full explanation details\n                detail_url = f\"https://hadeethenc.com/api/v1/hadeeths/one/?language={language}&id={matched_id}\"\n                detail_req = urllib.request.Request(detail_url, headers={\"User-Agent\": \"HadithApp/1.0\"})\n                with urllib.request.urlopen(detail_req, timeout=self.valves.REQUEST_TIMEOUT) as detail_resp:\n                    detail_data = json.loads(detail_resp.read().decode(\"utf-8\"))\n                    return json.dumps({\n                        \"title\": detail_data.get(\"title\"),\n                        \"hadith\": detail_data.get(\"hadeeth\"),\n                        \"explanation\": detail_data.get(\"explanation\"),\n                        \"hints\": detail_data.get(\"hints\", []),\n                        \"words_meanings\": detail_data.get(\"words_meanings\", []),\n                        \"reference\": detail_data.get(\"reference\")\n                    }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Failed to retrieve explanation from HadeethEnc: {str(e)}\"}, ensure_ascii=False)\n\n    def lookup_gharib_word(self, word: str) -> str:\n        \"\"\"\n        Look up a rare or difficult hadith word in the Gharib al-Hadith lexicon (33k+ definitions) with root and morphological analysis.\n        \n        :param word: The Arabic word to look up (e.g. 'عسعس', 'كسفت', 'الضيزى').\n        :return: JSON formatted lexical definition, root, lemma, part of speech, and corpus frequency.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        clean_word = word.strip()\n        norm_word = self._normalize_arabic(clean_word)\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            # First exact or normalized match\n            cur.execute(\"\"\"\n                SELECT word, root, root_dotted, transliteration, definition, frequency, lemma, pos, form, aspect\n                FROM hadith_vocab\n                WHERE word = ? OR word_norm = ?\n                LIMIT 5\n            \"\"\", (clean_word, norm_word))\n            rows = cur.fetchall()\n\n            # If not found, try prefix / root search\n            if not rows:\n                cur.execute(\"\"\"\n                    SELECT word, root, root_dotted, transliteration, definition, frequency, lemma, pos, form, aspect\n                    FROM hadith_vocab\n                    WHERE root = ? OR word_norm LIKE ?\n                    ORDER BY frequency DESC\n                    LIMIT 3\n                \"\"\", (clean_word, f\"{norm_word}%\"))\n                rows = cur.fetchall()\n\n            conn.close()\n\n            if not rows:\n                return json.dumps({\"message\": f\"Word '{word}' not found in Gharib al-Hadith lexicon.\"}, ensure_ascii=False)\n\n            results = []\n            for r in rows:\n                results.append({\n                    \"word\": r[0],\n                    \"root\": r[1],\n                    \"root_dotted\": r[2],\n                    \"transliteration\": r[3],\n                    \"classical_definition\": r[4],\n                    \"frequency\": r[5],\n                    \"lemma\": r[6],\n                    \"part_of_speech\": r[7],\n                    \"form\": r[8],\n                    \"aspect\": r[9]\n                })\n\n            return json.dumps({\n                \"query_word\": word,\n                \"definitions_found\": len(results),\n                \"entries\": results\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Gharib word lookup failed: {str(e)}\"}, ensure_ascii=False)\n\n    def lookup_root_lexicon(self, root: str) -> str:\n        \"\"\"\n        Look up classical Arabic root etymology and comprehensive Lane's Lexicon definition.\n        \n        :param root: 3-letter Arabic root (e.g. 'خسف', 'سلم', 'عبد', 'علم').\n        :return: JSON formatted classical root definitions, Buckwalter code, summary, and Quran frequency.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        clean_root = root.strip().replace(\" \", \"\").replace(\".\", \"\")\n        norm_root = self._normalize_arabic(clean_root)\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            cur.execute(\"\"\"\n                SELECT root, buckwalter, definition_en, summary_en, quran_freq\n                FROM hadith_roots\n                WHERE root = ? OR root = ?\n                LIMIT 1\n            \"\"\", (clean_root, norm_root))\n            row = cur.fetchone()\n            conn.close()\n\n            if not row:\n                return json.dumps({\"message\": f\"Root '{root}' not found in roots lexicon.\"}, ensure_ascii=False)\n\n            return json.dumps({\n                \"root\": row[0],\n                \"buckwalter\": row[1],\n                \"summary\": row[3],\n                \"quran_frequency\": row[4],\n                \"lexicon_excerpt\": row[2][:800] + (\"...\" if len(row[2]) > 800 else \"\")\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Root lexicon lookup failed: {str(e)}\"}, ensure_ascii=False)\n\n    def search_vocab_meaning(self, english_concept: str, limit: int = 5) -> str:\n        \"\"\"\n        Search the vocabulary lexicon using English concepts/terms via full-text search (FTS5).\n        \n        :param english_concept: English keyword or concept to search (e.g. 'eclipse', 'fasting', 'humility', 'prostration').\n        :param limit: Maximum entries to return (default: 5).\n        :return: JSON formatted matching Arabic words, roots, and definitions.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        concept = english_concept.strip()\n        if not concept:\n            return json.dumps({\"error\": \"English search concept cannot be empty.\"}, ensure_ascii=False)\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            cur.execute(\"\"\"\n                SELECT v.word, v.root, v.pos, v.definition\n                FROM hadith_vocab_fts f\n                JOIN hadith_vocab v ON f.rowid = v.id\n                WHERE hadith_vocab_fts MATCH ?\n                LIMIT ?\n            \"\"\", (concept, limit))\n            rows = cur.fetchall()\n            conn.close()\n\n            results = []\n            for r in rows:\n                results.append({\n                    \"word\": r[0],\n                    \"root\": r[1],\n                    \"part_of_speech\": r[2],\n                    \"definition\": r[3]\n                })\n\n            return json.dumps({\n                \"concept\": english_concept,\n                \"matches_count\": len(results),\n                \"results\": results\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"FTS5 vocabulary search failed: {str(e)}\"}, ensure_ascii=False)\n"
+}

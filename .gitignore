@@ -311,3 +311,8 @@ cypress/videos
 cypress/screenshots
 .vscode/settings.json
 .cptr
+.npm-cache/
+*.sqlite
+*.sqlite3
+*.db
+

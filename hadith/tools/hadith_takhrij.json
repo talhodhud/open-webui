@@ -1,0 +1,54 @@
+{
+  "id": "hadith_takhrij",
+  "name": "Hadith Takhrij & Scholar Verification",
+  "meta": {
+    "description": "Multi-scholar takhrij, authenticity rulings (al-Albani, Ibn Hajar, al-Arna'ut, al-Dhahabi), and source citations via Dorar al-Sunniyyah.",
+    "manifest": {
+      "title": "Hadith Takhrij & Scholar Verification",
+      "author": "Hadith Project",
+      "author_url": "https://github.com/hadith-ksa",
+      "version": "1.0.0",
+      "description": "Multi-scholar takhrij, authenticity rulings (al-Albani, Ibn Hajar, al-Arna'ut, al-Dhahabi), and source citations via Dorar al-Sunniyyah."
+    }
+  },
+  "specs": [
+    {
+      "name": "search_dorar_hadith",
+      "description": "Search Dorar al-Sunniyyah hadith database to verify authenticity gradings, multi-scholar rulings, and source citations.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Arabic text fragment to search for."
+          },
+          "page": {
+            "type": "integer",
+            "default": 1,
+            "description": "Page number for pagination."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "get_hadith_takhrij_summary",
+      "description": "Synthesizes multi-scholar takhrij from Dorar, categorizing scholar rulings into consensus, primary narrators, and book sources.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Arabic text fragment to takhrij."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
+  ],
+  "content": "\"\"\"\ntitle: Hadith Takhrij & Scholar Verification Tool\nauthor: Hadith Project\nauthor_url: https://github.com/hadith-ksa\nversion: 1.0.0\ndescription: Takhrij al-Hadith engine retrieving multi-scholar authenticity gradings, ruling degrees, source citations, and primary narrator chains via Dorar al-Sunniyyah API.\n\"\"\"\n\nimport urllib.request\nimport urllib.parse\nimport urllib.error\nimport json\nimport re\nfrom typing import Dict, Any, List, Optional\nfrom pydantic import BaseModel, Field\n\nclass Tools:\n    class Valves(BaseModel):\n        REQUEST_TIMEOUT: int = Field(\n            default=15,\n            description=\"Network request timeout in seconds.\"\n        )\n\n    def __init__(self):\n        self.valves = self.Valves()\n\n    SYSTEM_INSTRUCTIONS = \"\"\"\n    # HADITH TAKHRIJ & SCHOLAR EVALUATION GUIDELINES:\n    1. Primary Goal: Provide authoritative multi-scholar takhrij (تخريج الحديث) for any matn or fragment.\n    2. Multi-Scholar Perspective:\n       - Hadith rulings are scholarly judgments (ijtihad). Present evaluations from both classical masters (al-Bukhari, Ahmad, al-Tirmidhi, Ibn Hajar, al-Dhahabi) and contemporary verifiers (al-Albani, al-Arna'ut).\n       - When scholars disagree on a hadith's authenticity (e.g. one grades it Da'if and another Hasan), clearly explain the basis of difference (e.g. presence of a contested narrator, or elevated vs. stopped chain / marfu' vs. mawquf).\n    3. Output Formatting:\n       - Include: Matn fragment, Sahabi (Primary Narrator), Source Book, Muhaddith (Evaluating Scholar), Degree/Ruling (Hukm), and Volume/Page reference.\n       - Present the results in a clean Markdown comparison table.\n    \"\"\"\n\n    def search_dorar_hadith(self, query: str, page: int = 1) -> str:\n        \"\"\"\n        Search Dorar al-Sunniyyah hadith database to verify hadith authenticity, multi-scholar gradings, and takhrij.\n        \n        :param query: Part of the hadith matn (Arabic text) to search for.\n        :param page: Page number for paginated results (default: 1).\n        :return: JSON formatted list of hadith entries with scholars, rulings, books, and narrators.\n        \"\"\"\n        url = f\"https://dorar.net/dorar_api.json?skey={urllib.parse.quote(query)}&page={page}\"\n        try:\n            req = urllib.request.Request(\n                url,\n                headers={\"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64)\"}\n            )\n            with urllib.request.urlopen(req, timeout=self.valves.REQUEST_TIMEOUT) as resp:\n                raw_json = json.loads(resp.read().decode(\"utf-8\"))\n                html_content = raw_json.get(\"ahadith\", {}).get(\"result\", \"\")\n\n                hadith_blocks = html_content.split('<div class=\"hadith-info\">')\n                results = []\n\n                for block in hadith_blocks:\n                    text_match = re.search(r'class=\"hadith\"[^>]*>(.*?)</div>', block, re.DOTALL)\n                    raw_text = text_match.group(1) if text_match else \"\"\n                    clean_text = re.sub(r'<[^>]+>', '', raw_text).strip()\n                    clean_text = re.sub(r'\\s+', ' ', clean_text)\n\n                    def get_field(lbl):\n                        m = re.search(r'<span class=\"info-subtitle\">\\s*' + lbl + r':?\\s*</span>\\s*([^<]+)', block)\n                        return m.group(1).strip() if m else \"\"\n\n                    rawi = get_field('الراوي')\n                    muhaddith = get_field('المحدث')\n                    book = get_field('المصدر')\n                    page_num = get_field('الصفحة أو الرقم')\n                    hukm = get_field('خلاصة حكم المحدث')\n\n                    if clean_text or rawi or muhaddith:\n                        results.append({\n                            \"text\": clean_text,\n                            \"rawi\": rawi,\n                            \"muhaddith\": muhaddith,\n                            \"book\": book,\n                            \"number_or_page\": page_num,\n                            \"ruling\": hukm\n                        })\n\n                return json.dumps({\n                    \"query\": query,\n                    \"count\": len(results),\n                    \"results\": results\n                }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Dorar API request failed: {str(e)}\"}, ensure_ascii=False)\n\n    def get_hadith_takhrij_summary(self, query: str) -> str:\n        \"\"\"\n        Synthesizes multi-scholar takhrij from Dorar, categorizing scholar rulings into consensus, primary narrators, and book sources.\n        \n        :param query: Arabic text fragment to takhrij.\n        :return: JSON formatted synthesis with consensus verdict, scholar breakdown, and primary sources.\n        \"\"\"\n        res_json = self.search_dorar_hadith(query, page=1)\n        data = json.loads(res_json)\n        if \"error\" in data:\n            return res_json\n\n        results = data.get(\"results\", [])\n        if not results:\n            return json.dumps({\"message\": f\"No takhrij results found for '{query}'.\"}, ensure_ascii=False)\n\n        rulings_summary = {}\n        sahaba = set()\n        books = set()\n\n        for item in results:\n            muhaddith = item.get(\"muhaddith\", \"Unknown\")\n            ruling = item.get(\"ruling\", \"Unspecified\")\n            book = item.get(\"book\", \"\")\n            rawi = item.get(\"rawi\", \"\")\n\n            if rawi:\n                sahaba.add(rawi)\n            if book:\n                books.add(book)\n\n            if muhaddith not in rulings_summary:\n                rulings_summary[muhaddith] = []\n            rulings_summary[muhaddith].append({\n                \"book\": book,\n                \"ruling\": ruling,\n                \"ref\": item.get(\"number_or_page\", \"\")\n            })\n\n        return json.dumps({\n            \"query\": query,\n            \"total_records\": len(results),\n            \"primary_narrators\": list(sahaba),\n            \"canonical_sources\": list(books)[:10],\n            \"scholar_evaluations\": rulings_summary\n        }, ensure_ascii=False, indent=2)\n"
+}

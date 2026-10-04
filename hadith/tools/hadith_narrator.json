@@ -1,0 +1,75 @@
+{
+  "id": "hadith_narrator",
+  "name": "Hadith Narrator (Rijal) Biography & Network",
+  "meta": {
+    "description": "Biographical lookup across 115,735 Hadith narrators, Jarh wa Ta'dil credibility evaluations, death dates, tabaqat, and book-level transmission networks.",
+    "manifest": {
+      "title": "Hadith Narrator (Rijal) Biography & Network",
+      "author": "Hadith Project",
+      "author_url": "https://github.com/hadith-ksa",
+      "version": "1.0.0",
+      "description": "Biographical lookup across 115,735 Hadith narrators, Jarh wa Ta'dil credibility evaluations, death dates, tabaqat, and book-level transmission networks."
+    }
+  },
+  "specs": [
+    {
+      "name": "search_narrator",
+      "description": "Search the 115,735 Rijal database using full-text search (FTS5) or normalized Arabic matching.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Name, kunya, or title of the narrator."
+          },
+          "limit": {
+            "type": "integer",
+            "default": 5,
+            "description": "Maximum results to return."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "get_narrator_biography",
+      "description": "Fetch complete biographical profile of a narrator by their database ID.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "narrator_id": {
+            "type": "integer",
+            "description": "Integer ID of the narrator."
+          }
+        },
+        "required": [
+          "narrator_id"
+        ]
+      }
+    },
+    {
+      "name": "get_book_narrator_network",
+      "description": "Inspect precomputed transmission network for a specific canonical book, revealing central narrators and their links.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "book": {
+            "type": "string",
+            "description": "Collection name: 'bukhari', 'muslim', 'tirmidhi', 'abudawud', 'nasai', 'ibnmajah', 'ahmed', 'malik', 'darimi'."
+          },
+          "narrator_name": {
+            "type": "string",
+            "default": "",
+            "description": "Optional narrator name to focus on."
+          }
+        },
+        "required": [
+          "book"
+        ]
+      }
+    }
+  ],
+  "content": "\"\"\"\ntitle: Hadith Narrator (Rijal) Biography & Network Tool\nauthor: Hadith Project\nauthor_url: https://github.com/hadith-ksa\nversion: 1.0.0\ndescription: Comprehensive biographical lookup across 115,735 Hadith narrators, Jarh wa Ta'dil credibility evaluations, death dates, tabaqat, and book-level transmission networks.\n\"\"\"\n\nimport os\nimport re\nimport json\nimport sqlite3\nfrom typing import Dict, Any, List, Optional\nfrom pydantic import BaseModel, Field\n\nclass Tools:\n    class Valves(BaseModel):\n        DB_PATH: str = Field(\n            default=r\"c:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\hadith_rijal.db\",\n            description=\"Path to hadith_rijal.db containing narrators, narrators_fts, isnad_nodes, and isnad_links.\"\n        )\n\n    def __init__(self):\n        self.valves = self.Valves()\n\n    SYSTEM_INSTRUCTIONS = \"\"\"\n    # HADITH RIJAL & JARH WA TA'DIL EVALUATION GUIDELINES:\n    1. Jarh wa Ta'dil Hierarchy (مراتب الجرح والتعديل):\n       - Tier 1 (Highest): Thiqah Thabt / Thiqah Hafiz (ثقة ثبت / ثقة حافظ) - exemplary authority.\n       - Tier 2: Thiqah / Saduq (ثقة / صدوق حسن الحديث) - acceptable narrator of Sahih/Hasan hadith.\n       - Tier 3 (Contested/Minor Weakness): Saduq Yahim / Layyin (صدوق يهم / لين الحديث) - corroborated narrations accepted.\n       - Tier 4 (Severe Weakness): Da'if / Matruk / Munkar (ضعيف / متروك / منكر الحديث) - rejected unless severe shawahid exist.\n       - Tier 5 (Discredited): Kadhdhab / Wadda' (كذاب / وضاع) - fabricated narrations.\n    2. Transmission Analysis:\n       - When inspecting a narrator, highlight their death year (وفاته), geographical hub (Kufah, Basrah, Madinah, Damascus), generation (Tabaqah), and key teachers and students.\n       - Use `get_book_narrator_network` to visualize how central this narrator is within a specific collection (e.g. Sahih al-Bukhari).\n    \"\"\"\n\n    def _normalize_arabic(self, text: str) -> str:\n        if not text:\n            return \"\"\n        t = re.sub(r'[\\u064B-\\u065F\\u0670\\u0610-\\u061A\\u06D6-\\u06ED]', '', text)\n        t = t.replace('\\u0640', '')\n        t = re.sub(r'[إأآٱ]', 'ا', t)\n        t = re.sub(r'ة', 'ه', t)\n        t = re.sub(r'ى', 'ي', t)\n        return t.strip()\n\n    def search_narrator(self, query: str, limit: int = 5) -> str:\n        \"\"\"\n        Search the 115,735 Rijal database using full-text search (FTS5) or normalized Arabic matching.\n        \n        :param query: Name, kunya, or title of the narrator (e.g. 'سفيان الثوري', 'الزهري', 'شعبة').\n        :param limit: Maximum results to return (default: 5).\n        :return: JSON formatted list of matching narrators with ID, full name, grade, death year, and city.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        q_clean = query.strip()\n        q_norm = self._normalize_arabic(q_clean)\n        if not q_norm:\n            return json.dumps({\"error\": \"Query cannot be empty.\"}, ensure_ascii=False)\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            # Try FTS5 first\n            fts_query = \" \".join([f'\"{w}\"*' for w in q_norm.split() if len(w) >= 2])\n            rows = []\n            if fts_query:\n                try:\n                    cur.execute(\"\"\"\n                        SELECT n.id, n.full_name, n.grade_ar, n.grade_en, n.death, n.city, n.tabaqat\n                        FROM narrators_fts f\n                        JOIN narrators n ON f.rowid = n.id\n                        WHERE narrators_fts MATCH ?\n                        LIMIT ?\n                    \"\"\", (fts_query, limit))\n                    rows = cur.fetchall()\n                except Exception:\n                    rows = []\n\n            # Fallback to LIKE if FTS yielded few or no results\n            if not rows:\n                cur.execute(\"\"\"\n                    SELECT id, full_name, grade_ar, grade_en, death, city, tabaqat\n                    FROM narrators\n                    WHERE full_name_norm LIKE ? OR full_name_norm LIKE ?\n                    LIMIT ?\n                \"\"\", (f\"%{q_norm}%\", f\"%{q_clean}%\", limit))\n                rows = cur.fetchall()\n\n            conn.close()\n\n            results = []\n            for r in rows:\n                results.append({\n                    \"id\": r[0],\n                    \"name\": r[1],\n                    \"grade_ar\": r[2] or \"غير محدد\",\n                    \"grade_en\": r[3] or \"unspecified\",\n                    \"death\": r[4] or \"غير معروف\",\n                    \"city\": r[5] or \"غير محدد\",\n                    \"tabaqat\": r[6] or \"غير محدد\"\n                })\n\n            return json.dumps({\n                \"query\": query,\n                \"matches_count\": len(results),\n                \"narrators\": results\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Narrator search failed: {str(e)}\"}, ensure_ascii=False)\n\n    def get_narrator_biography(self, narrator_id: int) -> str:\n        \"\"\"\n        Fetch complete biographical profile of a narrator by their database ID.\n        \n        :param narrator_id: Integer ID of the narrator from search_narrator.\n        :return: JSON formatted detailed biography including classical sources, teachers, and students.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            cur.execute(\"\"\"\n                SELECT id, full_name, kunya, grade_ar, grade_en, death, city, tabaqat,\n                       laqab, nasab, classical_sources, teachers, students, namings\n                FROM narrators\n                WHERE id = ?\n                LIMIT 1\n            \"\"\", (narrator_id,))\n            row = cur.fetchone()\n            conn.close()\n\n            if not row:\n                return json.dumps({\"error\": f\"Narrator ID {narrator_id} not found.\"}, ensure_ascii=False)\n\n            def parse_list(val):\n                if not val: return []\n                try:\n                    parsed = json.loads(val)\n                    return parsed if isinstance(parsed, list) else [val]\n                except Exception:\n                    return [s.strip() for s in val.split(\";\") if s.strip()]\n\n            return json.dumps({\n                \"id\": row[0],\n                \"full_name\": row[1],\n                \"kunya\": row[2] or \"\",\n                \"grade_ar\": row[3] or \"غير محدد\",\n                \"grade_en\": row[4] or \"unspecified\",\n                \"death\": row[5] or \"غير معروف\",\n                \"city\": row[6] or \"غير محدد\",\n                \"tabaqat\": row[7] or \"غير محدد\",\n                \"laqab\": row[8] or \"\",\n                \"nasab\": row[9] or \"\",\n                \"classical_sources\": parse_list(row[10]),\n                \"teachers\": parse_list(row[11]),\n                \"students\": parse_list(row[12]),\n                \"alternate_namings\": parse_list(row[13])\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Biography lookup failed: {str(e)}\"}, ensure_ascii=False)\n\n    def get_book_narrator_network(self, book: str, narrator_name: str = \"\") -> str:\n        \"\"\"\n        Inspect precomputed transmission network for a specific canonical book, revealing central narrators and their links.\n        \n        :param book: Collection name: 'bukhari', 'muslim', 'tirmidhi', 'abudawud', 'nasai', 'ibnmajah', 'ahmed', 'malik', 'darimi'.\n        :param narrator_name: Optional narrator name to focus on within that book's network.\n        :return: JSON formatted top nodes and transmission links.\n        \"\"\"\n        if not os.path.exists(self.valves.DB_PATH):\n            return json.dumps({\"error\": \"Database not found.\"}, ensure_ascii=False)\n\n        book = book.lower().strip()\n        norm_name = self._normalize_arabic(narrator_name) if narrator_name else \"\"\n\n        try:\n            conn = sqlite3.connect(self.valves.DB_PATH)\n            cur = conn.cursor()\n\n            if norm_name:\n                cur.execute(\"\"\"\n                    SELECT name, count, grade_ar, grade_en, death, places\n                    FROM isnad_nodes\n                    WHERE LOWER(book) = ? AND (name_norm LIKE ? OR name LIKE ?)\n                    LIMIT 5\n                \"\"\", (book, f\"%{norm_name}%\", f\"%{narrator_name}%\"))\n                nodes = cur.fetchall()\n\n                cur.execute(\"\"\"\n                    SELECT source_name, target_name, weight\n                    FROM isnad_links\n                    WHERE LOWER(book) = ? AND (source_name LIKE ? OR target_name LIKE ?)\n                    ORDER BY weight DESC\n                    LIMIT 10\n                \"\"\", (book, f\"%{narrator_name}%\", f\"%{narrator_name}%\"))\n                links = cur.fetchall()\n            else:\n                cur.execute(\"\"\"\n                    SELECT name, count, grade_ar, grade_en, death, places\n                    FROM isnad_nodes\n                    WHERE LOWER(book) = ?\n                    ORDER BY count DESC\n                    LIMIT 10\n                \"\"\", (book,))\n                nodes = cur.fetchall()\n\n                cur.execute(\"\"\"\n                    SELECT source_name, target_name, weight\n                    FROM isnad_links\n                    WHERE LOWER(book) = ?\n                    ORDER BY weight DESC\n                    LIMIT 15\n                \"\"\", (book,))\n                links = cur.fetchall()\n\n            conn.close()\n\n            node_list = []\n            for n in nodes:\n                node_list.append({\n                    \"name\": n[0],\n                    \"hadith_count_in_book\": n[1],\n                    \"grade_ar\": n[2],\n                    \"grade_en\": n[3],\n                    \"death\": n[4],\n                    \"locations\": n[5]\n                })\n\n            link_list = []\n            for l in links:\n                link_list.append({\n                    \"source\": l[0],\n                    \"target\": l[1],\n                    \"transmission_frequency\": l[2]\n                })\n\n            return json.dumps({\n                \"book\": book,\n                \"focus_narrator\": narrator_name or \"All Top Transmitters\",\n                \"top_nodes\": node_list,\n                \"strongest_links\": link_list\n            }, ensure_ascii=False, indent=2)\n\n        except Exception as e:\n            return json.dumps({\"error\": f\"Transmission network lookup failed: {str(e)}\"}, ensure_ascii=False)\n"
+}

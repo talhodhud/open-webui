@@ -1,0 +1,24 @@
+{
+  "name": "hadith-theme-poc",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "dev": "vite --host 127.0.0.1 --port 5175"
+  },
+  "dependencies": {
+    "svelte": "5.53.10",
+    "gsap": "3.14.2",
+    "lucide-svelte": "0.468.0",
+    "@fontsource/readex-pro": "5.2.8",
+    "@fontsource/amiri": "5.2.6"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "4.0.4",
+    "vite": "5.4.21",
+    "svelte-check": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}
