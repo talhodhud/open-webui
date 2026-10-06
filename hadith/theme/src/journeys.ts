@@ -309,7 +309,9 @@ export function buildFollowupURL(origin: string, id: string, index: number, opti
 
   const isUnified = options.mode === 'unified';
   const modelId = isUnified ? 'bayan-unified-pilot' : (action.modelId || FOLLOWUP_MODELS[id]?.[index] || journey.modelId);
-  const prompt = `الموضوع: ${journey.title}. سؤال الحالة الأصلي: ${journey.question}\nالمطلوب الآن: ${action.prompt}\nهذه مسودة مستقلة ولا تتضمن نتائج المحادثة السابقة. استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم. إذا لم يتحدد النص المقصود فاعرض المرشحين للاختيار. اعرض ما استرجعته فقط، وأبقِ الفجوات والالتباس وحالة المراجعة ظاهرة، ولا تفترض منتهى نبويًا لكل أثر.`;
+  const skillTag = isUnified && action.unifiedSkillId ? `<$${action.unifiedSkillId}> ` : '';
+  const occText = options.occurrenceIds && options.occurrenceIds.length > 0 ? `\nالسجل المحدد: ${options.occurrenceIds.join(', ')}` : '';
+  const prompt = `${skillTag}الموضوع: ${journey.title}. سؤال الحالة الأصلي: ${journey.question}\nالمطلوب الآن: ${action.prompt}${occText}\nهذه مسودة مستقلة ولا تتضمن نتائج المحادثة السابقة. استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم. إذا لم يتحدد النص المقصود فاعرض المرشحين للاختيار. اعرض ما استرجعته فقط، وأبقِ الفجوات والالتباس وحالة المراجعة ظاهرة، ولا تفترض منتهى نبويًا لكل أثر.`;
   
   const url = new URL(buildJourneyURL(origin, id, options.submit ?? false, prompt, options));
   url.searchParams.set('model', modelId);
@@ -353,15 +355,23 @@ export function buildJourneyURL(
   if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Invalid application origin');
 
   const model = options.mode === 'unified' ? journey.unifiedModelId : journey.modelId;
-  const q = question || journey.question;
+  const q = question || (journey.topic && (options.audience || options.format)
+    ? topicQuestion(journey, options.audience || 'newcomer', options.format || 'card')
+    : journey.question);
 
-  url.search = new URLSearchParams({
+  const searchParams = new URLSearchParams({
     model,
     q,
     submit: String(submit),
     athar: 'chat',
     case: journey.id
-  }).toString();
+  });
+  if (options.audience) searchParams.set('audience', options.audience);
+  if (options.format) searchParams.set('format', options.format);
+  if (options.occurrenceIds && options.occurrenceIds.length > 0) {
+    searchParams.set('occurrenceIds', options.occurrenceIds.join(','));
+  }
+  url.search = searchParams.toString();
   return url.toString();
 }
 
