@@ -6,6 +6,7 @@
  export let apiBase: string;
  export let webuiOrigin: string;
  export let onClose: () => void;
+ export let onVariant2: () => void = onClose;
  export let onReady: (fn: (view:'landing'|'workspace')=>void) => void;
  let root: HTMLElement;
  let view: 'landing'|'workspace'='landing';
@@ -20,7 +21,7 @@
  $: compared=response?.results.find(r=>r.record_id===compareId);
  $: isSaved=!!selected && saved.some(r=>r.record_id===selected?.record_id);
  const examples=['الأعمال بالنيات','فليقل خيرا أو ليصمت','يسروا ولا تعسروا'];
- function animateEntry(){ if(canAnimate && root) gsap.fromTo(root.querySelectorAll('[data-enter]'),{opacity:0,y:16},{opacity:1,y:0,duration:.7,stagger:.065,ease:'power3.out',clearProps:'transform'}); }
+ function animateEntry(selector='[data-enter]'){ if(canAnimate && root) gsap.fromTo(root.querySelectorAll(selector),{opacity:0,y:12},{opacity:1,y:0,duration:.45,stagger:.045,ease:'power3.out',clearProps:'transform'}); }
  async function showWorkspace(mode:'learn'|'research'){persona=mode;view='workspace';mobileNav=false;await tick();root.closest('dialog')?.scrollTo({top:0});animateEntry();}
  async function search(value=query){
   query=value.trim(); if(!query || busy)return;
@@ -28,11 +29,11 @@
   try{
    const res=await fetch(`${apiBase}/search?${new URLSearchParams({query,collection})}`,{signal:aborter.signal,credentials:'omit'});
    const data=await res.json(); if(!res.ok)throw new Error(data.message||'تعذّر الوصول إلى فهرس البحث.');
-   if(request!==requestNo)return;response=data;await tick();animateEntry();
+   if(request!==requestNo)return;response=data;
   }catch(e){if((e as Error).name!=='AbortError')error=(e as Error).message.includes('fetch')?'خدمة البحث المحلية غير متاحة. شغّل خدمة تجربة الواجهة ثم أعد المحاولة.':(e as Error).message;}
-  finally{if(request===requestNo)busy=false;}
+  finally{if(request===requestNo){busy=false;await tick();animateEntry('.result-card');}}
  }
- async function selectRecord(record:HadithRecord){selected=record;activeTab='text';narrator=-1;sourceOpen=false;compareId=response?.results.find(r=>r.record_id!==record.record_id)?.record_id||'';await tick();animateEntry();}
+ async function selectRecord(record:HadithRecord){selected=record;activeTab='text';narrator=-1;sourceOpen=false;compareId=response?.results.find(r=>r.record_id!==record.record_id)?.record_id||'';await tick();root.querySelector('.evidence-layout')?.scrollIntoView({block:'start',behavior:canAnimate?'smooth':'instant'});animateEntry('.evidence-layout');}
  function reset(){aborter?.abort();requestNo++;busy=false;response=null;selected=null;searched=false;query='';error='';notice='';trayOpen=false;}
  function saveRecord(){if(!selected)return;const wasSaved=isSaved;if(wasSaved){saved=saved.filter(r=>r.record_id!==selected?.record_id);}else{saved=[...saved,selected];}notice=wasSaved?'أزيل النص من دفتر الجلسة.':'أضيف النص إلى دفتر هذه الجلسة.';}
  async function copyRecord(){if(!selected)return;try{await navigator.clipboard.writeText(`${selected.arabic}\n\n${selected.citation}`);copied=true;setTimeout(()=>copied=false,2000);}catch{notice='النسخ غير متاح في هذا المتصفح. يمكنك تحديد النص والمصدر ونسخهما.';}}
@@ -42,7 +43,7 @@
  async function copyMermaid(){try{await navigator.clipboard.writeText(mermaid());notice='نُسخ مخطط هذا السجل فقط بصيغة Mermaid.';}catch{notice='تعذّر النسخ من المتصفح.';}}
  onMount(()=>{
    const mm=gsap.matchMedia();mm.add('(prefers-reduced-motion: no-preference)',()=>{canAnimate=true;animateEntry();return()=>{canAnimate=false;};});
-   onReady((next)=>{view=next;tick().then(animateEntry);});
+   onReady((next)=>{view=next;tick().then(()=>animateEntry());});
    return()=>{mm.revert();aborter?.abort();};
  });
 </script>
@@ -54,7 +55,7 @@
    <header class="landing-nav">
     <button class="brand" on:click={()=>{view='landing';}} aria-label="أثر — الصفحة الرئيسية"><span class="brand-symbol"><GitBranch size={24}/></span><span class="wordmark">أثــر</span><span class="brand-caption">معرفةٌ يُستدلّ عليها</span></button>
     <nav class="landing-links" aria-label="التنقل"><button on:click={()=>root.querySelector('#journeys')?.scrollIntoView({behavior:canAnimate?'smooth':'instant'})}>رحلتك مع الحديث</button><button on:click={()=>root.querySelector('#approach')?.scrollIntoView({behavior:canAnimate?'smooth':'instant'})}>منهجنا</button><span class="quiet-tag">تجربة تصميمية</span></nav>
-    <button class="return-light" on:click={onClose}>الواجهة الحالية <ArrowUpLeft size={16}/></button>
+    <div class="variant-actions"><button class="return-light" on:click={onVariant2}>بيان السُّنّة · المحادثة <ArrowUpLeft size={16}/></button><button class="return-light" on:click={onClose}>الأصلية <ArrowUpLeft size={16}/></button></div>
    </header>
    <main>
     <div class="hero">
@@ -80,11 +81,12 @@
     </section>
     <section class="approach" id="approach"><span class="eyebrow">وضوحٌ في كل خطوة</span><h2>جمال التجربة، في وضوح الدليل.</h2><div class="approach-grid"><div><span>01</span><h3>اعثر على النص</h3><p>مطابقات من فهرس الكتب الستة، مع إبراز الكلمات التي تبحث عنها.</p></div><div><span>02</span><h3>افتح المصدر</h3><p>النص الأصلي، وموضعه في النسخة الرقمية، وحالة مراجعته.</p></div><div><span>03</span><h3>واصل على بيّنة</h3><p>اختيار محفوظ أثناء الفحص، ونسخٌ يحمل المصدر معه.</p></div></div></section>
    </main>
-   <footer class="landing-footer"><span class="wordmark">أثــر</span><span>تصوّر واجهة مشروع الحديث · هاكاثون الذكاء الاصطناعي الإسلامي</span><span>Powered by <b>Open WebUI</b></span></footer>
+   <footer class="landing-footer"><span class="wordmark">أثــر</span><span>تصوّر واجهة مشروع الحديث · هاكاثون الذكاء الاصطناعي الإسلامي</span><span>مشروع <b>بيان السنة</b></span></footer>
   </section>
  {:else}
   <div class="workspace" class:research>
    <aside class:mobile-open={mobileNav} class="sidebar">
+    <button class="mobile-only close-menu icon-button" aria-label="أغلق قائمة المساحة" on:click={()=>mobileNav=false}><X size={18}/></button>
     <button class="brand" on:click={()=>{view='landing';}}><span class="brand-symbol"><GitBranch size={22}/></span><span class="wordmark">أثــر</span><span class="lab-label">مختبر الواجهة</span></button>
     <button class="new-journey" on:click={reset}><Sparkles size={16}/> رحلة جديدة <span>+</span></button>
     <span class="sidebar-label">مساحتك المعرفية</span>
@@ -93,10 +95,10 @@
     <div class="side-separator"></div><span class="sidebar-label">عدسة العرض</span>
     <button class="persona-option" class:chosen={!research} on:click={()=>{persona='learn';}}><BookOpen size={17}/><span>تعلّم وافهم<small>مسار مبسّط نحو المعنى</small></span>{#if !research}<Check size={15}/>{/if}</button>
     <button class="persona-option" class:chosen={research} on:click={()=>{persona='research';}}><GitBranch size={17}/><span>ابحث وقارن<small>تفاصيل النص والمصدر</small></span>{#if research}<Check size={15}/>{/if}</button>
-    <div class="sidebar-bottom"><div class="integrity-note"><ShieldCheck size={20}/><p>قيمة المعرفة<br/><strong>في إمكانية تتبّعها.</strong></p></div><span class="powered">Powered by Open WebUI</span></div>
+    <div class="sidebar-bottom"><div class="integrity-note"><ShieldCheck size={20}/><p>قيمة المعرفة<br/><strong>في إمكانية تتبّعها.</strong></p></div><span class="powered">مشروع بيان السنة</span></div>
    </aside>
    <div class="workspace-body">
-    <header class="workspace-top"><div class="breadcrumb"><button class="icon-button mobile-only" aria-label="افتح قائمة المساحة" on:click={()=>mobileNav=!mobileNav}><PanelRightClose size={20}/></button><span>مساحة {research?'الباحث':'المعرفة'}</span><ChevronLeft size={13}/><strong>{trayOpen?'دفتر المصادر':searched?'من الكلمة إلى الدليل':'بداية الرحلة'}</strong></div><div class="top-actions"><span class="preview-label"><span></span> واجهة تجريبية</span><button class="original-button" on:click={onClose}>العودة للواجهة الحالية <ArrowUpLeft size={15}/></button></div></header>
+    <header class="workspace-top"><div class="breadcrumb"><button class="icon-button mobile-only" aria-label="افتح قائمة المساحة" on:click={()=>mobileNav=!mobileNav}><PanelRightClose size={20}/></button><span>مساحة {research?'الباحث':'المعرفة'}</span><ChevronLeft size={13}/><strong>{trayOpen?'دفتر المصادر':searched?'من الكلمة إلى الدليل':'بداية الرحلة'}</strong></div><div class="top-actions"><button class="original-button" on:click={onVariant2}>بيان السُّنّة · المحادثة <ArrowUpLeft size={15}/></button><button class="original-button" on:click={onClose}>الأصلية <ArrowUpLeft size={15}/></button></div></header>
     <main class="workspace-main">
      {#if trayOpen}
       <div class="page-heading" data-enter><span class="eyebrow">ما اخترتَ الاحتفاظ به</span><h1>دفتر المصادر</h1><p>نصوص ومراجع لهذه الجلسة. صدّرها للاحتفاظ بها.</p></div>

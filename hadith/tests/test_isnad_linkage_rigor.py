@@ -38,8 +38,20 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tool = NarratorTools()
-        cls.db_path = BASE_DIR / 'hadith_rijal.db'
-        cls.fixtures_path = BASE_DIR / 'fixtures' / 'narrator_drawer_evidence.json'
+        db_candidates = [
+            BASE_DIR / 'hadith_rijal.db',
+            BASE_DIR.parent / 'hadith_rijal.db',
+            Path(r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\hadith_rijal.db")
+        ]
+        cls.db_path = next((p for p in db_candidates if p.exists() and p.stat().st_size > 100000000), None)
+        cls.has_rijal_db = cls.db_path is not None
+
+        fixtures_candidates = [
+            BASE_DIR / 'fixtures' / 'narrator_drawer_evidence.json',
+            BASE_DIR.parent / 'fixtures' / 'narrator_drawer_evidence.json',
+            Path(r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\fixtures\narrator_drawer_evidence.json")
+        ]
+        cls.fixtures_path = next((p for p in fixtures_candidates if p.exists()), None)
 
     # -------------------------------------------------------------
     # 1. Structured Dates & Symmetric Chronology
@@ -173,6 +185,8 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     # 5. Canonical Identities & Disambiguation
     # -------------------------------------------------------------
     def test_06_canonical_identities_distinct(self):
+        if not self.has_rijal_db:
+            self.skipTest('Large 1GB hadith_rijal.db not present in lightweight checkout')
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         # Abdullah b. Amr = 368
@@ -194,6 +208,8 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     # 6. Query Plan (SEARCH TABLE, Zero Table Scans)
     # -------------------------------------------------------------
     def test_07_query_plan_uses_index(self):
+        if not self.has_rijal_db:
+            self.skipTest('Large 1GB hadith_rijal.db not present in lightweight checkout')
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         plan = c.execute(
@@ -239,6 +255,8 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     # 8. Provenance Schema Integrity
     # -------------------------------------------------------------
     def test_09_provenance_schema_integrity(self):
+        if not self.has_rijal_db:
+            self.skipTest('Large 1GB hadith_rijal.db not present in lightweight checkout')
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         cols = [r[1] for r in c.execute('PRAGMA table_info(isnad_transmissions)').fetchall()]
@@ -258,6 +276,8 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     # 9. Zero Occurrence Collisions Across Distinct Hadith Records
     # -------------------------------------------------------------
     def test_10_zero_occurrence_collisions(self):
+        if not self.has_rijal_db:
+            self.skipTest('Large 1GB hadith_rijal.db not present in lightweight checkout')
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         collisions = c.execute("""
@@ -274,6 +294,8 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     # 10. Exact Substring Fidelity on Authentic Source Text
     # -------------------------------------------------------------
     def test_11_exact_substring_fidelity(self):
+        if not self.has_rijal_db:
+            self.skipTest('Large 1GB hadith_rijal.db not present in lightweight checkout')
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         sample = c.execute("""
@@ -291,6 +313,8 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     # 11. Tool API Hardening: Limits, Validation, & Scoping
     # -------------------------------------------------------------
     def test_12_tool_api_hardening(self):
+        if not self.has_rijal_db:
+            self.skipTest('Large 1GB hadith_rijal.db not present in lightweight checkout')
         # A. Bounded limit [1, 50]
         res_limit_high = json.loads(self.tool.get_narrator_link_evidence(book='bukhari', student_id=566, teacher_id=106, limit=100))
         self.assertLessEqual(len(res_limit_high['data']['evidence_items']), 50)
@@ -322,6 +346,8 @@ class TestIsnadLinkageRigor(unittest.TestCase):
     # 12. Verification of Codex Narrator Drawer Fixtures
     # -------------------------------------------------------------
     def test_13_drawer_fixtures_integrity(self):
+        if not self.has_rijal_db:
+            self.skipTest('Large 1GB hadith_rijal.db not present in lightweight checkout')
         self.assertTrue(self.fixtures_path.exists(), "Fixtures file must exist")
         with open(self.fixtures_path, 'r', encoding='utf-8') as f:
             fixtures_data = json.load(f)

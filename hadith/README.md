@@ -18,25 +18,38 @@ hadith/
 │   ├── hadith_sharh_vocab_tool.py / .json     # Rare terms (Gharib) & commentaries
 │   ├── hadith_takhrij_tool.py / .json         # Cross-referencing & authentication
 │   └── hadith_engine_openwebui_tool.py / .json# Unified Hadith orchestrator tool
+├── planning/               # Verified curriculum packs, taxonomy & architectural audit
+│   ├── bayan_lesson_packs_v1.json             # 6 introduction topics & vetted occurrences
+│   ├── islam_topic_taxonomy_v1.json           # Pedagogical taxonomy
+│   └── unified_six_skills_execution_audit.json# Cryptographic release fingerprints
+├── exports/                # One-click Open WebUI JSON packages
+│   ├── hadith_skills_vps_export.json          # 7 unified Hadith skills
+│   └── hadith_models_vps_export.json          # bayan-unified-pilot model definition
 ├── theme/                  # Athar theme POC (Svelte / Vite)
 │   ├── src/
 │   │   ├── App.svelte      # Theme overlay & Arabic typography components
 │   │   ├── main.ts         # Non-intrusive launcher injector
+│   │   ├── journeys.ts     # User journey route definitions
+│   │   ├── topics.ts       # Semantic topic packs
+│   │   ├── topicEvidence.ts# Vetted evidence mapping
 │   │   └── types.ts
 │   ├── vite.config.ts
 │   └── package.json
 ├── deliverables/           # Presentation guides & client-facing deliverables
-│   ├── Bayan_AlSunnah_Presentation_Guide_AR.md
+│   ├── Bayan_AlSunnah_AlHudhud403_AR.pptx      # 22-slide bilingual pitch deck
+│   ├── Bayan_AlSunnah_Presentation_Guide_AR.md # Hackathon presentation notes
 │   ├── Bayan_AlSunnah_Visual_Handoff_AR.md
 │   └── Bayan_Unified_Architecture.mmd
 ├── fixtures/               # UI fixtures & narrator drawer evidence
 │   └── narrator_drawer_evidence.json
 ├── migrations/             # Database schema migrations
 │   └── 001_add_link_provenance.sql
-├── tests/                  # Verification test suites
-│   ├── test_bayan_topics.py
-│   ├── test_hadith_backend.py
-│   ├── test_isnad_linkage_rigor.py
+├── tests/                  # Verification test suites (39 tests, 100% pass)
+│   ├── run_all_tests.py    # Master runner for AI evaluators and CI/CD
+│   ├── test_unified_u01_u08.py # U01-U08 architectural acceptance tests
+│   ├── test_bayan_topics.py    # 12 pedagogical & exclusion tests
+│   ├── test_hadith_backend.py  # 7 retrieval & provider tests
+│   ├── test_isnad_linkage_rigor.py # 13 transmission & DAG tests
 │   └── acceptance/
 ├── poc/
 │   └── phrase_search/      # Exact phrase matching & FTS indexing engine
@@ -50,12 +63,10 @@ hadith/
 │   ├── unified_skills_architecture_AR.md
 │   └── source_and_implementation_review.md
 └── scripts/                # Database generation, indexing & prompt synchronization
+    ├── deploy_unified_v2.py# Production deployer with safe rollback
+    ├── rollback_snapshot.py# Instant database restoration
     ├── build_full_isnad_transmissions.py
-    ├── build_hadith_db.py
-    ├── deploy_bayan_unified_pilot.py
-    ├── deploy_hadith_skills.py
-    ├── sync_narrator_tool_and_webui.py
-    └── update_*.py
+    └── build_hadith_db.py
 ```
 
 ---

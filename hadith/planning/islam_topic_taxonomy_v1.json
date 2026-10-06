@@ -1,0 +1,280 @@
+{
+  "schema_version": "1.0",
+  "taxonomy_title": "Bayan al-Sunnah: Six-Topic Introduction to Islam Taxonomy",
+  "description": "Semantic taxonomy mapping 336 canonical chapters across the six Hadith collections to six core introductory topics for educators, new Muslims, and interested newcomers. Preserves source chapter titles, normalizes aliases, defines subtopics, records confidence, and explicitly identifies negative exclusion rules and multi-label intersections.",
+  "corpus_basis": {
+    "collections": [
+      "bukhari",
+      "muslim",
+      "abudawud",
+      "tirmidhi",
+      "nasai",
+      "ibnmajah"
+    ],
+    "total_chapters": 336,
+    "total_occurrences": 34240
+  },
+  "topics": [
+    {
+      "id": "topic-faith",
+      "title_ar": "الإيمان والمعنى",
+      "title_en": "Faith and Purpose",
+      "initial_question_ar": "كيف يربط الإسلام الإيمان بالنية والعمل؟",
+      "initial_question_en": "How does Islam connect inner faith with intention and daily action?",
+      "subtopics": [
+        {
+          "id": "faith_intention",
+          "title_ar": "النية والإخلاص وتجريد القصد لله",
+          "learning_objective": "فهم أن الأعمال في الإسلام لا تُقاس بظاهرها المادي فحسب، بل بصدق القصد الباطني ونقاء النية."
+        },
+        {
+          "id": "faith_pillars",
+          "title_ar": "أركان الإيمان وأثرها في سكينة النفس",
+          "learning_objective": "استيعاب ركائز الإيمان بالله ورسله واليوم الآخر كمنظومة تعطي الإنسان طمأنينة وغاية في الوجود."
+        },
+        {
+          "id": "faith_conduct",
+          "title_ar": "الإيمان سلوك عملي ومسؤولية أخلاقية",
+          "learning_objective": "إدراك أن الإيمان الصادق يثمر حياءً وحسن تعامل وأمانة، وأن دعوى الإيمان بلا عمل دعوى جوفاء."
+        }
+      ],
+      "semantic_chapter_patterns": [
+        "كتاب الإيمان",
+        "كتاب بدء الوحى",
+        "كتاب الرقاق",
+        "كتاب القدر"
+      ],
+      "negative_exclusion_rules": [
+        {
+          "pattern": "كتاب الأيمان والنذور",
+          "reason": "Homonym clash: 'الأَيمان' in classical Arabic denotes legal oaths, dispute swearing, and penances (kaffarah), which is juristic procedural law, completely distinct from 'الإِيمان' (spiritual faith)."
+        },
+        {
+          "pattern": "أبواب الردة والقتال التفصيلية",
+          "reason": "Juristic dispute texts that require historical context and lead to misunderstanding if introduced to basic seekers without foundational faith."
+        }
+      ],
+      "multi_label_intersections": [
+        "topic-knowledge",
+        "topic-mercy"
+      ],
+      "mapping_method": "Semantic matn-anchored chapter grouping + negative title disambiguation",
+      "confidence": "high",
+      "review_status": "reviewed_taxonomy_v1"
+    },
+    {
+      "id": "topic-mercy",
+      "title_ar": "الرحمة وحسن الخلق",
+      "title_en": "Mercy and Good Character",
+      "initial_question_ar": "كيف تظهر الرحمة في تعامل المسلم مع الناس؟",
+      "initial_question_en": "How is mercy manifested in a Muslim's interaction with humanity and creation?",
+      "subtopics": [
+        {
+          "id": "mercy_universal",
+          "title_ar": "الرحمة الشاملة بالبشر والحيوان وسائر الخلق",
+          "learning_objective": "إبراز أن رسالة النبي ﷺ قائمة على الرحمة العامة، وأن الإحسان للحيوان والضعيف سبب لمغفرة الله."
+        },
+        {
+          "id": "mercy_gentleness",
+          "title_ar": "الرفق ونبذ العنف والغلظة",
+          "learning_objective": "بيان فضل الرفق والتأني في معالجة الأمور، وأن ما كان الرفق في شيء إلا زانه."
+        },
+        {
+          "id": "mercy_character",
+          "title_ar": "بشاشة الوجه وطيب الكلام والتواضع",
+          "learning_objective": "تبيان أن التبسم والكلمة الطيبة والصفح من صميم الدين ومراتب الفضل عند الله."
+        }
+      ],
+      "semantic_chapter_patterns": [
+        "كتاب الأدب",
+        "كتاب البر والصلة والآداب",
+        "كتاب الرقاق"
+      ],
+      "negative_exclusion_rules": [
+        {
+          "pattern": "أدعية الاستفتاح والطهور المحتوية على جذر (رحم)",
+          "reason": "Incidental supplications during ritual washing or funeral procedures that mention divine mercy incidentally but do not instruct on moral/ethical conduct towards fellow beings."
+        }
+      ],
+      "multi_label_intersections": [
+        "topic-family",
+        "topic-fairness"
+      ],
+      "mapping_method": "Matn thematic cluster of rahma and rifq + incidental supplication exclusion",
+      "confidence": "high",
+      "review_status": "reviewed_taxonomy_v1"
+    },
+    {
+      "id": "topic-worship",
+      "title_ar": "العبادة والحياة",
+      "title_en": "Worship and Life",
+      "initial_question_ar": "ما الصلة بين العبادة والحياة اليومية؟",
+      "initial_question_en": "What is the connection between Islamic worship and everyday life?",
+      "subtopics": [
+        {
+          "id": "worship_prayer",
+          "title_ar": "الصلاة: معراج الروح ومحطة السكينة اليومية",
+          "learning_objective": "إدراك الصلاة كصلة مستمرة بالله تريح القلب وتنهى عن الفحشاء والمنكر وتضبط إيقاع اليوم."
+        },
+        {
+          "id": "worship_fasting",
+          "title_ar": "الصوم: تدريب الإرادة ومواساة المحتاجين",
+          "learning_objective": "فهم الصيام كوسيلة للتحكم في الشهوات والشعور الفعلي بجوع الفقراء وتزكية النفس."
+        },
+        {
+          "id": "worship_solidarity",
+          "title_ar": "الزكاة والصدقة: النماء والتكافل المجتمعي",
+          "learning_objective": "بيان أن التصدق ليس مجرد ضريبة مالية بل تطهير للمال وشعور بالمسؤولية التكافلية تجاه المحتاجين."
+        }
+      ],
+      "semantic_chapter_patterns": [
+        "كتاب الصلاة",
+        "كتاب الصوم",
+        "كتاب الزكاة",
+        "كتاب العمل فى الصلاة"
+      ],
+      "negative_exclusion_rules": [
+        {
+          "pattern": "أبواب سجود السهو ومسائل القبلة التفصيلية الخلافية",
+          "reason": "Juristic procedural branches intended for fiqh specialization, unsuitable for foundational introduction."
+        }
+      ],
+      "multi_label_intersections": [
+        "topic-faith",
+        "topic-fairness"
+      ],
+      "mapping_method": "Pillar-anchored core texts selected for spiritual and communal significance",
+      "confidence": "high",
+      "review_status": "reviewed_taxonomy_v1"
+    },
+    {
+      "id": "topic-family",
+      "title_ar": "الأسرة والجوار",
+      "title_en": "Family and Neighbors",
+      "initial_question_ar": "كيف يحفظ الإسلام حقوق الأسرة والجار؟",
+      "initial_question_en": "How does Islam safeguard family bonds and neighborly rights?",
+      "subtopics": [
+        {
+          "id": "family_parents",
+          "title_ar": "بر الوالدين وصلة الأرحام",
+          "learning_objective": "إظهار منزلة الأم والأب في الإسلام كأعظم الواجبات الاجتماعية بعد التوحيد."
+        },
+        {
+          "id": "family_neighbors",
+          "title_ar": "حقوق الجار وحرمة إيذائه وإكرامه",
+          "learning_objective": "بيان الوصية النبوية المتكررة بالجار مسلماً كان أو غير مسلم، وحرمة ترويعه أو بخسه."
+        },
+        {
+          "id": "family_spouses",
+          "title_ar": "المودة والرحمة وحسن العشرة الزوجية",
+          "learning_objective": "فهم المعيار النبوي للرجولة والخيرية: «خيركم خيركم لأهله وأنا خيركم لأهلي»."
+        }
+      ],
+      "semantic_chapter_patterns": [
+        "كتاب النكاح",
+        "كتاب الأدب",
+        "كتاب النفقات",
+        "كتاب البر والصلة"
+      ],
+      "negative_exclusion_rules": [
+        {
+          "pattern": "أبواب اللعان والميراث والحضانة القضائية الخلافية",
+          "reason": "Judicial resolution codes that confuse introductory understanding of moral family foundation."
+        }
+      ],
+      "multi_label_intersections": [
+        "topic-mercy",
+        "topic-fairness"
+      ],
+      "mapping_method": "Kinship & neighborliness hadith cluster with judicial isolation",
+      "confidence": "high",
+      "review_status": "reviewed_taxonomy_v1"
+    },
+    {
+      "id": "topic-fairness",
+      "title_ar": "العدل والأمانة",
+      "title_en": "Justice and Trustworthiness",
+      "initial_question_ar": "كيف تحضر الأمانة والعدل في التعاملات؟",
+      "initial_question_en": "How are justice, honesty, and trust manifested in trade and daily interactions?",
+      "subtopics": [
+        {
+          "id": "fairness_trade",
+          "title_ar": "الصدق في البيع والشراء والتحذير من الغش",
+          "learning_objective": "إدراك مكانة التاجر الصدوق الأمين، وحرمة التطفيف والغش والخداع."
+        },
+        {
+          "id": "fairness_justice",
+          "title_ar": "حرمة الظلم وأداء الحقوق إلى أهلها",
+          "learning_objective": "بيان تحريم الظلم حتى مع المخالف، وإيفاء الأجير حقه قبل أن يجف عرقه."
+        },
+        {
+          "id": "fairness_trust",
+          "title_ar": "رعاية الأمانة والوفاء بالعهود",
+          "learning_objective": "ترسيخ أن خيانة الأمانة ونقض العهد من سمات النفاق المنافية لجوهر الإسلام."
+        }
+      ],
+      "semantic_chapter_patterns": [
+        "كتاب البيوع",
+        "كتاب المظالم",
+        "كتاب الإجارة",
+        "كتاب الشهادات",
+        "كتاب الصلح"
+      ],
+      "negative_exclusion_rules": [
+        {
+          "pattern": "أبواب الربا المصرفي المعقد والديات والقصاص الجنائي",
+          "reason": "Detailed penal and specialized financial regulations that obscure the universal moral principles of justice."
+        }
+      ],
+      "multi_label_intersections": [
+        "topic-faith",
+        "topic-knowledge"
+      ],
+      "mapping_method": "Contractual ethics and anti-oppression matn isolation",
+      "confidence": "high",
+      "review_status": "reviewed_taxonomy_v1"
+    },
+    {
+      "id": "topic-knowledge",
+      "title_ar": "العلم والحوار",
+      "title_en": "Knowledge and Civil Dialogue",
+      "initial_question_ar": "كيف يدعو الحديث إلى التعلم وحسن الحوار؟",
+      "initial_question_en": "How does Hadith encourage the pursuit of knowledge and gracious dialogue?",
+      "subtopics": [
+        {
+          "id": "knowledge_seeking",
+          "title_ar": "فضل طلب العلم ونشره وتيسيره للناس",
+          "learning_objective": "بيان أن طلب العلم عبادة وفريضة، وتيسير التعلم منهج نبوي: «يسروا ولا تعسروا»."
+        },
+        {
+          "id": "knowledge_dialogue",
+          "title_ar": "أدب الحديث والكلمة الطيبة والصمت عن الشر",
+          "learning_objective": "ترسيخ قاعدة «فليقل خيراً أو ليصمت» والابتعاد عن السباب والفحش والمراء."
+        },
+        {
+          "id": "knowledge_humility",
+          "title_ar": "التثبت في النقل والتواضع وعدم ادعاء العلم",
+          "learning_objective": "تعليم التثبت من صحة الأخبار ونبذ التقول والافتراء والتواضع مع المعلم والمتعلم."
+        }
+      ],
+      "semantic_chapter_patterns": [
+        "كتاب العلم",
+        "كتاب الأدب",
+        "كتاب الاعتصام بالكتاب والسنة"
+      ],
+      "negative_exclusion_rules": [
+        {
+          "pattern": "أبواب الجدل الكلامي ومناظرات أهل البدع المتأخرة",
+          "reason": "Polemical historical arguments unhelpful to constructive, respectful introductory dialogue."
+        }
+      ],
+      "multi_label_intersections": [
+        "topic-faith",
+        "topic-mercy"
+      ],
+      "mapping_method": "Epistemological and conversational hadith core mapping",
+      "confidence": "high",
+      "review_status": "reviewed_taxonomy_v1"
+    }
+  ]
+}

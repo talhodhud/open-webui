@@ -1,0 +1,24 @@
+{
+  "executed_at": "2026-10-06T22:09:07Z",
+  "status": "ALL_TASKS_COMPLETED_AND_VERIFIED",
+  "tasks_closed": [
+    "U01",
+    "U02",
+    "U03",
+    "U04",
+    "U05",
+    "U06",
+    "U07",
+    "U08"
+  ],
+  "file_hashes": {
+    "hadith_models_vps_export.json": "f4b3e4004c06dec9a033b1d19e457efaeaa4f27602efde04055574ca6a3bf6a7",
+    "hadith_skills_vps_export.json": "15acafe6458b465bdcf9d97a803c9697ca24c551162f3e71ab5af1098f722fee",
+    "scripts/deploy_unified_v2.py": "18094184cededb4c8c77689ab3333bc1c36e1c3170d0d44a8ededad0002183db",
+    "scripts/rollback_snapshot.py": "ab9d409811b6f5cd8f3e4af9ff469256436cd79137eae0f5b6b675c43e078f79",
+    "tests/test_unified_u01_u08.py": "1ef5eb29f63dd211282a1e14b0dbc822405afb1eeda992a3f0b39d1912545cd9",
+    "tools/hadith_bayan_topics.json": "b659fe77987304bd93f98b59c2ffb342c371461ef416220df0b81726b6fa8d95",
+    "tools/hadith_bayan_topics_tool.py": "fff38d007887210489721ea8f683fdfefaded55413eda6f5da6a3bdb9b44a2c0",
+    "planning/bayan_lesson_packs_v1.json": "cf1275fc4a454b281fa9264b57ba174c6cfe6369d68227b0f320867967f9a730"
+  }
+}

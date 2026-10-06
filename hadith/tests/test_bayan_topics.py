@@ -37,8 +37,24 @@ class TestBayanTopicsEvaluation(unittest.TestCase):
         cls.bayan_tools = BayanTopicsTools()
         cls.isnad_tools = IsnadTreeTools()
         cls.sharh_tools = SharhVocabTools()
-        cls.db_path = BASE_DIR / "poc" / "phrase_search" / "search_index.sqlite"
-        cls.packs_path = BASE_DIR / "planning" / "bayan_lesson_packs_v1.json"
+        
+        # Check local path then parent path for SQLite index
+        db_candidates = [
+            BASE_DIR / "poc" / "phrase_search" / "search_index.sqlite",
+            BASE_DIR.parent / "poc" / "phrase_search" / "search_index.sqlite",
+            Path(r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\poc\phrase_search\search_index.sqlite")
+        ]
+        cls.db_path = next((p for p in db_candidates if p.exists() and p.stat().st_size > 100000), None)
+        cls.has_search_index = cls.db_path is not None
+
+        # Check local path then parent path for lesson packs
+        packs_candidates = [
+            BASE_DIR / "planning" / "bayan_lesson_packs_v1.json",
+            BASE_DIR.parent / "planning" / "bayan_lesson_packs_v1.json",
+            Path(r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\planning\bayan_lesson_packs_v1.json")
+        ]
+        cls.packs_path = next((p for p in packs_candidates if p.exists()), None)
+        assert cls.packs_path is not None, "Could not find bayan_lesson_packs_v1.json"
         with open(cls.packs_path, "r", encoding="utf-8") as f:
             cls.packs_data = json.load(f)
         cls.topics = [t["topic_id"] for t in cls.packs_data["topics"]]
@@ -85,6 +101,8 @@ class TestBayanTopicsEvaluation(unittest.TestCase):
     # -------------------------------------------------------------
     def test_03_quote_source_spans_match_original_text(self):
         """Verify that slicing text[span[0]:span[1]] in SQLite returns the exact quoted words."""
+        if not self.has_search_index:
+            self.skipTest("Local search_index.sqlite not present in checkout; skipping direct offset verification.")
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         for topic in self.packs_data["topics"]:
@@ -215,6 +233,8 @@ class TestBayanTopicsEvaluation(unittest.TestCase):
     # -------------------------------------------------------------
     def test_12_isnad_tree_offsets_and_marfu_classification(self):
         """Verify isnad tree tool maps exact original text slices and classifies Bukhari #1 as marfu."""
+        if not self.has_search_index:
+            self.skipTest("Local search_index.sqlite not present in checkout; skipping direct offset verification.")
         res = json.loads(self.isnad_tools.get_hadith_isnad_tree("bukhari", 1, chapter=1))
         self.assertEqual(res["status"], "ok")
         data = res["data"]
