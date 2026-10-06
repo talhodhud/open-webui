@@ -76,7 +76,6 @@ class Tools:
         t = re.sub(r'[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED]', '', text)
         t = t.replace('\u0640', '')
         t = re.sub(r'[إأآٱ]', 'ا', t)
-        t = re.sub(r'ة', 'ه', t)
         t = re.sub(r'ى', 'ي', t)
         return t.strip()
 

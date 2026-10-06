@@ -2,6 +2,14 @@
 
 Design review date: 4 October 2026. This is a proposed design, not a claim that the features below have been implemented or scientifically validated.
 
+**Latest implementation decision, 6 October:** [next implementation plan](next_implementation_plan.md) sets the remaining source-backed learning and research journeys, ownership for Agents 1/2 and Codex, and an optional independent QA role. [Second delivery review](round2_acceptance_review.md) records accepted progress and reproduced remaining failures. These take precedence over earlier status notes below.
+
+**Execution update, 5 October:** see [prioritized execution plan](prioritized_execution_plan.md) for the live four-model inventory, implemented interface status, current blockers, revised release order, and division of work. The original sections below remain the longer-term product design; their P0 labels should not all be interpreted as simultaneous next tasks. Backend handoff: [AI-agent work package](ai_agent_backend_handoff.md).
+
+**Journey update, 5 October (later):** the working name is **بيان السُّنّة — الحديث النبوي للمعرّفين بالإسلام**. أثر ٢ now explicitly routes three tested cases to the user's three presets and adds a six-topic educator path with `hadith-islam-guide`. See [current backend review and subject-track handoff](bayan_agent_next_handoff.md). This is the latest implementation/assignment note; the earlier inventory and proposed preset repurposing are historical. Reviewed thematic lessons and corrected replacement tools are still pending acceptance.
+
+**Acceptance update, 6 October:** the six-topic journey now exposes 13 exact source-matched occurrences with package coverage, citation copy and stable-ID handoff. This accepts source fidelity, not scholarly approval of lessons. The dedicated guide is installed; topic-tool/Knowledge upgrades remain pending. Separate current assignments: [Agent 1 — P0/P1, lessons and guide](agent_1_p0_p1_review_and_next.md), [Agent 2 — narrator linkage, provenance and performance](agent_2_narrator_linkage_review_and_next.md). These reviews supersede delivery claims that all blockers are closed. Preserve the three existing case/model bindings.
+
 ## 1. Product decision
 
 Build a source-traceable Hadith assistant with two experiences: **Learn & Understand / تعلّم وافهم** and **Research & Compare / ابحث وقارن**. Both use the same evidence records. The difference is the amount of detail, terminology, and available research controls.
