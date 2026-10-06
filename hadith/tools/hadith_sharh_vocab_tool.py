@@ -16,11 +16,36 @@ import urllib.error
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 
+try:
+    from tools.hadith_contract_helper import build_response, to_json_str
+except ImportError:
+    try:
+        from hadith_contract_helper import build_response, to_json_str
+    except ImportError:
+        from datetime import datetime, timezone
+        def build_response(status, data=None, evidence=None, coverage=None, warnings=None, dataset_version="2026-10-05-v1", retrieved_at=None):
+            return {
+                "schema_version": "1",
+                "status": status,
+                "data": data or {},
+                "evidence": evidence or {},
+                "coverage": coverage or {},
+                "warnings": warnings or [],
+                "dataset_version": dataset_version,
+                "retrieved_at": retrieved_at or datetime.now(timezone.utc).isoformat()
+            }
+        def to_json_str(payload, indent=2):
+            return json.dumps(payload, ensure_ascii=False, indent=indent)
+
 class Tools:
     class Valves(BaseModel):
         DB_PATH: str = Field(
             default=r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\hadith_rijal.db",
             description="Path to hadith_rijal.db containing hadith_vocab and hadith_roots."
+        )
+        SEARCH_INDEX_PATH: str = Field(
+            default=r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\poc\phrase_search\search_index.sqlite",
+            description="Path to search_index.sqlite containing stable occurrence IDs."
         )
         REQUEST_TIMEOUT: int = Field(
             default=15,
@@ -49,63 +74,163 @@ class Tools:
         t = re.sub(r'[إأآٱ]', 'ا', t)
         t = re.sub(r'ة', 'ه', t)
         t = re.sub(r'ى', 'ي', t)
-        return t.strip()
+        t = re.sub(r'[«»"\'\(\)\[\]،,\.:؛؟!\-]', ' ', t)
+        return ' '.join(t.split())
 
-    def get_hadith_explanation(self, query: str, language: str = "ar") -> str:
+    def get_hadith_explanation(self, query: str, language: str = "ar", occurrence_id: Optional[str] = None) -> str:
         """
-        Search HadeethEnc to retrieve detailed hadith commentary (Sharh), vocabulary meanings, and derived benefits.
+        Retrieve authentic Hadith explanation from HadeethEnc matching the query or exact occurrence_id.
+        Rejects unrelated first hits and returns 'unavailable' if no authentic commentary matches.
         
         :param query: Part of the hadith text or keywords to find explanation for.
         :param language: Language code ('ar' for Arabic, 'en' for English, 'fr', 'ur', etc. Default: 'ar').
-        :return: JSON formatted commentary, vocabulary words, benefits, and references.
+        :param occurrence_id: Optional exact occurrence ID to match commentary against.
+        :return: Standardized JSON envelope with commentary, provider ID, source URL, and matching basis.
         """
+        # If occurrence_id is supplied, validate authoritatively against local index
+        if occurrence_id:
+            clean_occ_id = occurrence_id.strip()
+            if not os.path.exists(self.valves.SEARCH_INDEX_PATH):
+                return to_json_str(build_response(
+                    status="unavailable",
+                    data={"occurrence_id": clean_occ_id, "query": query},
+                    warnings=["قاعدة السجلات المحلية غير متاحة للتحقق من معرف السجل المطلوب."]
+                ))
+            try:
+                conn = sqlite3.connect(self.valves.SEARCH_INDEX_PATH)
+                row = conn.execute("SELECT arabic FROM records WHERE record_id = ?", (clean_occ_id,)).fetchone()
+                conn.close()
+                if not row or not row[0]:
+                    return to_json_str(build_response(
+                        status="invalid_reference",
+                        data={"occurrence_id": clean_occ_id, "query": query},
+                        warnings=[f"معرف السجل المحدد '{clean_occ_id}' غير موجود في قاعدة السجلات المعتمدة. تم إيقاف العملية لمنع المطابقة على سجل خاطئ."]
+                    ))
+                target_text = row[0]
+            except Exception as e:
+                return to_json_str(build_response(
+                    status="unavailable",
+                    data={"occurrence_id": clean_occ_id},
+                    warnings=[f"فشل التحقق من معرف السجل في القاعدة المحلية: {str(e)}"]
+                ))
+        else:
+            target_text = query.strip()
+
+        norm_target = self._normalize_arabic(target_text)
+        target_tokens = set([t for t in norm_target.split() if len(t) >= 3 and t not in ('قال', 'رسول', 'الله', 'صلى', 'عليه', 'وسلم', 'عنه', 'عنها')])
+        if not target_tokens:
+            target_tokens = set(norm_target.split())
+
         try:
-            encoded = urllib.parse.quote(query.strip())
+            encoded = urllib.parse.quote(query.strip()[:100])
             search_url = f"https://hadeethenc.com/api/v1/hadeeths/search/?phrase={encoded}&language={language}&page=1&per_page=5"
-            req = urllib.request.Request(
-                search_url,
-                headers={"User-Agent": "Mozilla/5.0"}
-            )
+            req = urllib.request.Request(search_url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=self.valves.REQUEST_TIMEOUT) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
-                if isinstance(data, list):
-                    hadeeths = data
-                elif isinstance(data, dict):
-                    hadeeths = data.get("data", [])
-                else:
-                    hadeeths = []
+                hadeeths = data if isinstance(data, list) else data.get("data", [])
 
                 if not hadeeths:
-                    return json.dumps({"message": f"No explanation found on HadeethEnc for: {query}"}, ensure_ascii=False)
+                    return to_json_str(build_response(
+                        status="unavailable",
+                        data={"query": query, "occurrence_id": occurrence_id},
+                        warnings=["لم يتم العثور على شرح مسجل في موسوعة HadeethEnc لهذا النص. غياب الشرح لا يمس صحة الحديث الأصلية."]
+                    ))
 
-                matched_id = hadeeths[0].get("id")
+                # Score each candidate by significant token overlap
+                scored_candidates = []
+                for item in hadeeths:
+                    c_id = item.get("id")
+                    c_title = item.get("title", "")
+                    c_text = item.get("hadith_text", "") or item.get("title", "")
+                    norm_c = self._normalize_arabic(c_text)
+                    c_tokens = set(norm_c.split())
+                    overlap = sum(1 for t in target_tokens if t in c_tokens or any(t in ct or ct in t for ct in c_tokens if len(ct) >= 4 and len(t) >= 4))
+                    ratio = overlap / max(len(target_tokens), 1)
+                    scored_candidates.append({
+                        "id": c_id,
+                        "title": c_title,
+                        "overlap_count": overlap,
+                        "ratio": ratio,
+                        "raw_item": item
+                    })
 
-                # Fetch full explanation details
+                scored_candidates.sort(key=lambda x: (x["overlap_count"], x["ratio"]), reverse=True)
+                best = scored_candidates[0]
+
+                # Strict match threshold: candidate snippet must share significant overlap
+                if best["overlap_count"] < 2 or best["ratio"] < 0.35:
+                    return to_json_str(build_response(
+                        status="unavailable",
+                        data={"query": query, "occurrence_id": occurrence_id, "best_candidate_title": best["title"]},
+                        warnings=["نتيجة البحث المسترجعة من HadeethEnc لا تطابق متن الحديث المختار؛ تم حجب الشرح غير المطابق حفظاً لدقة العزو."],
+                        evidence={"source_name": "HadeethEnc API", "status_detail": "unmatched_first_hit_rejected"}
+                    ))
+
+                matched_id = best["id"]
                 detail_url = f"https://hadeethenc.com/api/v1/hadeeths/one/?language={language}&id={matched_id}"
                 detail_req = urllib.request.Request(detail_url, headers={"User-Agent": "Mozilla/5.0"})
                 with urllib.request.urlopen(detail_req, timeout=self.valves.REQUEST_TIMEOUT) as detail_resp:
                     detail_data = json.loads(detail_resp.read().decode("utf-8"))
-                    return json.dumps({
-                        "title": detail_data.get("title"),
-                        "hadith": detail_data.get("hadeeth"),
-                        "explanation": detail_data.get("explanation"),
-                        "hints": detail_data.get("hints", []),
-                        "words_meanings": detail_data.get("words_meanings", []),
-                        "reference": detail_data.get("reference")
-                    }, ensure_ascii=False, indent=2)
+                    
+                    # Phase 2: Verify detailed matn body against target tokens
+                    detail_matn = detail_data.get("hadeeth", "") or detail_data.get("title", "")
+                    norm_detail = self._normalize_arabic(detail_matn)
+                    detail_tokens = set(norm_detail.split())
+                    detail_overlap = sum(1 for t in target_tokens if t in detail_tokens or any(t in dt or dt in t for dt in detail_tokens if len(dt) >= 4 and len(t) >= 4))
+                    detail_ratio = detail_overlap / max(len(target_tokens), 1)
+
+                    if detail_overlap < 2 or detail_ratio < 0.35:
+                        return to_json_str(build_response(
+                            status="unavailable",
+                            data={
+                                "query": query,
+                                "occurrence_id": occurrence_id,
+                                "detail_title": detail_data.get("title"),
+                                "detail_overlap_ratio": round(detail_ratio, 2)
+                            },
+                            warnings=["متن الحديث المسترجع من تفاصيل HadeethEnc لا يطابق النص المستهدف المختار؛ تم حجب الشرح لمنع الإسناد الخاطئ."],
+                            evidence={"source_name": "HadeethEnc Encyclopedia", "provider_id": str(matched_id), "status_detail": "detail_matn_mismatch"}
+                        ))
+
+                    return to_json_str(build_response(
+                        status="ok",
+                        data={
+                            "provider_id": matched_id,
+                            "source_url": f"https://hadeethenc.com/{language}/browse/hadith/{matched_id}",
+                            "matching_basis": "verified_matn_body_overlap",
+                            "overlap_score": round(detail_ratio, 2),
+                            "title": detail_data.get("title"),
+                            "hadith": detail_data.get("hadeeth"),
+                            "explanation": detail_data.get("explanation"),
+                            "hints": detail_data.get("hints", []),
+                            "words_meanings": detail_data.get("words_meanings", []),
+                            "reference": detail_data.get("reference"),
+                            "language": language,
+                            "review_state": "verified_matn_body_match"
+                        },
+                        evidence={
+                            "source_name": "HadeethEnc Encyclopedia",
+                            "provider_id": str(matched_id),
+                            "source_url": f"https://hadeethenc.com/{language}/browse/hadith/{matched_id}",
+                            "review_status": "verified_matn_body_match"
+                        }
+                    ))
 
         except Exception as e:
-            return json.dumps({"error": f"Failed to retrieve explanation from HadeethEnc: {str(e)}"}, ensure_ascii=False)
+            return to_json_str(build_response(
+                status="unavailable",
+                warnings=[f"تعذر استرجاع الشرح من HadeethEnc: {str(e)}. لا يعني ذلك ضعف الحديث أو انعدام أصله."]
+            ))
 
     def lookup_gharib_word(self, word: str) -> str:
         """
         Look up a rare or difficult hadith word in the Gharib al-Hadith lexicon (33k+ definitions) with root and morphological analysis.
         
         :param word: The Arabic word to look up (e.g. 'عسعس', 'كسفت', 'الضيزى').
-        :return: JSON formatted lexical definition, root, lemma, part of speech, and corpus frequency.
+        :return: Standardized JSON envelope with lexical definition, root, lemma, part of speech, and corpus frequency.
         """
         if not os.path.exists(self.valves.DB_PATH):
-            return json.dumps({"error": "Database not found."}, ensure_ascii=False)
+            return to_json_str(build_response(status="unavailable", warnings=["Database not found."]))
 
         clean_word = word.strip()
         norm_word = self._normalize_arabic(clean_word)
@@ -137,7 +262,11 @@ class Tools:
             conn.close()
 
             if not rows:
-                return json.dumps({"message": f"Word '{word}' not found in Gharib al-Hadith lexicon."}, ensure_ascii=False)
+                return to_json_str(build_response(
+                    status="no_match",
+                    data={"word": word},
+                    warnings=[f"Word '{word}' not found in Gharib al-Hadith lexicon."]
+                ))
 
             results = []
             for r in rows:
@@ -154,24 +283,31 @@ class Tools:
                     "aspect": r[9]
                 })
 
-            return json.dumps({
-                "query_word": word,
-                "definitions_found": len(results),
-                "entries": results
-            }, ensure_ascii=False, indent=2)
+            return to_json_str(build_response(
+                status="ok",
+                data={
+                    "query_word": word,
+                    "definitions_found": len(results),
+                    "entries": results
+                },
+                evidence={"source_name": "Gharib al-Hadith Lexicon (Al-Nihayah & classical lexicons)", "locator": word}
+            ))
 
         except Exception as e:
-            return json.dumps({"error": f"Gharib word lookup failed: {str(e)}"}, ensure_ascii=False)
+            return to_json_str(build_response(
+                status="unavailable",
+                warnings=[f"Gharib word lookup failed: {str(e)}"]
+            ))
 
     def lookup_root_lexicon(self, root: str) -> str:
         """
         Look up classical Arabic root etymology and comprehensive Lane's Lexicon definition.
         
         :param root: 3-letter Arabic root (e.g. 'خسف', 'سلم', 'عبد', 'علم').
-        :return: JSON formatted classical root definitions, Buckwalter code, summary, and Quran frequency.
+        :return: Standardized JSON envelope with classical root definitions, Buckwalter code, summary, and Quran frequency.
         """
         if not os.path.exists(self.valves.DB_PATH):
-            return json.dumps({"error": "Database not found."}, ensure_ascii=False)
+            return to_json_str(build_response(status="unavailable", warnings=["Database not found."]))
 
         clean_root = root.strip().replace(" ", "").replace(".", "")
         norm_root = self._normalize_arabic(clean_root)
@@ -190,18 +326,29 @@ class Tools:
             conn.close()
 
             if not row:
-                return json.dumps({"message": f"Root '{root}' not found in roots lexicon."}, ensure_ascii=False)
+                return to_json_str(build_response(
+                    status="no_match",
+                    data={"root": root},
+                    warnings=[f"Root '{root}' not found in roots lexicon."]
+                ))
 
-            return json.dumps({
-                "root": row[0],
-                "buckwalter": row[1],
-                "summary": row[3],
-                "quran_frequency": row[4],
-                "lexicon_excerpt": row[2][:800] + ("..." if len(row[2]) > 800 else "")
-            }, ensure_ascii=False, indent=2)
+            return to_json_str(build_response(
+                status="ok",
+                data={
+                    "root": row[0],
+                    "buckwalter": row[1],
+                    "summary": row[3],
+                    "quran_frequency": row[4],
+                    "lexicon_excerpt": row[2][:800] + ("..." if len(row[2]) > 800 else "")
+                },
+                evidence={"source_name": "Lane's Arabic-English Lexicon", "locator": root}
+            ))
 
         except Exception as e:
-            return json.dumps({"error": f"Root lexicon lookup failed: {str(e)}"}, ensure_ascii=False)
+            return to_json_str(build_response(
+                status="unavailable",
+                warnings=[f"Root lexicon lookup failed: {str(e)}"]
+            ))
 
     def search_vocab_meaning(self, english_concept: str, limit: int = 5) -> str:
         """
@@ -209,14 +356,17 @@ class Tools:
         
         :param english_concept: English keyword or concept to search (e.g. 'eclipse', 'fasting', 'humility', 'prostration').
         :param limit: Maximum entries to return (default: 5).
-        :return: JSON formatted matching Arabic words, roots, and definitions.
+        :return: Standardized JSON envelope with matching Arabic words, roots, and definitions.
         """
         if not os.path.exists(self.valves.DB_PATH):
-            return json.dumps({"error": "Database not found."}, ensure_ascii=False)
+            return to_json_str(build_response(status="unavailable", warnings=["Database not found."]))
 
         concept = english_concept.strip()
         if not concept:
-            return json.dumps({"error": "English search concept cannot be empty."}, ensure_ascii=False)
+            return to_json_str(build_response(
+                status="invalid_reference",
+                warnings=["English search concept cannot be empty."]
+            ))
 
         try:
             conn = sqlite3.connect(self.valves.DB_PATH)
@@ -232,6 +382,13 @@ class Tools:
             rows = cur.fetchall()
             conn.close()
 
+            if not rows:
+                return to_json_str(build_response(
+                    status="no_match",
+                    data={"concept": english_concept, "matches_count": 0, "results": []},
+                    warnings=[f"No vocabulary entries matched concept '{english_concept}'."]
+                ))
+
             results = []
             for r in rows:
                 results.append({
@@ -241,11 +398,18 @@ class Tools:
                     "definition": r[3]
                 })
 
-            return json.dumps({
-                "concept": english_concept,
-                "matches_count": len(results),
-                "results": results
-            }, ensure_ascii=False, indent=2)
+            return to_json_str(build_response(
+                status="ok",
+                data={
+                    "concept": english_concept,
+                    "matches_count": len(results),
+                    "results": results
+                },
+                evidence={"source_name": "Hadith Vocabulary FTS", "locator": english_concept}
+            ))
 
         except Exception as e:
-            return json.dumps({"error": f"FTS5 vocabulary search failed: {str(e)}"}, ensure_ascii=False)
+            return to_json_str(build_response(
+                status="unavailable",
+                warnings=[f"FTS5 vocabulary search failed: {str(e)}"]
+            ))

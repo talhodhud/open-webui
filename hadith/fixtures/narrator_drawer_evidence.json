@@ -1,0 +1,225 @@
+{
+  "version": "2.0.0",
+  "date": "2026-10-06",
+  "description": "Reviewed transmission evidence fixtures for Codex Narrator Drawer UI integration with exact text slices, candidate identity states, gap preservation, and stable occurrence lookup.",
+  "samples": [
+    {
+      "case_description": "Direct Sahaba-Tabi'i link: Al-A'raj -> Abu Hurairah",
+      "occurrence_id": "itqan:bukhari:38:1:384b9e491044",
+      "book": "bukhari",
+      "chapter": 38,
+      "hadith_number": 1,
+      "path_id": 1,
+      "step": 3,
+      "student": {
+        "id": 566,
+        "name": "عبد الرحمن بن هرمز الأعرج",
+        "raw_mention": "الأَعْرَجِ",
+        "state": "resolved",
+        "char_bounds": [89, 99]
+      },
+      "teacher": {
+        "id": 106,
+        "name": "أبو هريرة الدوسي",
+        "raw_mention": "أَبِي هُرَيْرَةَ",
+        "state": "resolved",
+        "char_bounds": [106, 122]
+      },
+      "relation_type": "direct",
+      "resolution_rule": "canonical_pivot",
+      "transmission_phrase": "عَنْ",
+      "isnad_text_span": "الأَعْرَجِ، عَنْ أَبِي هُرَيْرَةَ",
+      "source_char_offsets": [89, 122],
+      "source_sha256": "384b9e49104467fad12f8eb465e595d2a1845b9710872370c8c33d58900cba77",
+      "hadith_excerpt": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، أَخْبَرَنَا مَالِكٌ، عَنْ أَبِي الزِّنَادِ، عَنِ الأَعْرَجِ، عَنْ أَبِي هُرَيْرَةَ ـ رضى الله عنه ـ أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"‏ مَطْلُ الْغَنِيِّ ظُلْمٌ، فَإِذَا أُتْبِعَ أَحَدُكُمْ عَلَ...",
+      "chronology": {
+        "status": "no_conflict_detected",
+        "reason": "Death intervals compatible (Student: 117-117 AH, Teacher: 57-59 AH). Note: no-conflict-detected is not proof of meeting."
+      },
+      "assessment": {
+        "status": "ok",
+        "grade": "ثقة ثبت",
+        "scholar": "ابن حجر العسقلاني",
+        "work": "تقريب التهذيب",
+        "locator": "رقم 3745"
+      }
+    },
+    {
+      "case_description": "Occurrence family hop: Hisham b. Urwah -> Urwah b. al-Zubayr (عن أبيه)",
+      "occurrence_id": "itqan:bukhari:83:1:ed9af67e4111",
+      "book": "bukhari",
+      "chapter": 83,
+      "hadith_number": 1,
+      "path_id": 1,
+      "step": 2,
+      "student": {
+        "id": 173,
+        "name": "هشام بن عروة",
+        "raw_mention": "هِشَامُ بْنُ عُرْوَةَ",
+        "state": "resolved",
+        "char_bounds": [93, 114]
+      },
+      "teacher": {
+        "id": 874,
+        "name": "عروة بن الزبير",
+        "raw_mention": "أَبِيهِ",
+        "state": "resolved",
+        "char_bounds": [121, 128]
+      },
+      "relation_type": "father",
+      "resolution_rule": "occurrence_kinship:father:173->874",
+      "transmission_phrase": "عَنْ",
+      "isnad_text_span": "هِشَامُ بْنُ عُرْوَةَ، عَنْ أَبِيهِ",
+      "source_char_offsets": [93, 128],
+      "source_sha256": "ed9af67e4111d91af6bd89331a45e50a217d6f8acc7fff0c622b2fa8ea8e81cc",
+      "hadith_excerpt": "حَدَّثَنَا مُحَمَّدُ بْنُ مُقَاتِلٍ أَبُو الْحَسَنِ، أَخْبَرَنَا عَبْدُ اللَّهِ، أَخْبَرَنَا هِشَامُ بْنُ عُرْوَةَ، عَنْ أَبِيهِ، عَنْ عَائِشَةَ، أَنَّ أَبَا بَكْرٍ ـ رضى الله عنه ـ لَمْ يَكُنْ يَحْنَثُ فِي يَمِينٍ قَطُّ، حَتَّى أَنْزَلَ اللَّهُ كَفّ...",
+      "chronology": {
+        "status": "no_conflict_detected",
+        "reason": "Death intervals compatible (Student: 146-146 AH, Teacher: 94-94 AH). Note: no-conflict-detected is not proof of meeting."
+      },
+      "assessment": {
+        "status": "ok",
+        "grade": "ثقة فقيه",
+        "scholar": "ابن حجر العسقلاني",
+        "work": "تقريب التهذيب",
+        "locator": "رقم 7296"
+      }
+    },
+    {
+      "case_description": "Unresolved relative gap: Abbad b. Tamim -> his uncle (عن عمه) [Preserved Gap Node]",
+      "occurrence_id": "itqan:bukhari:15:1:f0fdae467702",
+      "book": "bukhari",
+      "chapter": 15,
+      "hadith_number": 1,
+      "path_id": 1,
+      "step": 3,
+      "student": {
+        "id": null,
+        "name": "عباد بن تميم",
+        "raw_mention": "عَبَّادِ بْنِ تَمِيمٍ",
+        "state": "unresolved_gap",
+        "char_bounds": [99, 120]
+      },
+      "teacher": {
+        "id": null,
+        "name": "عمه",
+        "raw_mention": "عَمِّهِ",
+        "state": "unresolved_relative",
+        "char_bounds": [127, 134]
+      },
+      "relation_type": "unresolved_relative",
+      "resolution_rule": "occurrence_kinship:unresolved_relative:عباد بن تميم->None",
+      "transmission_phrase": "عَنْ",
+      "isnad_text_span": "عَبَّادِ بْنِ تَمِيمٍ، عَنْ عَمِّهِ",
+      "source_char_offsets": [99, 134],
+      "source_sha256": "f0fdae467702f25abc886edf0ea543ac9b05abf66d83e451a83aeeb027a35029",
+      "hadith_excerpt": "حَدَّثَنَا أَبُو نُعَيْمٍ، قَالَ حَدَّثَنَا سُفْيَانُ، عَنْ عَبْدِ اللَّهِ بْنِ أَبِي بَكْرٍ، عَنْ عَبَّادِ بْنِ تَمِيمٍ، عَنْ عَمِّهِ، قَالَ خَرَجَ النَّبِيُّ صلى الله عليه وسلم يَسْتَسْقِي فَتَوَجَّهَ إِلَى الْقِبْلَةِ يَدْعُو...",
+      "chronology": {
+        "status": "unknown",
+        "reason": "Biographical profile missing for one or both transmitters"
+      },
+      "assessment": {
+        "status": "unavailable",
+        "grade": "غير معروف بدقة",
+        "scholar": "مستقل",
+        "work": "إسناد متن",
+        "locator": "مبهم / صلة قرابة لم تحدد هويتها بصورة قاطعة",
+        "reason": "Unnamed relative cannot be biographically evaluated without explicit historical identification."
+      }
+    },
+    {
+      "case_description": "Ambiguous candidate identity: Sufyan -> al-Zuhri (Sufyan b. Uyaynah vs Sufyan al-Thawri candidate pool)",
+      "occurrence_id": "itqan:bukhari:10:146:48c4e2df09d4",
+      "book": "bukhari",
+      "chapter": 10,
+      "hadith_number": 146,
+      "path_id": 1,
+      "step": 1,
+      "student": {
+        "id": 192,
+        "name": "سفيان بن عيينة",
+        "raw_mention": "سُفْيَانُ",
+        "state": "candidate",
+        "candidate_pool": [
+          {
+            "id": 192,
+            "name": "سفيان بن عيينة",
+            "basis": "Madar transmission from al-Zuhri in Hijaz"
+          },
+          {
+            "id": 434,
+            "name": "سفيان الثوري",
+            "basis": "Transmitted from al-Zuhri in Kufa"
+          }
+        ],
+        "char_bounds": [40, 49]
+      },
+      "teacher": {
+        "id": 569,
+        "name": "محمد بن مسلم بن شهاب الزهري",
+        "raw_mention": "الزُّهْرِيِّ",
+        "state": "resolved",
+        "char_bounds": [56, 68]
+      },
+      "relation_type": "direct",
+      "resolution_rule": "canonical_pivot|pair_context:569->192",
+      "transmission_phrase": "عَنِ",
+      "isnad_text_span": "سُفْيَانُ، عَنِ الزُّهْرِيِّ",
+      "source_char_offsets": [40, 68],
+      "source_sha256": "48c4e2df09d463b4906b22abc33a422122123b511e21e07e43c2ef1f7ae25a3b",
+      "hadith_excerpt": "حَدَّثَنَا قُتَيْبَةُ، قَالَ حَدَّثَنَا سُفْيَانُ، عَنِ الزُّهْرِيِّ، عَنْ عُرْوَةَ، عَنْ عَائِشَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم صَلَّى فِي خَمِيصَةٍ لَهَا أَعْلاَمٌ، فَنَظَرَ إِلَى أَعْلاَمِهَا نَظْرَةً...",
+      "chronology": {
+        "status": "no_conflict_detected",
+        "reason": "Death intervals compatible (Student: 198-198 AH, Teacher: 124-124 AH). Note: no-conflict-detected is not proof of meeting."
+      },
+      "assessment": {
+        "status": "ok",
+        "grade": "ثقة حافظ فقيه إمام حجة",
+        "scholar": "ابن حجر العسقلاني",
+        "work": "تقريب التهذيب",
+        "locator": "رقم 2451"
+      }
+    },
+    {
+      "case_description": "Tahwil split isnad path: Abd Allah b. Yusuf -> Malik (Path 2 after [ح])",
+      "occurrence_id": "itqan:bukhari:10:258:1b8de7919227",
+      "book": "bukhari",
+      "chapter": 10,
+      "hadith_number": 258,
+      "path_id": 2,
+      "step": 0,
+      "student": {
+        "id": null,
+        "name": "عبد الله بن يوسف",
+        "raw_mention": "وحدثنا عبد الله بن يوسف",
+        "state": "unresolved_gap",
+        "char_bounds": [59, 99]
+      },
+      "teacher": {
+        "id": 664,
+        "name": "مالك بن أنس",
+        "raw_mention": "مَالِكٌ",
+        "state": "resolved",
+        "char_bounds": [119, 126]
+      },
+      "relation_type": "direct",
+      "resolution_rule": "canonical_pivot",
+      "transmission_phrase": "قَالَ أَخْبَرَنَا",
+      "isnad_text_span": "وَحَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، قَالَ أَخْبَرَنَا مَالِكٌ",
+      "source_char_offsets": [59, 126],
+      "source_sha256": "1b8de791922747bf6e73c1c5366980a5adea20970377605ab0ff23ae50b62ea7",
+      "hadith_excerpt": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مَسْلَمَةَ، عَنْ مَالِكٍ، ح وَحَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، قَالَ أَخْبَرَنَا مَالِكٌ، عَنْ يَحْيَى بْنِ سَعِيدٍ، عَنْ عَمْرَةَ بِنْتِ عَبْدِ الرَّحْمَنِ، عَنْ عَائِشَةَ...",
+      "chronology": {
+        "status": "unknown",
+        "reason": "Biographical profile missing for one or both transmitters"
+      },
+      "assessment": {
+        "status": "ok",
+        "grade": "ثقة متقن",
+        "scholar": "ابن حجر العسقلاني",
+        "work": "تقريب التهذيب",
+        "locator": "رقم 3698"
+      }
+    }
+  ]
+}

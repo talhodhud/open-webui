@@ -1,0 +1,61 @@
+{
+  "id": "chatcmpl-EVFpuaNNooOkmNm8m5fNGS6Pf4OhC",
+  "object": "chat.completion",
+  "created": 1791117750,
+  "model": "gpt-5.4-mini-2026-03-17",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_w46m24ALdbxnltrhWFVdLLiN",
+            "type": "function",
+            "function": {
+              "name": "search_hadith_corpus",
+              "arguments": "{\"query\": \"الصلاة جامعة\", \"book\": \"all\", \"limit\": 10}"
+            }
+          },
+          {
+            "id": "call_yeuMapPSuoBCxrI02hPRGkgj",
+            "type": "function",
+            "function": {
+              "name": "search_dorar_hadith",
+              "arguments": "{\"query\": \"الصلاة جامعة\", \"page\": 1}"
+            }
+          },
+          {
+            "id": "call_HiTKtRqF9irwaY5ghKNEMPQV",
+            "type": "function",
+            "function": {
+              "name": "get_hadith_explanation",
+              "arguments": "{\"query\": \"الصلاة جامعة\", \"language\": \"ar\"}"
+            }
+          }
+        ],
+        "refusal": null,
+        "annotations": []
+      },
+      "finish_reason": "tool_calls"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 3039,
+    "completion_tokens": 95,
+    "total_tokens": 3134,
+    "prompt_tokens_details": {
+      "cached_tokens": 2688,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": null
+}

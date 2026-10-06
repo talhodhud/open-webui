@@ -14,6 +14,27 @@ import re
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 
+try:
+    from tools.hadith_contract_helper import build_response, to_json_str
+except ImportError:
+    try:
+        from hadith_contract_helper import build_response, to_json_str
+    except ImportError:
+        from datetime import datetime, timezone
+        def build_response(status, data=None, evidence=None, coverage=None, warnings=None, dataset_version="2026-10-05-v1", retrieved_at=None):
+            return {
+                "schema_version": "1",
+                "status": status,
+                "data": data or {},
+                "evidence": evidence or {},
+                "coverage": coverage or {},
+                "warnings": warnings or [],
+                "dataset_version": dataset_version,
+                "retrieved_at": retrieved_at or datetime.now(timezone.utc).isoformat()
+            }
+        def to_json_str(payload, indent=2):
+            return json.dumps(payload, ensure_ascii=False, indent=indent)
+
 class Tools:
     class Valves(BaseModel):
         REQUEST_TIMEOUT: int = Field(
@@ -29,10 +50,9 @@ class Tools:
     1. Primary Goal: Provide authoritative multi-scholar takhrij (تخريج الحديث) for any matn or fragment.
     2. Multi-Scholar Perspective:
        - Hadith rulings are scholarly judgments (ijtihad). Present evaluations from both classical masters (al-Bukhari, Ahmad, al-Tirmidhi, Ibn Hajar, al-Dhahabi) and contemporary verifiers (al-Albani, al-Arna'ut).
-       - When scholars disagree on a hadith's authenticity (e.g. one grades it Da'if and another Hasan), clearly explain the basis of difference (e.g. presence of a contested narrator, or elevated vs. stopped chain / marfu' vs. mawquf).
+       - When scholars disagree on a hadith's authenticity (e.g. one grades it Da'if and another Hasan), clearly explain the basis of difference.
     3. Output Formatting:
-       - Include: Matn fragment, Sahabi (Primary Narrator), Source Book, Muhaddith (Evaluating Scholar), Degree/Ruling (Hukm), and Volume/Page reference.
-       - Present the results in a clean Markdown comparison table.
+       - Include: Matn fragment, Sahabi, Source Book, Muhaddith, Degree/Ruling, and Volume/Page reference.
     """
 
     def search_dorar_hadith(self, query: str, page: int = 1) -> str:
@@ -41,9 +61,13 @@ class Tools:
         
         :param query: Part of the hadith matn (Arabic text) to search for.
         :param page: Page number for paginated results (default: 1).
-        :return: JSON formatted list of hadith entries with scholars, rulings, books, and narrators.
+        :return: Standardized JSON envelope with scholars, rulings, books, and narrators.
         """
-        url = f"https://dorar.net/dorar_api.json?skey={urllib.parse.quote(query)}&page={page}"
+        clean_q = query.strip()
+        if not clean_q:
+            return to_json_str(build_response(status="invalid_reference", warnings=["Search query cannot be empty."]))
+
+        url = f"https://dorar.net/dorar_api.json?skey={urllib.parse.quote(clean_q)}&page={page}"
         try:
             req = urllib.request.Request(
                 url,
@@ -82,30 +106,53 @@ class Tools:
                             "ruling": hukm
                         })
 
-                return json.dumps({
-                    "query": query,
-                    "count": len(results),
-                    "results": results
-                }, ensure_ascii=False, indent=2)
+                if not results:
+                    return to_json_str(build_response(
+                        status="no_match",
+                        data={"query": query, "page": page, "count": 0, "results": []},
+                        warnings=["لم يعثر على نتائج مطابقة في موسوعة الدرر السنية لهذا النص."]
+                    ))
+
+                return to_json_str(build_response(
+                    status="ok",
+                    data={
+                        "query": query,
+                        "page": page,
+                        "count": len(results),
+                        "results": results
+                    },
+                    evidence={
+                        "source_name": "Dorar al-Sunniyyah Hadith Encyclopedia",
+                        "locator": f"https://dorar.net/hadith/search?q={urllib.parse.quote(clean_q)}",
+                        "review_status": "external_multi_scholar_index"
+                    }
+                ))
 
         except Exception as e:
-            return json.dumps({"error": f"Dorar API request failed: {str(e)}"}, ensure_ascii=False)
+            return to_json_str(build_response(
+                status="unavailable",
+                warnings=[f"Dorar API request failed: {str(e)}. تنبيه منهجي: تعذر الاتصال بمزود الخدمة تقني، ولا يعني ضعف الحديث أو انقطاعه أو وضعه."]
+            ))
 
     def get_hadith_takhrij_summary(self, query: str) -> str:
         """
         Synthesizes multi-scholar takhrij from Dorar, categorizing scholar rulings into consensus, primary narrators, and book sources.
         
         :param query: Arabic text fragment to takhrij.
-        :return: JSON formatted synthesis with consensus verdict, scholar breakdown, and primary sources.
+        :return: Standardized JSON envelope with consensus verdict, scholar breakdown, and primary sources.
         """
         res_json = self.search_dorar_hadith(query, page=1)
-        data = json.loads(res_json)
-        if "error" in data:
+        resp = json.loads(res_json)
+        if resp.get("status") != "ok":
             return res_json
 
-        results = data.get("results", [])
+        results = resp.get("data", {}).get("results", [])
         if not results:
-            return json.dumps({"message": f"No takhrij results found for '{query}'."}, ensure_ascii=False)
+            return to_json_str(build_response(
+                status="no_match",
+                data={"query": query},
+                warnings=[f"No takhrij results found for '{query}'."]
+            ))
 
         rulings_summary = {}
         sahaba = set()
@@ -130,10 +177,17 @@ class Tools:
                 "ref": item.get("number_or_page", "")
             })
 
-        return json.dumps({
-            "query": query,
-            "total_records": len(results),
-            "primary_narrators": list(sahaba),
-            "canonical_sources": list(books)[:10],
-            "scholar_evaluations": rulings_summary
-        }, ensure_ascii=False, indent=2)
+        return to_json_str(build_response(
+            status="ok",
+            data={
+                "query": query,
+                "total_records": len(results),
+                "primary_narrators": list(sahaba),
+                "canonical_sources": list(books)[:10],
+                "scholar_evaluations": rulings_summary
+            },
+            evidence={
+                "source_name": "Dorar al-Sunniyyah Synthesized Rulings",
+                "locator": f"https://dorar.net/hadith/search?q={urllib.parse.quote(query.strip())}"
+            }
+        ))
