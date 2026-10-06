@@ -43,8 +43,61 @@ class Tools:
             description="Path to hadith_rijal.db containing narrators, narrators_fts, isnad_nodes, and isnad_links."
         )
 
+
+    @staticmethod
+    def _resolve_path(env_var: str, current_val: str, candidates: list) -> str:
+        env_val = os.environ.get(env_var)
+        if env_val and os.path.exists(env_val):
+            return os.path.abspath(env_val)
+        if current_val and os.path.exists(current_val):
+            return os.path.abspath(current_val)
+        search_roots = [
+            os.getcwd(),
+            os.path.abspath(os.path.join(os.getcwd(), "..")),
+            os.path.abspath(os.path.join(os.getcwd(), "../..")),
+            os.path.abspath(os.path.join(os.getcwd(), "hadith")),
+            os.path.abspath(os.path.join(os.getcwd(), "open-webui")),
+            os.path.abspath(os.path.join(os.getcwd(), "open-webui/hadith")),
+            "/app/backend/data",
+            "/app/data",
+            "/app",
+            "/root/open-webui",
+            "/root/open-webui/hadith",
+            "/root",
+        ]
+        if "__file__" in globals():
+            tool_dir = os.path.dirname(os.path.abspath(__file__))
+            search_roots.extend([
+                tool_dir,
+                os.path.abspath(os.path.join(tool_dir, "..")),
+                os.path.abspath(os.path.join(tool_dir, "../..")),
+                os.path.abspath(os.path.join(tool_dir, "../../..")),
+            ])
+        for c in candidates:
+            if os.path.isabs(c) and os.path.exists(c):
+                return os.path.abspath(c)
+            for root in search_roots:
+                p = os.path.join(root, c)
+                if os.path.exists(p):
+                    return os.path.abspath(p)
+        return current_val
+
+    def _resolve_all_paths(self):
+        self.valves.DB_PATH = self._resolve_path(
+            "HADITH_DB_PATH",
+            self.valves.DB_PATH,
+            [
+                "hadith_rijal.db",
+                "hadith/hadith_rijal.db",
+                "open-webui/hadith_rijal.db",
+                "backend/data/hadith_rijal.db",
+                "data/hadith_rijal.db"
+            ]
+        )
+
     def __init__(self):
         self.valves = self.Valves()
+        self._resolve_all_paths()
         self._rijal_loaded = False
         self._narrators_db = {}
         self._token_to_nids = defaultdict(list)

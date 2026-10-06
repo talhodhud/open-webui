@@ -44,12 +44,77 @@ class Tools:
             description="Absolute path to the reviewed lesson packs JSON."
         )
 
+
+    @staticmethod
+    def _resolve_path(env_var: str, current_val: str, candidates: list) -> str:
+        env_val = os.environ.get(env_var)
+        if env_val and os.path.exists(env_val):
+            return os.path.abspath(env_val)
+        if current_val and os.path.exists(current_val):
+            return os.path.abspath(current_val)
+        search_roots = [
+            os.getcwd(),
+            os.path.abspath(os.path.join(os.getcwd(), "..")),
+            os.path.abspath(os.path.join(os.getcwd(), "../..")),
+            os.path.abspath(os.path.join(os.getcwd(), "hadith")),
+            os.path.abspath(os.path.join(os.getcwd(), "open-webui")),
+            os.path.abspath(os.path.join(os.getcwd(), "open-webui/hadith")),
+            "/app/backend/data",
+            "/app/data",
+            "/app",
+            "/root/open-webui",
+            "/root/open-webui/hadith",
+            "/root",
+        ]
+        if "__file__" in globals():
+            tool_dir = os.path.dirname(os.path.abspath(__file__))
+            search_roots.extend([
+                tool_dir,
+                os.path.abspath(os.path.join(tool_dir, "..")),
+                os.path.abspath(os.path.join(tool_dir, "../..")),
+                os.path.abspath(os.path.join(tool_dir, "../../..")),
+            ])
+        for c in candidates:
+            if os.path.isabs(c) and os.path.exists(c):
+                return os.path.abspath(c)
+            for root in search_roots:
+                p = os.path.join(root, c)
+                if os.path.exists(p):
+                    return os.path.abspath(p)
+        return current_val
+
+    def _resolve_all_paths(self):
+        self.valves.TAXONOMY_PATH = self._resolve_path(
+            "HADITH_TAXONOMY_PATH",
+            self.valves.TAXONOMY_PATH,
+            [
+                "planning/islam_topic_taxonomy_v1.json",
+                "hadith/planning/islam_topic_taxonomy_v1.json",
+                "open-webui/hadith/planning/islam_topic_taxonomy_v1.json",
+                "backend/data/islam_topic_taxonomy_v1.json",
+                "islam_topic_taxonomy_v1.json"
+            ]
+        )
+        self.valves.LESSON_PACKS_PATH = self._resolve_path(
+            "HADITH_LESSON_PACKS_PATH",
+            self.valves.LESSON_PACKS_PATH,
+            [
+                "planning/bayan_lesson_packs_v1.json",
+                "hadith/planning/bayan_lesson_packs_v1.json",
+                "open-webui/hadith/planning/bayan_lesson_packs_v1.json",
+                "backend/data/bayan_lesson_packs_v1.json",
+                "bayan_lesson_packs_v1.json"
+            ]
+        )
+
     def __init__(self):
         self.valves = self.Valves()
+        self._resolve_all_paths()
         self._taxonomy_cache = None
         self._lesson_packs_cache = None
 
     def _load_data(self):
+        self._resolve_all_paths()
         if not self._taxonomy_cache and os.path.exists(self.valves.TAXONOMY_PATH):
             try:
                 with open(self.valves.TAXONOMY_PATH, "r", encoding="utf-8") as f:

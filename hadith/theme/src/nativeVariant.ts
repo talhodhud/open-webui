@@ -37,7 +37,7 @@ export function createNativeVariant(){
   followupPanel.dataset.notice=inserted?'أضيف السؤال إلى المسودة.':'يمكنك كتابة السؤال في مربع المحادثة.';
  }
  function launch(journey:Journey,submit:boolean,question?:string){
-  launchDestination(buildJourneyURL(location.origin,journey.id,submit,question));
+  launchDestination(buildJourneyURL(location.origin,journey.id,submit,question,{mode:'unified'}));
  }
  function launchDestination(destination:string){
   if(location.pathname.startsWith('/auth'))destination='/auth?'+new URLSearchParams({redirect:new URL(destination).pathname+new URL(destination).search,athar:'chat'});
@@ -59,7 +59,7 @@ export function createNativeVariant(){
    item.append(element('p','bayan-source-text',record.text),element('code','bayan-source-id',record.id));
    const tools=element('div','bayan-source-actions');const link=element('a','','افتح ملف المصدر');link.href=record.url;link.target='_blank';link.rel='noopener noreferrer';
    const copy=button('','انسخ النص ومصدره',async()=>{try{await navigator.clipboard.writeText(`${record.text}\n\n${names[record.collection]} — ${record.chapter}\nالموضع المحلي: ${record.position}\n${record.id}\n${record.url}\nمطابق للفهرس المحلي؛ يحتاج اختيار الشاهد وشرحه إلى مراجعة علمية.`);copy.textContent='نُسخ النص مع مصدره';}catch{copy.textContent='تعذر النسخ؛ حدّد النص لنسخه';}});
-   tools.append(link,copy,button('','حضّر فتح السجل بالأداة',()=>launchDestination(buildEvidenceURL(location.origin,record.id))));item.append(tools);view.append(item);
+   tools.append(link,copy,button('','حضّر فتح السجل بالأداة',()=>launchDestination(buildEvidenceURL(location.origin,record.id,{mode:'unified'}))));item.append(tools);view.append(item);
   }return view;
  }
  function openDemo(journey:Journey){
@@ -111,7 +111,7 @@ export function createNativeVariant(){
  function renderContext(){
   const key=active?.id||'none';if(lastContext===key)return;lastContext=key;contextPanel.replaceChildren();followupPanel.replaceChildren();delete followupPanel.dataset.notice;
   contextPanel.append(element('span','bayan-context-brand',BRAND.name));if(active)contextPanel.append(element('span','bayan-context-case',active.title));contextPanel.append(button('','الحالات التطبيقية',openGallery));
-  if(active){followupPanel.append(element('span','','افتح مسودة متخصصة لهذه الحالة'));const followupsToRender=active.track==='islam'?active.followups.filter(f=>f.task!=='isnad_graph'):active.followups;followupsToRender.forEach((item,index)=>{const b=button('',item.label,()=>launchDestination(buildFollowupURL(location.origin,active!.id,index)));b.title='تُفتح مسودة بالنموذج المناسب مع إعادة استرجاع الأدلة';followupPanel.append(b);});}
+  if(active){followupPanel.append(element('span','','افتح مسودة متخصصة لهذه الحالة'));const followupsToRender=active.track==='islam'?active.followups.filter(f=>f.task!=='isnad_graph'):active.followups;followupsToRender.forEach((item,index)=>{const b=button('',item.label,()=>launchDestination(buildFollowupURL(location.origin,active!.id,index,{mode:'unified'})));b.title='تُفتح مسودة بالنموذج المناسب مع إعادة استرجاع الأدلة';followupPanel.append(b);});}
  }
  function syncRoute(){
   if(location.pathname===lastPath)return;

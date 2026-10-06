@@ -52,8 +52,72 @@ class Tools:
             description="Network request timeout in seconds."
         )
 
+
+    @staticmethod
+    def _resolve_path(env_var: str, current_val: str, candidates: list) -> str:
+        env_val = os.environ.get(env_var)
+        if env_val and os.path.exists(env_val):
+            return os.path.abspath(env_val)
+        if current_val and os.path.exists(current_val):
+            return os.path.abspath(current_val)
+        search_roots = [
+            os.getcwd(),
+            os.path.abspath(os.path.join(os.getcwd(), "..")),
+            os.path.abspath(os.path.join(os.getcwd(), "../..")),
+            os.path.abspath(os.path.join(os.getcwd(), "hadith")),
+            os.path.abspath(os.path.join(os.getcwd(), "open-webui")),
+            os.path.abspath(os.path.join(os.getcwd(), "open-webui/hadith")),
+            "/app/backend/data",
+            "/app/data",
+            "/app",
+            "/root/open-webui",
+            "/root/open-webui/hadith",
+            "/root",
+        ]
+        if "__file__" in globals():
+            tool_dir = os.path.dirname(os.path.abspath(__file__))
+            search_roots.extend([
+                tool_dir,
+                os.path.abspath(os.path.join(tool_dir, "..")),
+                os.path.abspath(os.path.join(tool_dir, "../..")),
+                os.path.abspath(os.path.join(tool_dir, "../../..")),
+            ])
+        for c in candidates:
+            if os.path.isabs(c) and os.path.exists(c):
+                return os.path.abspath(c)
+            for root in search_roots:
+                p = os.path.join(root, c)
+                if os.path.exists(p):
+                    return os.path.abspath(p)
+        return current_val
+
+    def _resolve_all_paths(self):
+        self.valves.DB_PATH = self._resolve_path(
+            "HADITH_DB_PATH",
+            self.valves.DB_PATH,
+            [
+                "hadith_rijal.db",
+                "hadith/hadith_rijal.db",
+                "open-webui/hadith_rijal.db",
+                "backend/data/hadith_rijal.db",
+                "data/hadith_rijal.db"
+            ]
+        )
+        self.valves.SEARCH_INDEX_PATH = self._resolve_path(
+            "HADITH_SEARCH_INDEX_PATH",
+            self.valves.SEARCH_INDEX_PATH,
+            [
+                "poc/phrase_search/search_index.sqlite",
+                "hadith/poc/phrase_search/search_index.sqlite",
+                "search_index.sqlite",
+                "backend/data/search_index.sqlite",
+                "data/search_index.sqlite"
+            ]
+        )
+
     def __init__(self):
         self.valves = self.Valves()
+        self._resolve_all_paths()
 
     SYSTEM_INSTRUCTIONS = """
     # HADITH SHARH & GHARIB AL-HADITH GUIDELINES:
@@ -224,6 +288,7 @@ class Tools:
 
     def lookup_gharib_word(self, word: str) -> str:
         """
+        self._resolve_all_paths()
         Look up a rare or difficult hadith word in the Gharib al-Hadith lexicon (33k+ definitions) with root and morphological analysis.
         
         :param word: The Arabic word to look up (e.g. 'عسعس', 'كسفت', 'الضيزى').
@@ -301,6 +366,7 @@ class Tools:
 
     def lookup_root_lexicon(self, root: str) -> str:
         """
+        self._resolve_all_paths()
         Look up classical Arabic root etymology and comprehensive Lane's Lexicon definition.
         
         :param root: 3-letter Arabic root (e.g. 'خسف', 'سلم', 'عبد', 'علم').

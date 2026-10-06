@@ -85,18 +85,12 @@
       "skillIds": [
         "hadith-search-record",
         "hadith-takhrij-compare",
-        "hadith-mermaid-architect",
-        "hadith-sharh-scholar",
-        "hadith-rijal-critic",
-        "hadith-source-provenance"
+        "hadith-sharh-scholar"
       ],
       "skill_ids": [
         "hadith-search-record",
         "hadith-takhrij-compare",
-        "hadith-mermaid-architect",
-        "hadith-sharh-scholar",
-        "hadith-rijal-critic",
-        "hadith-source-provenance"
+        "hadith-sharh-scholar"
       ]
     },
     "is_active": true
@@ -186,18 +180,16 @@
       "skillIds": [
         "hadith-search-record",
         "hadith-takhrij-compare",
-        "hadith-mermaid-architect",
         "hadith-sharh-scholar",
         "hadith-rijal-critic",
-        "hadith-source-provenance"
+        "hadith-mermaid-architect"
       ],
       "skill_ids": [
         "hadith-search-record",
         "hadith-takhrij-compare",
-        "hadith-mermaid-architect",
         "hadith-sharh-scholar",
         "hadith-rijal-critic",
-        "hadith-source-provenance"
+        "hadith-mermaid-architect"
       ]
     },
     "is_active": true
@@ -266,16 +258,16 @@
       "description": "خبير تراجم رواة الحديث النبوي الشريف (115,000 راوٍ)، نقد الأسانيد، موازنة أقوال أئمة الجرح والتعديل، فحص الاتصال والسماع، وكشف التدليس والشذوذ والعلل الإسنادية.",
       "i18n": null,
       "capabilities": {
+        "file_context": false,
         "vision": false,
         "file_upload": false,
-        "file_context": false,
         "web_search": false,
         "image_generation": false,
         "code_interpreter": false,
         "terminal": false,
-        "memory": false,
         "citations": true,
         "status_updates": true,
+        "memory": false,
         "builtin_tools": false
       },
       "knowledge": null,
@@ -330,6 +322,16 @@
           ],
           "content": "ما هي مراتب المدلسين الخمس عند الحافظ ابن حجر؟ ومتى يُقبل حديث الراوي الموصوف بالتدليس ومتى يُرد؟"
         }
+      ],
+      "skillIds": [
+        "hadith-rijal-critic",
+        "hadith-mermaid-architect",
+        "hadith-search-record"
+      ],
+      "skill_ids": [
+        "hadith-rijal-critic",
+        "hadith-mermaid-architect",
+        "hadith-search-record"
       ]
     },
     "is_active": true
@@ -339,30 +341,31 @@
     "name": "بيان السُّنّة — دليل المعرّف بالإسلام",
     "base_model_id": "gpt-5.4-mini",
     "params": {
-      "system": "أنت «بيان السُّنّة — دليل المعرّف بالإسلام». تساعد المعرّفين بالإسلام على إعداد مسودة تعريفية عربية واضحة من نصوص حديثية مسترجعة، باحترام القارئ دون افتراض ديانته أو معرفته بالمصطلحات.\nهذه نسخة تجريبية لجمع الأدلة وصياغة مادة أولية؛ ليست منهجاً معتمداً ولا حكماً مستقلاً على صحة الأحاديث.\nابدأ باستدعاء search_hadith_corpus لكلمات أو عبارات قصيرة مناسبة للموضوع، بنطاق book=\"all\" وlimit صغير. نفذ بحد أقصى ثلاثة استدعاءات بحث في الرد الأول، ثم قدم النتيجة أو بين عدم توفر المادة. لا تدّع أن البحث المحدود يستوعب الكتب الستة كلها.\nاقتبس فقط النص العربي الذي أعادته الأداة حرفياً، وارفق اسم الكتاب والباب ومعرف السجل إن توفر. حافظ على تسمية رقم المصدر المحلي، ولا تحوله إلى رقم طبعة مشهورة. لا تستدع get_hadith_by_number برقم مجرد لأن ترقيم النسخة بابي؛ لا تخمّن معرفاً أو باباً.\nلا تنقل حديثاً من الذاكرة ولا تقطع بثبوته لمجرد وروده في فهرس. لا تستخرج رتب الرواة ولا ترسم أسانيد في هذا المسار. إذا غابت بيانات الحكم أو الشرح المعتمد فاذكر أنها تحتاج إلى مطابقة ومراجعة. لا تنسب تلخيصك إلى HadeethEnc أو شرح معين دون مصدر مسترجع. لا تستخدم أداة شرح غير مربوطة بهذا النموذج.\nنظم الرد في أربعة أجزاء قصيرة: (1) سؤال إنساني تمهيدي (2) شاهد أو شاهدان بنصهما ومصدرهما من البحث (3) معنى تعريفي مبسط موسوم «تلخيص أولي يحتاج مراجعة» دون فتوى أو ادعاء سياق تاريخي (4) مسودة المادة بالشكل الذي اختاره المستخدم، مع المصادر وحدود التغطية. افصل بصرياً بين الاقتباس والتلخيص.\nإذا طلب المستخدم حكماً شخصياً أو تفسيراً خلافياً فبيّن نطاقك وأحله إلى مراجعة علمية مختصة. انقطاع الأداة أو عدم العثور على مادة لا يعني ضعف الحديث أو عدم وجوده. لا تزعم اكتمال التغطية أو اعتماد المحتوى للنشر.\nاختم بسؤال متابعة واحد يساعد المعرّف على اختيار الجمهور أو مستوى التبسيط. أجب بلغة المستخدم؛ والترجمة الآلية تُوسم كتقريب للمعنى وليست نصاً نبوياً.",
+      "system": "أنت «بيان السُّنّة — دليل المعرّف بالإسلام». تساعد المعرّفين بالإسلام على إعداد مسودة تعريفية عربية واضحة من نصوص حديثية مسترجعة، باحترام القارئ دون افتراض ديانته أو معرفته بالمصطلحات.\nهذه نسخة تجريبية لجمع الأدلة وصياغة مادة أولية؛ ليست منهجاً معتمداً ولا حكماً مستقلاً على صحة الأحاديث.\n\n## 🚨 استدعاء الأدوات المعتمدة:\n1. **أداة الموضوعات والشواهد المعتمدة (hadith_bayan_topics):**\n   - استدعِ `list_islam_topics()` لاستعراض المحاور الستة وتساؤلاتها المركزية:\n     * topic-faith (الإيمان والمعنى - مع استبعاد الأيمان والنذور القضائية).\n     * topic-mercy (الرحمة وحسن الخلق).\n     * topic-worship (العبادة والحياة).\n     * topic-family (الأسرة والجوار).\n     * topic-fairness (العدل والأمانة).\n     * topic-knowledge (العلم والحوار).\n   - استدعِ `get_topic_evidence(topic_id=..., audience=...)` لجلب شواهد الموضوع المعتمدة مع بصماتها ومصادرها الثابتة للجمهور المحدد (newcomer, new_muslim, educator).\n   - استدعِ `get_reviewed_lesson(topic_id=..., audience=..., format=...)` لجلب مسودات الدروس المراجعة بحسب الجمهور والقالب (card, qa, two_minute).\n\n2. **أداة البحث المتني (search_hadith_corpus):**\n   - استدعِ `search_hadith_corpus(query=..., book=\"all\", limit=5)` للبحث عن ألفاظ إضافية أو التحقق من المتون في الكتب الستة.\n   - لا تدّعِ أن البحث المحدود يستوعب الكتب الستة كلها، واذكر حدود التغطية بأمانة.\n\n## 🚨 الأمانة العلمية والتنظيم:\n- اقتبس فقط النص العربي الذي أعادته الأداة حرفياً، وارفق اسم الكتاب والباب ومعرف السجل (occurrence_id) إن توفر. حافظ على تسمية رقم المصدر المحلي، ولا تحوله إلى رقم طبعة مشهورة.\n- لا تنقل حديثاً من الذاكرة دون استرجاع. لا تستخرج رتب الرواة ولا ترسم أسانيد في هذا المسار.\n- نظم الرد في أربعة أجزاء واضحة:\n  (1) سؤال إنساني تمهيدي\n  (2) شاهد أو شاهدان بنصهما ومصدرهما من الأداة\n  (3) معنى تعريفي مبسط موسوم «تلخيص أولي يحتاج مراجعة» دون فتوى أو ادعاء سياق تاريخي\n  (4) مسودة المادة بالشكل الذي اختاره المستخدم (بطاقة / حوار / كلمة) مع المصادر وحدود التغطية\n- بيّن حالة المراجعة بوضوح: المحتوى التعليمي والتلخيص هو مسودة استرشادية قيد المراجعة والاعتماد العلمي (review_status: needs_review).\n- اختم بسؤال متابعة واحد يساعد المعرّف على اختيار الجمهور أو مستوى التبسيط.\n",
       "function_calling": "native",
       "temperature": 0.2
     },
     "meta": {
       "profile_image_url": null,
       "background_image_url": null,
-      "description": "مسار موضوعي يجمع شواهد الحديث ويساعد المعرّف بالإسلام على إعداد مادة أولية بمصادرها.",
+      "description": "دليل المعرّف بالإسلام لمشروع بيان السُّنّة. يستعرض المحاور الستة والدروس والشواهد المعتمدة بأداة hadith_bayan_topics وأداة البحث المتني.",
       "i18n": null,
       "capabilities": {
+        "file_context": false,
         "vision": false,
         "file_upload": false,
-        "file_context": false,
         "web_search": false,
         "image_generation": false,
         "code_interpreter": false,
         "terminal": false,
-        "memory": false,
         "citations": true,
         "status_updates": true,
+        "memory": false,
         "builtin_tools": false
       },
       "knowledge": null,
       "toolIds": [
+        "hadith_bayan_topics",
         "hadith_corpus_search"
       ],
       "suggestion_prompts": [
@@ -387,6 +390,22 @@
           ],
           "content": "ما الصلة بين العبادة والحياة اليومية؟"
         }
+      ],
+      "tools": [
+        "hadith_bayan_topics",
+        "hadith_corpus_search"
+      ],
+      "tool_ids": [
+        "hadith_bayan_topics",
+        "hadith_corpus_search"
+      ],
+      "skillIds": [
+        "hadith-islam-guide",
+        "hadith-search-record"
+      ],
+      "skill_ids": [
+        "hadith-islam-guide",
+        "hadith-search-record"
       ]
     },
     "is_active": true
@@ -402,19 +421,21 @@
       "profile_image_url": null,
       "background_image_url": null,
       "description": "وكيل متخصص حصرياً في هندسة شبكات الأسانيد وتحويل سلاسل الرواة إلى مخططات Mermaid انسيابية معقمة برمجياً وخالية 100% من الأخطاء.",
+      "i18n": null,
       "capabilities": {
+        "file_context": false,
         "vision": false,
         "file_upload": false,
-        "file_context": false,
         "web_search": false,
         "image_generation": false,
         "code_interpreter": false,
         "terminal": false,
-        "memory": false,
         "citations": true,
         "status_updates": true,
+        "memory": false,
         "builtin_tools": false
       },
+      "knowledge": null,
       "suggestion_prompts": [
         {
           "title": [
@@ -455,6 +476,16 @@
         "hadith_narrator",
         "hadith_takhrij",
         "hadith_isnad_tree"
+      ],
+      "skillIds": [
+        "hadith-mermaid-architect",
+        "hadith-rijal-critic",
+        "hadith-search-record"
+      ],
+      "skill_ids": [
+        "hadith-mermaid-architect",
+        "hadith-rijal-critic",
+        "hadith-search-record"
       ]
     },
     "is_active": true
@@ -470,19 +501,21 @@
       "profile_image_url": null,
       "background_image_url": null,
       "description": "وكيل أكاديمي متخصص في شرح الحديث النبوي الشريف واستخراج الفوائد الفقهية والتربوية وغريب الألفاظ وعزو الشروح لمصادرها التراثية المعتمدة (شروح الصحيحين والسنن كفتح الباري وشرح النووي).",
+      "i18n": null,
       "capabilities": {
+        "file_context": false,
         "vision": false,
         "file_upload": false,
-        "file_context": false,
         "web_search": false,
         "image_generation": false,
         "code_interpreter": false,
         "terminal": false,
-        "memory": false,
         "citations": true,
         "status_updates": true,
+        "memory": false,
         "builtin_tools": false
       },
+      "knowledge": null,
       "suggestion_prompts": [
         {
           "title": [
@@ -520,6 +553,14 @@
         "hadith_sharh_vocab",
         "hadith_corpus_search",
         "hadith_takhrij"
+      ],
+      "skillIds": [
+        "hadith-sharh-scholar",
+        "hadith-search-record"
+      ],
+      "skill_ids": [
+        "hadith-sharh-scholar",
+        "hadith-search-record"
       ]
     },
     "is_active": true
@@ -548,6 +589,7 @@
         "terminal": false,
         "citations": true,
         "status_updates": true,
+        "memory": true,
         "builtin_tools": true
       },
       "knowledge": null,
@@ -555,8 +597,8 @@
         "hadith_corpus_search",
         "hadith_takhrij",
         "hadith_sharh_vocab",
-        "hadith_narrator",
         "hadith_isnad_tree",
+        "hadith_narrator",
         "hadith_bayan_topics"
       ],
       "builtinTools": {
@@ -568,16 +610,16 @@
         "hadith_corpus_search",
         "hadith_takhrij",
         "hadith_sharh_vocab",
-        "hadith_narrator",
         "hadith_isnad_tree",
+        "hadith_narrator",
         "hadith_bayan_topics"
       ],
       "tool_ids": [
         "hadith_corpus_search",
         "hadith_takhrij",
         "hadith_sharh_vocab",
-        "hadith_narrator",
         "hadith_isnad_tree",
+        "hadith_narrator",
         "hadith_bayan_topics"
       ],
       "suggestion_prompts": [
@@ -606,20 +648,20 @@
       "skillIds": [
         "hadith-search-record",
         "hadith-takhrij-compare",
-        "hadith-mermaid-architect",
         "hadith-sharh-scholar",
         "hadith-rijal-critic",
-        "hadith-source-provenance",
-        "hadith-islam-guide"
+        "hadith-mermaid-architect",
+        "hadith-islam-guide",
+        "hadith-bayan-maestro"
       ],
       "skill_ids": [
         "hadith-search-record",
         "hadith-takhrij-compare",
-        "hadith-mermaid-architect",
         "hadith-sharh-scholar",
         "hadith-rijal-critic",
-        "hadith-source-provenance",
-        "hadith-islam-guide"
+        "hadith-mermaid-architect",
+        "hadith-islam-guide",
+        "hadith-bayan-maestro"
       ]
     },
     "is_active": true
