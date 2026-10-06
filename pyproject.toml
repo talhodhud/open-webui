@@ -1,8 +1,9 @@
 [project]
 name = "open-webui"
-description = "Open WebUI"
+description = "Bayan Al-Sunnah (بيان السنة) - Intelligent Hadith & Isnad Analysis Platform built on Open WebUI"
 authors = [
-    { name = "Timothy Jaeryang Baek", email = "tim@openwebui.com" }
+    { name = "Timothy Jaeryang Baek", email = "tim@openwebui.com" },
+    { name = "Bayan Al-Sunnah Contributors" }
 ]
 license = { file = "LICENSE" }
 dependencies = [
