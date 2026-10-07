@@ -14,7 +14,11 @@ import urllib.request
 import urllib.parse
 import urllib.error
 from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
+try:
+    from pydantic import BaseModel, Field, model_validator
+except ImportError:
+    from pydantic import BaseModel, Field
+    model_validator = None
 
 try:
     from tools.hadith_contract_helper import build_response, to_json_str
@@ -38,41 +42,48 @@ except ImportError:
             return json.dumps(payload, ensure_ascii=False, indent=indent)
 
 class Tools:
-    class Valves(BaseModel):
-        DB_PATH: str = Field(
-            default=r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\hadith_rijal.db",
-            description="Path to hadith_rijal.db containing hadith_vocab and hadith_roots."
-        )
-        SEARCH_INDEX_PATH: str = Field(
-            default=r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\poc\phrase_search\search_index.sqlite",
-            description="Path to search_index.sqlite containing stable occurrence IDs."
-        )
-        REQUEST_TIMEOUT: int = Field(
-            default=15,
-            description="Network request timeout in seconds."
-        )
-
-
     @staticmethod
-    def _resolve_path(env_var: str, current_val: str, candidates: list) -> str:
+    def _verify_sqlite_schema(path: str, required_tables: List[str]) -> bool:
+        if not path or not os.path.exists(path):
+            return False
+        try:
+            if os.path.getsize(path) == 0:
+                return False
+            conn = sqlite3.connect(path)
+            cur = conn.cursor()
+            cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = {r[0] for r in cur.fetchall()}
+            conn.close()
+            return all(t in tables for t in required_tables)
+        except Exception:
+            return False
+
+    @classmethod
+    def _resolve_candidate_path(cls, env_var: str, current_val: str, candidates: List[str], required_tables: List[str]) -> str:
         env_val = os.environ.get(env_var)
-        if env_val and os.path.exists(env_val):
-            return os.path.abspath(env_val)
-        if current_val and os.path.exists(current_val):
-            return os.path.abspath(current_val)
+        if env_val:
+            env_val = os.path.abspath(env_val)
+            if not required_tables or cls._verify_sqlite_schema(env_val, required_tables):
+                return env_val
+
+        if current_val:
+            cur_abs = os.path.abspath(current_val) if not current_val.startswith("c:\\") or os.name == 'nt' else current_val
+            if os.path.exists(cur_abs) and (not required_tables or cls._verify_sqlite_schema(cur_abs, required_tables)):
+                return cur_abs
+
         search_roots = [
+            "/app/backend/data",
+            "/app/data",
+            "/data",
+            "/root/open-webui",
+            "/root/open-webui/hadith",
+            "/root",
             os.getcwd(),
             os.path.abspath(os.path.join(os.getcwd(), "..")),
             os.path.abspath(os.path.join(os.getcwd(), "../..")),
             os.path.abspath(os.path.join(os.getcwd(), "hadith")),
             os.path.abspath(os.path.join(os.getcwd(), "open-webui")),
             os.path.abspath(os.path.join(os.getcwd(), "open-webui/hadith")),
-            "/app/backend/data",
-            "/app/data",
-            "/app",
-            "/root/open-webui",
-            "/root/open-webui/hadith",
-            "/root",
         ]
         if "__file__" in globals():
             tool_dir = os.path.dirname(os.path.abspath(__file__))
@@ -82,38 +93,99 @@ class Tools:
                 os.path.abspath(os.path.join(tool_dir, "../..")),
                 os.path.abspath(os.path.join(tool_dir, "../../..")),
             ])
+        if os.name == 'nt':
+            search_roots.append(r"c:\Users\mhdal\OneDrive\AI\Hadith KSA")
+
         for c in candidates:
-            if os.path.isabs(c) and os.path.exists(c):
+            if os.path.isabs(c) and (not required_tables or cls._verify_sqlite_schema(c, required_tables)):
                 return os.path.abspath(c)
             for root in search_roots:
-                p = os.path.join(root, c)
-                if os.path.exists(p):
-                    return os.path.abspath(p)
-        return current_val
+                p = os.path.abspath(os.path.join(root, c))
+                if os.path.exists(p) and (not required_tables or cls._verify_sqlite_schema(p, required_tables)):
+                    return p
+        return current_val or ""
+
+    class Valves(BaseModel):
+        DB_PATH: str = Field(
+            default="",
+            description="Path to hadith_rijal.db (or set HADITH_DB_PATH). Schema-verified for 'hadith_vocab' and 'hadith_roots'."
+        )
+        SEARCH_INDEX_PATH: str = Field(
+            default="",
+            description="Path to search_index.sqlite (or set HADITH_SEARCH_INDEX_PATH). Schema-verified for 'records'."
+        )
+        REQUEST_TIMEOUT: int = Field(
+            default=15,
+            description="Network request timeout in seconds."
+        )
+
+        def __init__(self, **data):
+            super().__init__(**data)
+            self._ensure_resolved()
+
+        def _ensure_resolved(self):
+            if not self.DB_PATH or not Tools._verify_sqlite_schema(self.DB_PATH, ["hadith_vocab", "hadith_roots"]):
+                self.DB_PATH = Tools._resolve_candidate_path(
+                    "HADITH_DB_PATH",
+                    self.DB_PATH,
+                    [
+                        "hadith_rijal.db",
+                        "hadith/hadith_rijal.db",
+                        "open-webui/hadith_rijal.db",
+                        "backend/data/hadith_rijal.db",
+                        "data/hadith_rijal.db"
+                    ],
+                    ["hadith_vocab", "hadith_roots"]
+                )
+            if not self.SEARCH_INDEX_PATH or not Tools._verify_sqlite_schema(self.SEARCH_INDEX_PATH, ["records"]):
+                self.SEARCH_INDEX_PATH = Tools._resolve_candidate_path(
+                    "HADITH_SEARCH_INDEX_PATH",
+                    self.SEARCH_INDEX_PATH,
+                    [
+                        "poc/phrase_search/search_index.sqlite",
+                        "hadith/poc/phrase_search/search_index.sqlite",
+                        "search_index.sqlite",
+                        "backend/data/search_index.sqlite",
+                        "data/search_index.sqlite"
+                    ],
+                    ["records"]
+                )
+
+    def _ensure_db(self) -> str:
+        if not self._verify_sqlite_schema(self.valves.DB_PATH, ["hadith_vocab", "hadith_roots"]):
+            self.valves.DB_PATH = self._resolve_candidate_path(
+                "HADITH_DB_PATH",
+                self.valves.DB_PATH,
+                [
+                    "hadith_rijal.db",
+                    "hadith/hadith_rijal.db",
+                    "open-webui/hadith_rijal.db",
+                    "backend/data/hadith_rijal.db",
+                    "data/hadith_rijal.db"
+                ],
+                ["hadith_vocab", "hadith_roots"]
+            )
+        return self.valves.DB_PATH
+
+    def _ensure_search_index(self) -> str:
+        if not self._verify_sqlite_schema(self.valves.SEARCH_INDEX_PATH, ["records"]):
+            self.valves.SEARCH_INDEX_PATH = self._resolve_candidate_path(
+                "HADITH_SEARCH_INDEX_PATH",
+                self.valves.SEARCH_INDEX_PATH,
+                [
+                    "poc/phrase_search/search_index.sqlite",
+                    "hadith/poc/phrase_search/search_index.sqlite",
+                    "search_index.sqlite",
+                    "backend/data/search_index.sqlite",
+                    "data/search_index.sqlite"
+                ],
+                ["records"]
+            )
+        return self.valves.SEARCH_INDEX_PATH
 
     def _resolve_all_paths(self):
-        self.valves.DB_PATH = self._resolve_path(
-            "HADITH_DB_PATH",
-            self.valves.DB_PATH,
-            [
-                "hadith_rijal.db",
-                "hadith/hadith_rijal.db",
-                "open-webui/hadith_rijal.db",
-                "backend/data/hadith_rijal.db",
-                "data/hadith_rijal.db"
-            ]
-        )
-        self.valves.SEARCH_INDEX_PATH = self._resolve_path(
-            "HADITH_SEARCH_INDEX_PATH",
-            self.valves.SEARCH_INDEX_PATH,
-            [
-                "poc/phrase_search/search_index.sqlite",
-                "hadith/poc/phrase_search/search_index.sqlite",
-                "search_index.sqlite",
-                "backend/data/search_index.sqlite",
-                "data/search_index.sqlite"
-            ]
-        )
+        self._ensure_db()
+        self._ensure_search_index()
 
     def __init__(self):
         self.valves = self.Valves()
@@ -151,6 +223,8 @@ class Tools:
         :param occurrence_id: Optional exact occurrence ID to match commentary against.
         :return: Standardized JSON envelope with commentary, provider ID, source URL, and matching basis.
         """
+        self._ensure_search_index()
+        self._ensure_db()
         # If occurrence_id is supplied, validate authoritatively against local index
         if occurrence_id:
             clean_occ_id = occurrence_id.strip()
@@ -294,14 +368,15 @@ class Tools:
         :param word: The Arabic word to look up (e.g. 'عسعس', 'كسفت', 'الضيزى').
         :return: Standardized JSON envelope with lexical definition, root, lemma, part of speech, and corpus frequency.
         """
-        if not os.path.exists(self.valves.DB_PATH):
-            return to_json_str(build_response(status="unavailable", warnings=["Database not found."]))
+        db_path = self._ensure_db()
+        if not self._verify_sqlite_schema(db_path, ["hadith_vocab"]):
+            return to_json_str(build_response(status="unavailable", warnings=[f"Database not found or invalid schema at '{db_path}'."]))
 
         clean_word = word.strip()
         norm_word = self._normalize_arabic(clean_word)
 
         try:
-            conn = sqlite3.connect(self.valves.DB_PATH)
+            conn = sqlite3.connect(db_path)
             cur = conn.cursor()
 
             # First exact or normalized match
@@ -372,14 +447,15 @@ class Tools:
         :param root: 3-letter Arabic root (e.g. 'خسف', 'سلم', 'عبد', 'علم').
         :return: Standardized JSON envelope with classical root definitions, Buckwalter code, summary, and Quran frequency.
         """
-        if not os.path.exists(self.valves.DB_PATH):
-            return to_json_str(build_response(status="unavailable", warnings=["Database not found."]))
+        db_path = self._ensure_db()
+        if not self._verify_sqlite_schema(db_path, ["hadith_roots"]):
+            return to_json_str(build_response(status="unavailable", warnings=[f"Database not found or invalid schema at '{db_path}'."]))
 
         clean_root = root.strip().replace(" ", "").replace(".", "")
         norm_root = self._normalize_arabic(clean_root)
 
         try:
-            conn = sqlite3.connect(self.valves.DB_PATH)
+            conn = sqlite3.connect(db_path)
             cur = conn.cursor()
 
             cur.execute("""

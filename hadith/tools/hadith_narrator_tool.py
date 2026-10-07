@@ -625,6 +625,7 @@ class Tools:
         :param limit: Maximum results to return (default: 5).
         :return: JSON formatted list of matching narrators with ID, full name, grade, death year, and city.
         """
+        self._resolve_all_paths()
         if not os.path.exists(self.valves.DB_PATH):
             return to_json_str(build_response(
                 status="unavailable",
@@ -707,6 +708,7 @@ class Tools:
         :param narrator_id: Integer ID of the narrator from search_narrator.
         :return: JSON formatted detailed biography including classical sources, teachers, and students.
         """
+        self._resolve_all_paths()
         if not os.path.exists(self.valves.DB_PATH):
             return to_json_str(build_response(
                 status="unavailable",
@@ -855,6 +857,7 @@ class Tools:
         :param scholar_filter: Optional filter to focus on a specific evaluating scholar.
         :return: JSON formatted verbatim scholar statements.
         """
+        self._resolve_all_paths()
         if not os.path.exists(self.valves.DB_PATH):
             return to_json_str(build_response(
                 status="unavailable",

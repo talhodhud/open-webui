@@ -175,6 +175,11 @@ test('specialist follow-ups preserve occurrence identity and route explicitly', 
     assert.equal(contract.modelId, 'bayan-unified-pilot');
     assert.equal(contract.primarySkillId, unifiedSkill);
     assert.equal(contract.submit, false);
+    assert.ok(contract.originTrack, 'originTrack must be preserved');
+    assert.equal(contract.routeKind, 'all_paths');
+    if (unifiedSkill === 'hadith-mermaid-architect' || unifiedSkill === 'hadith-takhrij-compare' || unifiedSkill === 'hadith-rijal-critic') {
+      assert.equal(contract.track, 'research', 'Follow-up for graph/research must have track=research');
+    }
   }
 
   assert.throws(() => buildFollowupURL('http://localhost:8080', 'prayer-call', 9));

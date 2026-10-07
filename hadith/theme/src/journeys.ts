@@ -39,6 +39,8 @@ export interface JourneyContract {
   version: 1;
   modelId: string;
   track: TrackKind;
+  originTrack?: TrackKind;
+  routeKind?: 'all_paths' | 'specific_path';
   caseId?: string;
   topicId?: string;
   task: string;
@@ -236,6 +238,7 @@ export interface RouteOptions {
   format?: string;
   occurrenceIds?: string[];
   evidenceIds?: string[];
+  routeKind?: 'all_paths' | 'specific_path';
 }
 
 export function buildJourneyContract(id: string, options: RouteOptions = {}): JourneyContract {
@@ -261,6 +264,8 @@ export function buildJourneyContract(id: string, options: RouteOptions = {}): Jo
     version: 1,
     modelId: isUnified ? journey.unifiedModelId : journey.modelId,
     track: journey.track,
+    originTrack: journey.track,
+    routeKind: options.routeKind || 'all_paths',
     caseId: journey.id,
     topicId: journey.topic ? journey.id : undefined,
     task: journey.task,
@@ -283,11 +288,16 @@ export function buildFollowupContract(id: string, index: number, options: RouteO
   const isUnified = options.mode === 'unified';
   const targetModel = isUnified ? 'bayan-unified-pilot' : (action.modelId || FOLLOWUP_MODELS[id]?.[index] || journey.modelId);
   const primarySkill = isUnified ? (action.unifiedSkillId || 'hadith-search-record') : (action.modelId || 'hadith-model-1');
+  const followTrack: TrackKind = (action.task === 'isnad_graph' || action.task === 'compare' || action.task === 'narrator_network' || action.task === 'narrator_grades')
+    ? 'research'
+    : (journey.track === 'islam' ? 'islam' : journey.track);
 
   return {
     version: 1,
     modelId: targetModel,
-    track: journey.track,
+    track: followTrack,
+    originTrack: journey.track,
+    routeKind: options.routeKind || 'all_paths',
     caseId: journey.id,
     topicId: journey.topic ? journey.id : undefined,
     task: action.task || 'followup',

@@ -34,37 +34,45 @@ except ImportError:
 
 
 class Tools:
-    class Valves(BaseModel):
-        TAXONOMY_PATH: str = Field(
-            default=r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\planning\islam_topic_taxonomy_v1.json",
-            description="Absolute path to the topic taxonomy JSON."
-        )
-        LESSON_PACKS_PATH: str = Field(
-            default=r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\planning\bayan_lesson_packs_v1.json",
-            description="Absolute path to the reviewed lesson packs JSON."
-        )
-
-
     @staticmethod
-    def _resolve_path(env_var: str, current_val: str, candidates: list) -> str:
+    def _verify_json_file(path: str) -> bool:
+        if not path or not os.path.exists(path):
+            return False
+        try:
+            if os.path.getsize(path) == 0:
+                return False
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return bool(data)
+        except Exception:
+            return False
+
+    @classmethod
+    def _resolve_candidate_path(cls, env_var: str, current_val: str, candidates: List[str]) -> str:
         env_val = os.environ.get(env_var)
-        if env_val and os.path.exists(env_val):
-            return os.path.abspath(env_val)
-        if current_val and os.path.exists(current_val):
-            return os.path.abspath(current_val)
+        if env_val:
+            env_val = os.path.abspath(env_val)
+            if cls._verify_json_file(env_val):
+                return env_val
+
+        if current_val:
+            cur_abs = os.path.abspath(current_val) if not current_val.startswith("c:\\") or os.name == 'nt' else current_val
+            if os.path.exists(cur_abs) and cls._verify_json_file(cur_abs):
+                return cur_abs
+
         search_roots = [
+            "/app/backend/data",
+            "/app/data",
+            "/data",
+            "/root/open-webui",
+            "/root/open-webui/hadith",
+            "/root",
             os.getcwd(),
             os.path.abspath(os.path.join(os.getcwd(), "..")),
             os.path.abspath(os.path.join(os.getcwd(), "../..")),
             os.path.abspath(os.path.join(os.getcwd(), "hadith")),
             os.path.abspath(os.path.join(os.getcwd(), "open-webui")),
             os.path.abspath(os.path.join(os.getcwd(), "open-webui/hadith")),
-            "/app/backend/data",
-            "/app/data",
-            "/app",
-            "/root/open-webui",
-            "/root/open-webui/hadith",
-            "/root",
         ]
         if "__file__" in globals():
             tool_dir = os.path.dirname(os.path.abspath(__file__))
@@ -74,38 +82,91 @@ class Tools:
                 os.path.abspath(os.path.join(tool_dir, "../..")),
                 os.path.abspath(os.path.join(tool_dir, "../../..")),
             ])
+        if os.name == 'nt':
+            search_roots.append(r"c:\Users\mhdal\OneDrive\AI\Hadith KSA")
+
         for c in candidates:
-            if os.path.isabs(c) and os.path.exists(c):
+            if os.path.isabs(c) and cls._verify_json_file(c):
                 return os.path.abspath(c)
             for root in search_roots:
-                p = os.path.join(root, c)
-                if os.path.exists(p):
-                    return os.path.abspath(p)
-        return current_val
+                p = os.path.abspath(os.path.join(root, c))
+                if cls._verify_json_file(p):
+                    return p
+        return current_val or ""
+
+    class Valves(BaseModel):
+        TAXONOMY_PATH: str = Field(
+            default="",
+            description="Absolute path to the topic taxonomy JSON (or set HADITH_TAXONOMY_PATH)."
+        )
+        LESSON_PACKS_PATH: str = Field(
+            default="",
+            description="Absolute path to the reviewed lesson packs JSON (or set HADITH_LESSON_PACKS_PATH)."
+        )
+
+        def __init__(self, **data):
+            super().__init__(**data)
+            self._ensure_resolved()
+
+        def _ensure_resolved(self):
+            if not self.TAXONOMY_PATH or not Tools._verify_json_file(self.TAXONOMY_PATH):
+                self.TAXONOMY_PATH = Tools._resolve_candidate_path(
+                    "HADITH_TAXONOMY_PATH",
+                    self.TAXONOMY_PATH,
+                    [
+                        "planning/islam_topic_taxonomy_v1.json",
+                        "hadith/planning/islam_topic_taxonomy_v1.json",
+                        "open-webui/hadith/planning/islam_topic_taxonomy_v1.json",
+                        "backend/data/islam_topic_taxonomy_v1.json",
+                        "islam_topic_taxonomy_v1.json"
+                    ]
+                )
+            if not self.LESSON_PACKS_PATH or not Tools._verify_json_file(self.LESSON_PACKS_PATH):
+                self.LESSON_PACKS_PATH = Tools._resolve_candidate_path(
+                    "HADITH_LESSON_PACKS_PATH",
+                    self.LESSON_PACKS_PATH,
+                    [
+                        "planning/bayan_lesson_packs_v1.json",
+                        "hadith/planning/bayan_lesson_packs_v1.json",
+                        "open-webui/hadith/planning/bayan_lesson_packs_v1.json",
+                        "backend/data/bayan_lesson_packs_v1.json",
+                        "bayan_lesson_packs_v1.json"
+                    ]
+                )
+
+    def _ensure_taxonomy(self) -> str:
+        if not self._verify_json_file(self.valves.TAXONOMY_PATH):
+            self.valves.TAXONOMY_PATH = self._resolve_candidate_path(
+                "HADITH_TAXONOMY_PATH",
+                self.valves.TAXONOMY_PATH,
+                [
+                    "planning/islam_topic_taxonomy_v1.json",
+                    "hadith/planning/islam_topic_taxonomy_v1.json",
+                    "open-webui/hadith/planning/islam_topic_taxonomy_v1.json",
+                    "backend/data/islam_topic_taxonomy_v1.json",
+                    "islam_topic_taxonomy_v1.json"
+                ]
+            )
+        return self.valves.TAXONOMY_PATH
+
+    def _ensure_lesson_packs(self) -> str:
+        if not self._verify_json_file(self.valves.LESSON_PACKS_PATH):
+            self.valves.LESSON_PACKS_PATH = self._resolve_candidate_path(
+                "HADITH_LESSON_PACKS_PATH",
+                self.valves.LESSON_PACKS_PATH,
+                [
+                    "planning/bayan_lesson_packs_v1.json",
+                    "hadith/planning/bayan_lesson_packs_v1.json",
+                    "open-webui/hadith/planning/bayan_lesson_packs_v1.json",
+                    "backend/data/bayan_lesson_packs_v1.json",
+                    "bayan_lesson_packs_v1.json"
+                ]
+            )
+        return self.valves.LESSON_PACKS_PATH
 
     def _resolve_all_paths(self):
-        self.valves.TAXONOMY_PATH = self._resolve_path(
-            "HADITH_TAXONOMY_PATH",
-            self.valves.TAXONOMY_PATH,
-            [
-                "planning/islam_topic_taxonomy_v1.json",
-                "hadith/planning/islam_topic_taxonomy_v1.json",
-                "open-webui/hadith/planning/islam_topic_taxonomy_v1.json",
-                "backend/data/islam_topic_taxonomy_v1.json",
-                "islam_topic_taxonomy_v1.json"
-            ]
-        )
-        self.valves.LESSON_PACKS_PATH = self._resolve_path(
-            "HADITH_LESSON_PACKS_PATH",
-            self.valves.LESSON_PACKS_PATH,
-            [
-                "planning/bayan_lesson_packs_v1.json",
-                "hadith/planning/bayan_lesson_packs_v1.json",
-                "open-webui/hadith/planning/bayan_lesson_packs_v1.json",
-                "backend/data/bayan_lesson_packs_v1.json",
-                "bayan_lesson_packs_v1.json"
-            ]
-        )
+        self._ensure_taxonomy()
+        self._ensure_lesson_packs()
 
     def __init__(self):
         self.valves = self.Valves()
@@ -115,14 +176,14 @@ class Tools:
 
     def _load_data(self):
         self._resolve_all_paths()
-        if not self._taxonomy_cache and os.path.exists(self.valves.TAXONOMY_PATH):
+        if not self._taxonomy_cache and self._verify_json_file(self.valves.TAXONOMY_PATH):
             try:
                 with open(self.valves.TAXONOMY_PATH, "r", encoding="utf-8") as f:
                     self._taxonomy_cache = json.load(f)
             except Exception:
                 pass
 
-        if not self._lesson_packs_cache and os.path.exists(self.valves.LESSON_PACKS_PATH):
+        if not self._lesson_packs_cache and self._verify_json_file(self.valves.LESSON_PACKS_PATH):
             try:
                 with open(self.valves.LESSON_PACKS_PATH, "r", encoding="utf-8") as f:
                     self._lesson_packs_cache = json.load(f)

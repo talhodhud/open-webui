@@ -158,6 +158,8 @@ class TestHadithBackendRegression(unittest.TestCase):
             # Fallback to verify matching logic via mocked live response when offline
             mock_item = [{"id": 4560, "title": "إنما الأعمال بالنيات", "hadith_text": "إنما الأعمال بالنيات وإنما لكل امرئ ما نوى"}]
             mock_detail = {
+                "hadeeth": "إنما الأعمال بالنيات وإنما لكل امرئ ما نوى",
+                "title": "إنما الأعمال بالنيات",
                 "explanation": "الأعمال مدارها على النيات ومقاصد المكلفين",
                 "words_meanings": [],
                 "reference": "رياض الصالحين - النووي"

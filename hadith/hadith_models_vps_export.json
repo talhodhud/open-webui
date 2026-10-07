@@ -589,7 +589,6 @@
         "terminal": false,
         "citations": true,
         "status_updates": true,
-        "memory": true,
         "builtin_tools": true
       },
       "knowledge": null,
@@ -597,8 +596,8 @@
         "hadith_corpus_search",
         "hadith_takhrij",
         "hadith_sharh_vocab",
-        "hadith_isnad_tree",
         "hadith_narrator",
+        "hadith_isnad_tree",
         "hadith_bayan_topics"
       ],
       "builtinTools": {
@@ -610,16 +609,16 @@
         "hadith_corpus_search",
         "hadith_takhrij",
         "hadith_sharh_vocab",
-        "hadith_isnad_tree",
         "hadith_narrator",
+        "hadith_isnad_tree",
         "hadith_bayan_topics"
       ],
       "tool_ids": [
         "hadith_corpus_search",
         "hadith_takhrij",
         "hadith_sharh_vocab",
-        "hadith_isnad_tree",
         "hadith_narrator",
+        "hadith_isnad_tree",
         "hadith_bayan_topics"
       ],
       "suggestion_prompts": [
@@ -648,22 +647,21 @@
       "skillIds": [
         "hadith-search-record",
         "hadith-takhrij-compare",
+        "hadith-mermaid-architect",
         "hadith-sharh-scholar",
         "hadith-rijal-critic",
         "hadith-source-provenance",
-        "hadith-mermaid-architect",
         "hadith-islam-guide",
         "hadith-bayan-maestro"
       ],
       "skill_ids": [
         "hadith-search-record",
         "hadith-takhrij-compare",
+        "hadith-mermaid-architect",
         "hadith-sharh-scholar",
         "hadith-rijal-critic",
         "hadith-source-provenance",
-        "hadith-mermaid-architect",
-        "hadith-islam-guide",
-        "hadith-bayan-maestro"
+        "hadith-islam-guide"
       ]
     },
     "is_active": true

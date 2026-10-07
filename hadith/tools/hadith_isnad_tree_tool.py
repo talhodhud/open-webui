@@ -258,59 +258,104 @@ class Tools:
 
         return "unknown", "غير متاح في قاعدة البيانات", []
 
-    def disambiguate_narrator(self, name: str, relation: str = "") -> str:
+    def disambiguate_narrator(self, name: str, relation: str = "", occurrence_id: str = "", anchor_name: str = "") -> str:
         """
-        Disambiguate a narrator's kunya or relative mention ('عن أبيه', 'عن جده') using Itqan disambiguation tables.
+        Disambiguate a narrator's kunya or relative mention ('عن أبيه', 'عن جده') using authentic evidence.
         
-        :param name: Narrator name or previous narrator in chain.
+        :param name: Narrator name or relative mention.
         :param relation: Optional relation type ('father', 'grandfather', 'grandmother', 'mother', 'uncle').
-        :return: JSON result with resolved real name, English name, and notes.
+        :param occurrence_id: Optional occurrence ID context.
+        :param anchor_name: The child or anchor narrator whom this relative belongs to (e.g. 'سعيد بن أبي بردة' for 'أبيه').
+        :return: JSON result with resolved identity, evidence source, and status.
         """
+        self._resolve_all_paths()
         if not os.path.exists(self.valves.DB_PATH):
             return json.dumps({"error": "Database not found."}, ensure_ascii=False)
 
-        try:
-            conn = sqlite3.connect(self.valves.DB_PATH)
-            if relation:
-                resolved, cands = self._resolve_relative(relation.lower().strip(), name, conn)
-                conn.close()
-                if resolved:
-                    return json.dumps({
-                        "input_narrator": name,
-                        "relation": relation,
-                        "resolved_identity": resolved,
-                        "status": "resolved"
-                    }, ensure_ascii=False)
-                elif len(cands) > 1:
-                    return json.dumps({
-                        "input_narrator": name,
-                        "relation": relation,
-                        "candidates": cands,
-                        "status": "ambiguous"
-                    }, ensure_ascii=False)
-                return json.dumps({
-                    "input_narrator": name,
-                    "relation": relation,
-                    "status": "unresolved"
-                }, ensure_ascii=False)
-            else:
-                real_name, en_name, cands = self._resolve_kunya(name, conn)
-                conn.close()
-                if len(cands) > 1:
-                    return json.dumps({
-                        "kunya": name,
-                        "candidates": cands,
-                        "status": "ambiguous"
-                    }, ensure_ascii=False)
-                return json.dumps({
-                    "kunya": name,
-                    "real_name": real_name,
-                    "name_en": en_name,
-                    "status": "resolved" if en_name else "original"
-                }, ensure_ascii=False)
+        clean_name = (name or "").strip()
+        norm_name = re.sub(r'[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED\u0640]', '', clean_name)
+        norm_name = re.sub(r'[إأآاٱ]', 'ا', norm_name).replace('ة', 'ه').replace('ى', 'ي').strip()
 
-        except Exception as e:
-            return json.dumps({"error": f"Disambiguation failed: {str(e)}"}, ensure_ascii=False)
+        # Reject relative pronoun queries without an anchor narrator context
+        if norm_name in ("ابيه", "ابي", "ابوه", "جده", "جد", "عمه", "عم", "خاله", "خالته") and not anchor_name:
+            return json.dumps({
+                "status": "missing_context",
+                "input_narrator": name,
+                "relation": relation or norm_name,
+                "warning": f"طلب تمييز القرابة المبهمة '{name}' يتطلب تمرير اسم الراوي صاحب الضمير (anchor_name) أو سياق السجل occurrence_id لحل الهوية بدليل وتجنب التخمين."
+            }, ensure_ascii=False)
+
+        try:
+            from hadith.isnad.parser import ExtractedMention, IsnadParser
+            from hadith.isnad.resolver import NarratorResolver
+        except ImportError:
+            import sys
+            _cur = os.path.dirname(os.path.abspath(__file__))
+            for root_cand in [
+                os.path.abspath(os.path.join(_cur, "..", "..")),
+                os.path.abspath(os.path.join(_cur, "..")),
+                os.path.abspath(os.path.join(_cur, "..", "open-webui")),
+                os.path.abspath(os.path.join(_cur, "..", "..", "open-webui")),
+            ]:
+                if os.path.exists(os.path.join(root_cand, "hadith", "isnad")) and root_cand not in sys.path:
+                    sys.path.insert(0, root_cand)
+            from hadith.isnad.parser import ExtractedMention, IsnadParser
+            from hadith.isnad.resolver import NarratorResolver
+
+        resolver = NarratorResolver(self.valves.DB_PATH)
+
+        if relation or norm_name in ("ابيه", "ابي", "ابوه", "جده", "جد", "عمه", "عم", "خاله", "خالته"):
+            rel_type = relation.lower().strip() or ("father" if norm_name in ("ابيه", "ابي", "ابوه") else "grandfather")
+            effective_anchor = anchor_name or (name if norm_name not in ("ابيه", "ابي", "ابوه", "جده", "جد") else "")
+            
+            rel_mention = ExtractedMention(
+                mention_id="m_query",
+                raw_text=name,
+                norm_text=norm_name,
+                source_span=(0, 0),
+                transmission_term="عن",
+                transmission_span=(0, 0),
+                is_relative=True,
+                relation_type=rel_type
+            )
+            anchor_mention = ExtractedMention(
+                mention_id="m_anchor",
+                raw_text=effective_anchor,
+                norm_text=IsnadParser.normalize_arabic(effective_anchor),
+                source_span=(0, 0),
+                transmission_term="",
+                transmission_span=(0, 0)
+            ) if effective_anchor else None
+
+            resolved = resolver.resolve_relative(rel_mention, anchor_mention)
+            return json.dumps({
+                "input_narrator": name,
+                "relation": rel_type,
+                "anchor_narrator": effective_anchor,
+                "resolved_identity": resolved.canonical_name,
+                "grade": resolved.grade,
+                "status": resolved.identity_status,
+                "evidence_source": resolved.evidence_source,
+                "resolution_rule": resolved.resolution_rule,
+                "candidates": resolved.candidates
+            }, ensure_ascii=False)
+
+        # Kunya or direct name resolution
+        conn = sqlite3.connect(self.valves.DB_PATH)
+        real_name, en_name, cands = self._resolve_kunya(name, conn)
+        conn.close()
+        if len(cands) > 1:
+            return json.dumps({
+                "kunya": name,
+                "candidates": cands,
+                "status": "ambiguous"
+            }, ensure_ascii=False)
+        return json.dumps({
+            "kunya": name,
+            "real_name": real_name,
+            "name_en": en_name,
+            "status": "resolved" if en_name else "original"
+        }, ensure_ascii=False)
 
     SAHABA_META = {
         "عمر بن الخطاب": "أبو حفص · الفاروق · أمير المؤمنين · ت 23 هـ · روى 539 حديثاً",
@@ -892,282 +937,80 @@ class Tools:
                 warnings=[f"لم يتم العثور على متن حديث لكتاب {book} ورقم {hadith_number}."]
             ))
 
-        # 4. Parse narrator chain with exact character-level alignment to original text
-        clean_chars = []
-        clean_to_orig = []
-        for orig_idx, ch in enumerate(text):
-            if re.match(r'[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED\u0640]', ch):
-                continue
-            norm_ch = ch
-            if norm_ch in 'إأآٱ': norm_ch = 'ا'
-            elif norm_ch == 'ة': norm_ch = 'ه'
-            elif norm_ch == 'ى': norm_ch = 'ي'
-            clean_to_orig.append(orig_idx)
-            clean_chars.append(norm_ch)
-        clean = ''.join(clean_chars)
+        # 4. Modular Evidence-Based Isnad Parsing, Resolution, and Graph Construction
+        try:
+            from hadith.isnad.parser import IsnadParser
+            from hadith.isnad.resolver import NarratorResolver
+            from hadith.isnad.graph import IsnadGraphBuilder
+            from hadith.isnad.render_mermaid import MermaidRenderer
+            from hadith.isnad.validation import validate_isnad_graph
+        except ImportError:
+            import sys
+            _cur = os.path.dirname(os.path.abspath(__file__))
+            for root_cand in [
+                os.path.abspath(os.path.join(_cur, "..", "..")),
+                os.path.abspath(os.path.join(_cur, "..")),
+                os.path.abspath(os.path.join(_cur, "..", "open-webui")),
+                os.path.abspath(os.path.join(_cur, "..", "..", "open-webui")),
+            ]:
+                if os.path.exists(os.path.join(root_cand, "hadith", "isnad")) and root_cand not in sys.path:
+                    sys.path.insert(0, root_cand)
+            from hadith.isnad.parser import IsnadParser
+            from hadith.isnad.resolver import NarratorResolver
+            from hadith.isnad.graph import IsnadGraphBuilder
+            from hadith.isnad.render_mermaid import MermaidRenderer
+            from hadith.isnad.validation import validate_isnad_graph
 
-        matn_markers = r'(?:[،,\.\s]+|\b)(?:نحو\s+حديث|بمثله|بمعناه|وليس\s+في\s+حديث|زاد\s+في|وفي\s+رواية|غير\s+ان|وزاد|وقال|لما\s+كسفت|كسفت|خسفت|نودي|ان\s+الشمس|ان\s+رسول|ان\s+النبي|قال\s+رسول|قالت\s+ما\s+سجدت|انما\s+الاعمال|من\s+حج|من\s+كان\s+يؤمن)\b'
-        m_split = re.split(matn_markers, clean, maxsplit=1)
-        isnad_part = m_split[0]
+        resolver = NarratorResolver(self.valves.DB_PATH)
+        parser = IsnadParser()
+        builder = IsnadGraphBuilder(resolver)
 
-        # Check Tahweel (ح) and Multi-Path Convergence
-        tahweel_regex = r'[\s,،]+(?:[\(\[]?\s*ح\s*[\)\]]?|تحويل)[\s,،]+'
-        conv_regex = r'[\s,،]+(?:كلاهما|كلاهم|جميعا|جميعهم|قالا|رويا)\s+(?:عن|قال|روى)\s+'
-        t_match = re.search(tahweel_regex, isnad_part)
-        c_match = re.search(conv_regex, isnad_part)
+        parsed = parser.parse(text)
+        graph = builder.build_graph(
+            parsed=parsed,
+            book=book or '',
+            hadith_number=hadith_number or 0,
+            occurrence_id=resolved_occ_id,
+            chapter_title=chapter_title
+        )
+        graph_dict = graph.to_dict()
+        mermaid_diagram = MermaidRenderer.render(graph)
+        is_valid_dag, validation_errors = validate_isnad_graph(graph_dict, text)
 
-        if t_match and c_match and t_match.start() < c_match.start():
-            b1_text = isnad_part[:t_match.start()].strip()
-            b2_text = isnad_part[t_match.end():c_match.start()].strip()
-            stem_text = isnad_part[c_match.end():].strip()
-            branched_res = self._build_branched_isnad_dag(
-                b1_text=b1_text,
-                b2_text=b2_text,
-                stem_text=stem_text,
-                book=book,
-                hadith_number=hadith_number,
-                resolved_occ_id=resolved_occ_id,
-                chapter_title=chapter_title,
-                conn_db=conn_db
-            )
-            if conn_db: conn_db.close()
-            return to_json_str(branched_res)
-
-        verbs_pattern = r'(?:^|\s+|[،,])([وف]?(?:حدثنا|حدثني|حدثه|حدثهم|اخبرنا|اخبرني|اخبره|اخبرهم|انبانا|سمعت|سمعنا|سمع|انه سمع|انها سمعت|يخبر|يروي|عن|قال(?:\s+قال)?))\s+'
-        verb_matches = list(re.finditer(verbs_pattern, isnad_part))
-        
-        raw_chain = []
-        source_spans = []
-        transmission_terms = []
-
-        if not conn_db and os.path.exists(self.valves.DB_PATH):
-            conn_db = sqlite3.connect(self.valves.DB_PATH)
-
-        if verb_matches:
-            for i, vm in enumerate(verb_matches):
-                verb = vm.group(1).strip()
-                seg_start = vm.end()
-                seg_end = verb_matches[i + 1].start() if i + 1 < len(verb_matches) else len(isnad_part)
-                seg_text = isnad_part[seg_start:seg_end].strip()
-
-                if not seg_text:
-                    continue
-
-                # Map clean slice back to exact original diacritized text offsets
-                # Find start of actual name inside seg_text in clean
-                m_lead = re.search(r'^(?:[وف]?(?:حدثنا|حدثني|اخبرنا|اخبرني|انبانا|سمعت|عن|قال)\s+)+', seg_text)
-                lead_offset = len(m_lead.group(0)) if m_lead else 0
-                actual_clean_start = seg_start + (len(seg_text) - len(seg_text.lstrip())) + lead_offset
-                
-                seg_clean = re.sub(r'\s*رض[يى]\s*الله\s*عنه[ما]*\s*', ' ', seg_text)
-                seg_clean = re.sub(r'\s*(?:صلى|صلي)\s*الله\s*عليه\s*(?:وسلم|واله)?\s*', ' ', seg_clean)
-                seg_clean = re.sub(r'\s*رحم[هة]\s*الله\s*', ' ', seg_clean)
-                seg_clean = re.sub(r'[ـ\s]*عليه\s*السلام[ـ\s]*', '', seg_clean)
-                seg_clean = re.sub(r'(?:\s+|^)(?:وهو\s+)?(?:علي|على|في)\s+(?:المنبر|المسجد|الحجر|الكعبة).*|(?:\s+|^)(?:وهو\s+يخطب|يخطب|في\s+خطبته).*', '', seg_clean)
-                name_part = re.split(r'[،,\n]|(?:\s+(?:قال|يقول|ان|انه|انها|انهم)\s)', seg_clean)[0]
-                name_part = re.sub(r'^(?:[وف]?(?:حدثنا|حدثني|اخبرنا|اخبرني|انبانا|سمعت|عن|قال)\s+)+', '', name_part).strip()
-                name_cleaned = self._clean_narrator_name(name_part)
-
-                # Length in clean
-                name_clean_len = len(name_cleaned)
-                actual_clean_end = min(actual_clean_start + max(name_clean_len, 4), len(clean_to_orig))
-
-                if clean_to_orig and actual_clean_start < len(clean_to_orig):
-                    orig_s = clean_to_orig[actual_clean_start]
-                    end_idx = min(actual_clean_end - 1, len(clean_to_orig) - 1)
-                    orig_e = clean_to_orig[end_idx] + 1
-                    while orig_e < len(text) and re.match(r'[\u064B-\u065F\u0670\u0610-\u061A\u06D6-\u06ED\u0640]', text[orig_e]):
-                        orig_e += 1
-                    orig_span = (orig_s, orig_e)
-                else:
-                    orig_span = (0, 0)
-
-                name_part = name_cleaned
-
-                # Relative resolution (عن أبيه / عن جده)
-                if raw_chain:
-                    prev_narrator = raw_chain[-1]
-                    norm_prev = self._normalize_arabic(prev_narrator)
-                    fam_res = self.FAMOUS_FAMILY_RESOLUTIONS.get(norm_prev)
-                    if fam_res:
-                        if name_part in ('ابيه', 'ابي', 'ابوه'):
-                            name_part = fam_res["father"][0]
-                        elif name_part.startswith('جده') or name_part in ('جده', 'جد'):
-                            name_part = fam_res["grandfather"][0]
-                    elif conn_db:
-                        if name_part in ('ابيه', 'ابي'):
-                            resolved, _ = self._resolve_relative('father', prev_narrator, conn_db)
-                            if resolved: name_part = f"{resolved} (والد {prev_narrator})"
-                        elif name_part.startswith('جده'):
-                            resolved, _ = self._resolve_relative('grandfather', prev_narrator, conn_db)
-                            if resolved: name_part = f"{resolved} (جد {prev_narrator})"
-
-                # Kunya lookup
-                if conn_db and name_part:
-                    real, _, _ = self._resolve_kunya(name_part, conn_db)
-                    if real != name_part:
-                        name_part = f"{name_part} [{real}]"
-
-                non_narrator = ('الله', 'رسول', 'ذلك', 'هذا', 'كان', 'النبي')
-                if len(name_part) >= 3 and name_part not in non_narrator and not name_part.startswith('رسول الله') and not name_part.startswith('النبي'):
-                    raw_chain.append(name_part)
-                    source_spans.append(orig_span)
-                    transmission_terms.append(verb)
-
-        # Reverse chain so it flows top-down: Sahabi/Tabi'i -> ... -> Compiler teacher
-        descending_narrators = list(reversed(raw_chain))
-        descending_spans = list(reversed(source_spans))
-        descending_terms = list(reversed(transmission_terms))
-
-        # Detect prophetic endpoint truthfully from path evidence connecting to top narrator
-        has_prophetic_endpoint = False
-        endpoint_type = "unresolved"
-        if descending_narrators:
-            top_narrator = descending_narrators[0]
-            norm_top = self._normalize_arabic(top_narrator)
-            idx_in_clean = clean.find(norm_top.split()[0]) if norm_top else -1
-            after_top = clean[idx_in_clean + len(norm_top.split()[0]):min(idx_in_clean + len(norm_top.split()[0]) + 150, len(clean))] if idx_in_clean != -1 else ""
-            prophetic_pattern = r'(?:سمعت|سمعنا|قال|يقول|يحدث|روى|عن|ان|انه\s+سمع|انها\s+سمعت)\s+(?:رسول\s+الل[هة]|النبي)'
-            has_prophetic_endpoint = bool(re.search(prophetic_pattern, after_top))
-
-            is_top_sahabi = bool(self._get_sahabi_meta(norm_top))
-            if not is_top_sahabi and conn_db:
-                g_k, _, _ = self._get_narrator_grade(top_narrator, conn_db)
-                if g_k == "sahabi": is_top_sahabi = True
-
-            if has_prophetic_endpoint:
-                endpoint_type = "marfu" if is_top_sahabi else "mursal"
-            else:
-                endpoint_type = "mawquf" if is_top_sahabi else "maqtu"
-
-        # 5. Build structured graph nodes and edges
-        nodes = []
-        edges = []
-        mermaid_lines = ["graph TD"]
-        class_defs = [
-            "    classDef prophet fill:#18181b,stroke:#f59e0b,stroke-width:2px,color:#fef3c7,rx:10px,ry:10px;",
-            "    classDef sahabi fill:#064e3b,stroke:#10a37f,stroke-width:2px,color:#ecfdf5,rx:8px,ry:8px;",
-            "    classDef reliable fill:#1e293b,stroke:#3b82f6,stroke-width:1.5px,color:#f8fafc,rx:6px,ry:6px;",
-            "    classDef acceptable fill:#27272a,stroke:#71717a,stroke-width:1.5px,color:#f4f4f5,rx:6px,ry:6px;",
-            "    classDef weak fill:#450a0a,stroke:#f43f5e,stroke-width:1.5px,color:#fff1f2,rx:6px,ry:6px;",
-            "    classDef compiler fill:#09090b,stroke:#0ea5e9,stroke-width:2px,color:#f0f9ff,rx:8px,ry:8px;",
-            "    classDef unknown fill:#27272a,stroke:#52525b,stroke-width:1.5px,color:#e4e4e7,rx:6px,ry:6px;"
-        ]
-
-        prev_node_id = None
-        if has_prophetic_endpoint:
-            prophet_id = "P"
-            mermaid_lines.append('    P(["رسول الله ﷺ<br/><small>خاتم الأنبياء والمرسلين</small>"]):::prophet')
-            nodes.append({
-                "id": prophet_id,
-                "name": "رسول الله ﷺ",
-                "grade": "نبي معصوم",
-                "status": "prophet",
-                "source_span": [0, 0],
-                "occurrence_id": resolved_occ_id,
-                "candidates": None
-            })
-            prev_node_id = prophet_id
-
-        for idx, narrator in enumerate(descending_narrators):
-            nid = f"N{idx+1}"
-            clean_n = narrator.replace('"', '').replace("'", "")
-            norm_n = self._normalize_arabic(clean_n)
-
-            sahabi_meta = self._get_sahabi_meta(norm_n)
-            if sahabi_meta:
-                grade_key = "sahabi"
-                grade_title = "صحابي جليل"
-                label = f"<b>{clean_n} رضي الله عنه</b><br/><small>{sahabi_meta or 'صحابي جليل'}</small>"
-                cands = []
-            else:
-                grade_key, grade_title, cands = ("unknown", "غير محدد في المصدر", [])
-                if conn_db:
-                    grade_key, grade_title, cands = self._get_narrator_grade(clean_n, conn_db)
-                label = f"{clean_n}<br/><small>({grade_title})</small>"
-
-            span = descending_spans[idx] if idx < len(descending_spans) else [0, 0]
-            term = descending_terms[idx] if idx < len(descending_terms) else "عن"
-
-            nodes.append({
-                "id": nid,
-                "name": clean_n,
-                "grade": grade_title,
-                "status": grade_key,
-                "source_span": [span[0], span[1]],
-                "occurrence_id": resolved_occ_id,
-                "candidates": cands if cands else None
-            })
-
-            mermaid_lines.append(f'    {nid}["{label}"]:::{grade_key}')
-            if prev_node_id:
-                mermaid_lines.append(f"    {prev_node_id} --> {nid}")
-                edges.append({
-                    "source": prev_node_id,
-                    "target": nid,
-                    "transmission_term": term,
-                    "source_span": [span[0], span[1]],
-                    "occurrence_id": resolved_occ_id
-                })
-            prev_node_id = nid
-
-        # Bottom node: Compiler
-        book_titles = {
-            "bukhari": "صحيح البخاري", "muslim": "صحيح مسلم", "abudawud": "سنن أبي داود",
-            "tirmidhi": "جامع الترمذي", "nasai": "سنن النسائي", "ibnmajah": "سنن ابن ماجه"
-        }
-        b_title = book_titles.get(book, f"كتاب {book}")
-        comp_id = "COMP"
-        comp_label = f"{b_title}<br/><small>حديث {hadith_number or ''}</small>"
-        nodes.append({
-            "id": comp_id,
-            "name": b_title,
-            "grade": "المصنف الإمام",
-            "status": "compiler",
-            "source_span": [0, 0],
-            "occurrence_id": resolved_occ_id
-        })
-        mermaid_lines.append(f'    {comp_id}["{comp_label}"]:::compiler')
-        if prev_node_id:
-            mermaid_lines.append(f"    {prev_node_id} --> {comp_id}")
-            edges.append({
-                "source": prev_node_id,
-                "target": comp_id,
-                "transmission_term": "أخرجه في مصنفه",
-                "source_span": [0, 0],
-                "occurrence_id": resolved_occ_id
-            })
-
-        if conn_db: conn_db.close()
-
-        mermaid_lines.extend(class_defs)
-        mermaid_diagram = "\n".join(mermaid_lines)
-
-        path_obj = {
-            "path_id": "path_primary",
-            "endpoint_type": endpoint_type,
-            "has_prophetic_endpoint": has_prophetic_endpoint,
-            "nodes_count": len(nodes),
-            "edges_count": len(edges),
-            "nodes": nodes,
-            "edges": edges
+        data_payload = {
+            'book': graph.book,
+            'hadith_number': graph.hadith_number,
+            'occurrence_id': graph.occurrence_id,
+            'chapter_title': graph.chapter_title,
+            'isnad_text': text,
+            'is_branched': graph.is_branched,
+            'referral_note': graph.referral_note,
+            'variant_notes': graph.variant_notes,
+            'paths_count': len(graph.paths),
+            'paths': [p.to_dict() for p in graph.paths],
+            'nodes': graph.nodes,
+            'edges': graph.edges,
+            'mermaid_diagram': mermaid_diagram,
+            'graph_topology': {
+                'is_valid_dag': is_valid_dag,
+                'validation_errors': validation_errors
+            }
         }
 
         return to_json_str(build_response(
-            status="ok",
-            data={
-                "book": book,
-                "hadith_number": hadith_number,
-                "occurrence_id": resolved_occ_id,
-                "chapter_title": chapter_title,
-                "paths": [path_obj],
-                "nodes": nodes,
-                "edges": edges,
-                "mermaid_diagram": mermaid_diagram
-            },
+            status='ok' if is_valid_dag else 'needs_review',
+            data=data_payload,
             evidence={
-                "source_name": "Itqan Verified Canonical Isnads",
-                "locator": resolved_occ_id or f"{book}:{hadith_number}",
-                "review_status": "unreviewed_dataset_copy"
-            }
+                'source_name': 'Itqan Verified Canonical Isnads',
+                'locator': resolved_occ_id or f'{book}:{hadith_number}',
+                'database_path': self.valves.DB_PATH,
+                'referral_note': graph.referral_note,
+                'variant_notes': graph.variant_notes
+            },
+            coverage={
+                'complete': is_valid_dag,
+                'routes_discovered': len(graph.paths),
+                'nodes_count': len(graph.nodes)
+            },
+            warnings=validation_errors if validation_errors else []
         ))
