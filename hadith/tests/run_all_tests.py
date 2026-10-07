@@ -33,6 +33,11 @@ TESTS = [
         "name": "Unified Architecture U01-U08 Acceptance (7 Suites)",
         "file": "test_unified_u01_u08.py",
         "description": "Verifies 4 Hadith endings (Marfu, Mawquf, Maqtu, Mursal), field parity, occurrence_id priority, topics tool wiring, snapshot safety, adaptive output, and clean DAG."
+    },
+    {
+        "name": "Tahweel [ح] Multi-Path DAG & Family Isnad (2 Tests)",
+        "file": "test_tahweel_dag.py",
+        "description": "Verifies Tahweel (ح) branching, convergence at common link, famous family isnad resolution, and clean prophetic endpoint."
     }
 ]
 

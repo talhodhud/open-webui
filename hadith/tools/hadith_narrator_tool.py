@@ -174,7 +174,8 @@ class Tools:
         return re.sub(r'\s+', ' ', t).strip()
 
     def _ensure_rijal_index(self):
-        if self._rijal_loaded:
+        self._resolve_all_paths()
+        if self._rijal_loaded and os.path.exists(self.valves.DB_PATH):
             return
         if not os.path.exists(self.valves.DB_PATH):
             return
@@ -571,6 +572,7 @@ class Tools:
         return chain
 
     def _get_book_edges(self, book_name: str) -> Dict[tuple, int]:
+        self._resolve_all_paths()
         b_clean = book_name.lower().strip()
         if b_clean in self._book_edges:
             return self._book_edges[b_clean]
