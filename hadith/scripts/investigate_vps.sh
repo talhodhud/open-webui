@@ -73,15 +73,21 @@ fi
 if [ -n "$DOCKER_CONTAINER" ]; then
     CNAME=$(docker ps --filter "id=$DOCKER_CONTAINER" --format "{{.Names}}")
     echo "  🐳 Open WebUI is running inside DOCKER container: $CNAME ($DOCKER_CONTAINER)"
-    echo "  Checking databases INSIDE container /app/backend/data/:"
+    echo "  Checking databases INSIDE container:"
+    CONTAINER_RIJAL=$(docker exec "$DOCKER_CONTAINER" find /app -name "hadith_rijal.db" -size +10M 2>/dev/null | head -n 1 || true)
+    CONTAINER_SEARCH=$(docker exec "$DOCKER_CONTAINER" find /app -name "search_index.sqlite" -size +10M 2>/dev/null | head -n 1 || true)
     
-    docker exec "$DOCKER_CONTAINER" ls -lh /app/backend/data/hadith_rijal.db 2>/dev/null && \
-        echo "    ✅ hadith_rijal.db exists inside Docker container" || \
-        echo "    ❌ hadith_rijal.db is MISSING inside Docker container! (Must use docker cp)"
-        
-    docker exec "$DOCKER_CONTAINER" ls -lh /app/backend/data/search_index.sqlite 2>/dev/null && \
-        echo "    ✅ search_index.sqlite exists inside Docker container" || \
-        echo "    ❌ search_index.sqlite is MISSING inside Docker container! (Must use docker cp)"
+    if [ -n "$CONTAINER_RIJAL" ]; then
+        echo "    ✅ hadith_rijal.db exists inside container at: $CONTAINER_RIJAL"
+    else
+        echo "    ❌ hadith_rijal.db is MISSING inside container! (Must use docker cp)"
+    fi
+    
+    if [ -n "$CONTAINER_SEARCH" ]; then
+        echo "    ✅ search_index.sqlite exists inside container at: $CONTAINER_SEARCH"
+    else
+        echo "    ❌ search_index.sqlite is MISSING inside container! (Must use docker cp)"
+    fi
 else
     echo "  🖥️ Open WebUI is running directly on Host (Native / Systemd / Virtualenv)."
 fi
