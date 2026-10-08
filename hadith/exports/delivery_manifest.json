@@ -1,12 +1,12 @@
 {
   "manifest_version": "2.0.0",
   "release_tag": "v2.0.0-rc1",
-  "generated_at": "2026-10-08T04:10:34Z",
+  "generated_at": "2026-10-08T08:35:10Z",
   "description": "Bayan Al-Sunnah Canonical Delivery Manifest with Cryptographic Integrity Checksums",
   "components": {
     "tools_export": {
       "file": "hadith_tools_vps_export.json",
-      "sha256": "7dd60dc126880f45cfd07e162815253809bd54966e9d19131096113520898282",
+      "sha256": "b2d730e3a314f28a3573be321ddcc36f18d244b6b5188f5b64d23a773b2c218e",
       "count": 6,
       "items": [
         "hadith_corpus_search",
@@ -34,7 +34,7 @@
     },
     "models_export": {
       "file": "hadith_models_vps_export.json",
-      "sha256": "d8a91fcc73e1bacf8b91cb4adc245ce707e8b19b14adfe17ea8a92f948127125",
+      "sha256": "581dc7b1205cd709a7d795efdcaf138080a7dcd81a8c0e537f26502f047c9cb7",
       "count": 8,
       "items": [
         "hadith-model-1",
@@ -66,8 +66,8 @@
     },
     "hadith_isnad_tree": {
       "file": "hadith_isnad_tree_tool.py",
-      "sha256": "2e1ebe300a5a8be2de187581f03863790a1b1e9d8f657a07a5d131e4f578853e",
-      "size_bytes": 34360
+      "sha256": "fc10ecf7aa7c4da8a3ba6e7f00959ff2b3da20cd8af10bbbefde41d98aaeb51f",
+      "size_bytes": 36771
     },
     "hadith_narrator": {
       "file": "hadith_narrator_tool.py",
@@ -78,6 +78,11 @@
       "file": "hadith_bayan_topics_tool.py",
       "sha256": "3cd68ca768ce2f8e940e3a0d6cf1ae351426f53aa496141f8c5ef96a48585d7e",
       "size_bytes": 21262
+    },
+    "hadith_contract_helper": {
+      "file": "hadith_contract_helper.py",
+      "sha256": "9a1ef1991616102cab4d351c4ec5f42706695a3e02a52fc62b15333180949827",
+      "size_bytes": 1667
     }
   },
   "tool_specs": {
@@ -98,8 +103,8 @@
     },
     "hadith_isnad_tree": {
       "file": "hadith_isnad_tree.json",
-      "sha256": "76b4cd30405c1adfe86320f150300c08236bca32e7a3ef8e1249eacdd6b56c1c",
-      "size_bytes": 38150
+      "sha256": "4e4359c2f352f55ffa6edf43cae7d5ca4c070d74f6f6e2919c3af78bc4d96dda",
+      "size_bytes": 40583
     },
     "hadith_narrator": {
       "file": "hadith_narrator.json",
@@ -120,13 +125,13 @@
     },
     "parser.py": {
       "file": "hadith/isnad/parser.py",
-      "sha256": "654054c4d19fd102d3cfb1eacac086036268a2cc8340217f76346d6b26f23c80",
-      "size_bytes": 18259
+      "sha256": "45c0f3f70a6e78435c3a935b8c04da7f4acf8f0853c550bf928bb4778047a748",
+      "size_bytes": 20719
     },
     "resolver.py": {
       "file": "hadith/isnad/resolver.py",
-      "sha256": "5eeadd6bf403b968cda1c700ee894228a0b69442e3d3c0c482fe0b8b1e7ca3ad",
-      "size_bytes": 19261
+      "sha256": "a0eb9075c59717ce10aa0456b0fe8b123b4f25945b800ae47156817968314f8a",
+      "size_bytes": 21085
     },
     "graph.py": {
       "file": "hadith/isnad/graph.py",
@@ -140,8 +145,8 @@
     },
     "validation.py": {
       "file": "hadith/isnad/validation.py",
-      "sha256": "6b35aeea4998439b057cf2354255b23a3ddee7f0c49a4a83e4465a1f4192a46c",
-      "size_bytes": 3874
+      "sha256": "adfbcc6090873c23a3599b7576b5fbb904741c203d2b7ed3fecc0adfadf3f4b8",
+      "size_bytes": 4264
     }
   },
   "theme_assets": {
@@ -152,13 +157,28 @@
     },
     "test_journeys.mjs": {
       "file": "hadith/theme/test_journeys.mjs",
-      "sha256": "a1b28608b737b8ced2f28ca5042be4e7873faed093373f86968375300e5a9a39",
-      "size_bytes": 10728
+      "sha256": "d24b37170d5015cd4e19a328b623015249306bc361fc37cd9d3afdd71bb6d552",
+      "size_bytes": 15713
     },
     "src/journeys.ts": {
       "file": "hadith/theme/src/journeys.ts",
-      "sha256": "458e0873df854bbf46f9e493aed2a07824b23495c5ab9529e5728f79fcca602a",
-      "size_bytes": 22169
+      "sha256": "039186109b8618c52445a967dab96874759b0a2f82416bc79e08b49b88aa184b",
+      "size_bytes": 25875
+    },
+    "src/nativeVariant.ts": {
+      "file": "hadith/theme/src/nativeVariant.ts",
+      "sha256": "9dc9ad60f960e6e697cc62545f15c7dea588ef29ba69552cc017ee0fa3f4f41d",
+      "size_bytes": 32057
+    },
+    "src/nativeVariant.css": {
+      "file": "hadith/theme/src/nativeVariant.css",
+      "sha256": "75357f69355b6981cfa309c0e2f0eed15f17c1277972a0fc32fc781281cd3cea",
+      "size_bytes": 22248
+    },
+    "src/topicEvidence.ts": {
+      "file": "hadith/theme/src/topicEvidence.ts",
+      "sha256": "a12f78b3551833baeca15166e7797d9886fbb5c2bd31a3d5c2ba570e36f7625f",
+      "size_bytes": 18295
     }
   },
   "databases": {

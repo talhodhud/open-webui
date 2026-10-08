@@ -59,11 +59,12 @@ def validate_isnad_graph(graph_dict: Dict[str, Any], original_text: str = "") ->
                 errors.append(f"Cycle detected in Isnad DAG starting at node {nid}")
                 break
 
-    # 4. Source span verification
+    # 4. Source span verification and matn intrusion check
     text_len = len(original_text) if original_text else None
     for n in nodes:
         span = n.get("source_span")
         kind = n.get("kind", "mention")
+        name = n.get("name", "")
         is_metadata = n.get("metadata_only", False)
         if kind == "collection" or is_metadata:
             continue
@@ -76,6 +77,10 @@ def validate_isnad_graph(graph_dict: Dict[str, Any], original_text: str = "") ->
                     errors.append(f"Node {n['id']} has empty source_span [0, 0] for non-empty text")
                 elif text_len is not None and not (0 <= s <= e <= text_len):
                     errors.append(f"Node {n['id']} source_span [{s}, {e}] out of bounds for text length {text_len}")
+
+        # Guard against conversational text or matn intrusion in narrator nodes
+        if len(name) > 50 or any(kw in name for kw in ("فقالوا", "فقال", "فقلت", "يا نبي الله", "يا رسول الله")):
+            errors.append(f"Node {n['id']} contains non-narrator or dialog phrase from matn: '{name}'")
 
     # 5. Path connectivity and sequential walk
     for p in paths:

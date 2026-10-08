@@ -237,12 +237,27 @@ class NarratorResolver:
 
             # Check cached isnad_relative_map
             fathers_from_map = self._relative_map_cache.get((anchor_norm, "father"), [])
-            if fathers_from_map:
-                father_from_map = fathers_from_map[0]
+            distinct_fathers = list(dict.fromkeys(fathers_from_map))
+            if len(distinct_fathers) > 1:
+                cands_list = []
+                for fn in distinct_fathers:
+                    gk, gt, _, nid, cn = self.query_narrator_db(fn)
+                    cands_list.append({"id": nid, "name": cn or fn, "grade": gt or "غير محدد"})
+                resolved.canonical_name = None
+                resolved.narrator_id = None
+                resolved.identity_status = "candidate"
+                resolved.status = "ambiguous"
+                resolved.grade = "متعدد المرشحين يحتاج تمييزاً"
+                resolved.evidence_source = "isnad_relative_map_lookup_multiple_candidates"
+                resolved.resolution_rule = f"تعدد المرشحين في قاعدة العلاقات كوالد لـ ({anchor_raw})"
+                resolved.candidates = cands_list
+                return resolved
+            elif len(distinct_fathers) == 1:
+                father_from_map = distinct_fathers[0]
                 g_key, g_title, cands, nid, c_name = self.query_narrator_db(father_from_map)
                 resolved.canonical_name = c_name or father_from_map
                 resolved.narrator_id = nid
-                resolved.identity_status = "resolved" if g_key in ("reliable", "acceptable", "weak", "sahabi") else "candidate"
+                resolved.identity_status = "resolved"
                 resolved.grade = g_title
                 resolved.status = g_key
                 resolved.evidence_source = "isnad_relative_map_lookup"
@@ -253,14 +268,14 @@ class NarratorResolver:
         # 2. Grandfather resolution
         if rel_type == "grandfather" or norm_rel in ("جده", "جد"):
             # Determine father first if anchor is grandson with patronymic
-            gf_name = None
+            gf_candidates = []
             evidence_src = None
             res_rule = None
 
             # Case A: anchor has two 'بن' e.g. 'سعيد بن أبي بردة بن أبي موسى' -> grandfather is 3rd part
             if anchor_raw.count(" بن ") >= 2:
                 parts = anchor_raw.split(" بن ")
-                gf_name = parts[2].strip()
+                gf_candidates = [parts[2].strip()]
                 evidence_src = "patronymic_nasab_derivation"
                 res_rule = f"مشتق من نسب الحفيد ({anchor_raw})"
 
@@ -276,14 +291,14 @@ class NarratorResolver:
                 # Look up father's father in isnad_relative_map
                 gfs = self._relative_map_cache.get((father_norm, "father"), [])
                 if gfs:
-                    gf_name = gfs[0]
+                    gf_candidates = list(dict.fromkeys(gfs))
                     evidence_src = "isnad_relative_map_lookup"
                     res_rule = f"مسجل في قاعدة العلاقات الإسنادية كجد لـ ({anchor_raw})"
                 else:
                     # Also check direct grandfather map for anchor_norm
                     direct_gfs = self._relative_map_cache.get((anchor_norm, "grandfather"), [])
                     if direct_gfs:
-                        gf_name = direct_gfs[0]
+                        gf_candidates = list(dict.fromkeys(direct_gfs))
                         evidence_src = "isnad_relative_map_lookup"
                         res_rule = f"مسجل في قاعدة العلاقات الإسنادية كجد لـ ({anchor_raw})"
 
@@ -296,15 +311,30 @@ class NarratorResolver:
 
                 gfs = self._relative_map_cache.get((anchor_kunya_norm, "father"), [])
                 if gfs:
-                    gf_name = gfs[0]
+                    gf_candidates = list(dict.fromkeys(gfs))
                     evidence_src = "isnad_relative_map_lookup"
                     res_rule = f"مسجل في قاعدة العلاقات الإسنادية كجد لـ ({anchor_raw})"
 
-            if gf_name:
+            if len(gf_candidates) > 1:
+                cands_list = []
+                for gn in gf_candidates:
+                    gk, gt, _, nid, cn = self.query_narrator_db(gn)
+                    cands_list.append({"id": nid, "name": cn or gn, "grade": gt or "غير محدد"})
+                resolved.canonical_name = None
+                resolved.narrator_id = None
+                resolved.identity_status = "candidate"
+                resolved.status = "ambiguous"
+                resolved.grade = "متعدد المرشحين يحتاج تمييزاً"
+                resolved.evidence_source = "isnad_relative_map_lookup_multiple_candidates"
+                resolved.resolution_rule = f"تعدد المرشحين في قاعدة العلاقات كجد لـ ({anchor_raw})"
+                resolved.candidates = cands_list
+                return resolved
+            elif len(gf_candidates) == 1:
+                gf_name = gf_candidates[0]
                 g_key, g_title, cands, nid, c_name = self.query_narrator_db(gf_name)
                 resolved.canonical_name = c_name or gf_name
                 resolved.narrator_id = nid
-                resolved.identity_status = "resolved" if g_key in ("reliable", "acceptable", "weak", "sahabi") else "candidate"
+                resolved.identity_status = "resolved"
                 resolved.grade = g_title
                 resolved.status = g_key
                 resolved.evidence_source = evidence_src

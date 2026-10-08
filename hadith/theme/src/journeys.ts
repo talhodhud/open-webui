@@ -234,6 +234,83 @@ const FOLLOWUP_MODELS: Record<string, string[]> = {
   'abu-hurairah': ['hadith-rijal-agent', 'hadith-rijal-agent']
 };
 
+export interface GraphPath {
+  path_id: string;
+  teacher_name?: string;
+  narrator_sequence?: Array<{ raw_name?: string; name?: string; grade?: string }>;
+  narrators?: Array<{ raw_name?: string; name?: string; grade?: string }>;
+  label?: string;
+}
+
+export interface NarratorNodeDetails {
+  raw_text: string;
+  occurrence_id?: string;
+  mention_id?: string;
+  source_span?: [number, number];
+  source_span_text?: string;
+  canonical_name?: string;
+  identity_status?: 'resolved' | 'unresolved' | 'ambiguous' | string;
+  candidates?: Array<{ id?: string | number; name: string; grade?: string }>;
+  grade_text?: string;
+  grade_source?: string;
+  ibn_hajar?: string;
+  dhahabi?: string;
+  anchor_name?: string;
+}
+
+export function buildRouteSelectorItems(paths?: GraphPath[]): Array<{ id: string; label: string; route: string }> | null {
+  if (!paths || paths.length <= 1) return null;
+  const items: Array<{ id: string; label: string; route: string }> = [
+    { id: 'all', label: 'جميع الطرق', route: 'all_paths' }
+  ];
+  paths.forEach((p, idx) => {
+    const pId = p.path_id || `path_${idx + 1}`;
+    const teacher = p.teacher_name || p.narrator_sequence?.[0]?.raw_name || p.narrators?.[0]?.raw_name;
+    const label = teacher ? `الطريق ${idx + 1} (${teacher})` : `الطريق ${idx + 1}`;
+    items.push({ id: pId, label, route: pId });
+  });
+  return items;
+}
+
+export function formatNarratorEvidenceDetails(details: NarratorNodeDetails): {
+  raw_text: string;
+  occurrence_id: string;
+  mention_id: string;
+  source_span_display: string;
+  canonical_name: string;
+  identity_status: string;
+  ibn_hajar: string;
+  dhahabi: string;
+  general_grade: string;
+  grade_source: string;
+  has_evidence: boolean;
+  missing_evidence_note?: string;
+} {
+  const hasGrade = Boolean(details.grade_text || details.ibn_hajar || details.dhahabi);
+  const ibnHajarText = details.ibn_hajar || (details.grade_source?.includes('تقريب') ? details.grade_text : undefined) || 'غير مسجل في بيانات التقريب';
+  const dhahabiText = details.dhahabi || (details.grade_source?.includes('كاشف') ? details.grade_text : undefined) || 'غير مسجل في بيانات الكاشف';
+  const spanDisplay = details.source_span
+    ? `[${details.source_span[0]}, ${details.source_span[1]}]${details.source_span_text ? ` «${details.source_span_text}»` : ''}`
+    : 'غير محدد في النص';
+
+  return {
+    raw_text: details.raw_text,
+    occurrence_id: details.occurrence_id || 'غير متوفر',
+    mention_id: details.mention_id || 'غير محدد',
+    source_span_display: spanDisplay,
+    canonical_name: details.canonical_name || 'هوية لم تُحسم في البيانات (تحتاج دليلاً)',
+    identity_status: details.identity_status === 'resolved'
+      ? 'هوية مثبتة بدليل'
+      : (details.identity_status === 'ambiguous' ? 'هوية غير محسومة (مشترك/مبهم)' : 'هوية لم تُحسم في البيانات (تحتاج دليلاً)'),
+    ibn_hajar: ibnHajarText,
+    dhahabi: dhahabiText,
+    general_grade: details.grade_text || 'غير محدد بدليل صريح',
+    grade_source: details.grade_source || (details.grade_text ? 'منقول من قاعدة البيانات' : 'لم يثبت قول ناقد في البيانات'),
+    has_evidence: hasGrade,
+    missing_evidence_note: hasGrade ? undefined : 'تنبيه منهجي: لا يتوفر دليل صريح مسجل على التوثيق أو التضعيف لهذا الراوي؛ لا يتم اشتقاق الرتبة تلقائياً من اسم الراوي.'
+  };
+}
+
 export interface RouteOptions {
   mode?: 'legacy' | 'unified';
   submit?: boolean;

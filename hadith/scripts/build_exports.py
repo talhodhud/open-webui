@@ -95,7 +95,10 @@ ISNAD_MODULE_FILES = [
 THEME_ASSET_FILES = [
     "package.json",
     "test_journeys.mjs",
-    "src/journeys.ts"
+    "src/journeys.ts",
+    "src/nativeVariant.ts",
+    "src/nativeVariant.css",
+    "src/topicEvidence.ts"
 ]
 
 
@@ -259,6 +262,22 @@ def load_canonical_models() -> list:
     assert len(pilot["meta"]["skillIds"]) == 8, f"Pilot must wire 8 skills, found {len(pilot['meta']['skillIds'])}"
     assert "hadith_bayan_topics" in pilot["meta"]["toolIds"], "Topics tool missing in pilot!"
 
+    # Bind canonical knowledge collection for Bayan Islam Guide
+    bayan_knowledge = [
+        {
+            "id": "bayan-islam-guide-v1",
+            "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
+            "type": "collection",
+            "description": "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)",
+            "version": "1.0",
+            "review_status": "verified"
+        }
+    ]
+    islam_guide = next((m for m in models if m["id"] == "hadith-islam-guide"), None)
+    if islam_guide:
+        islam_guide.setdefault("meta", {})["knowledge"] = bayan_knowledge
+    pilot.setdefault("meta", {})["knowledge"] = bayan_knowledge
+
     for m in models:
         print(f"  + Verified model: {m['id']} (name: '{m.get('name')}')")
 
@@ -417,6 +436,15 @@ def build_all(check_only: bool = False):
             out_file.write_bytes(content.encode("utf-8"))
             print(f"  -> Synced to outer workspace: {out_file}")
 
+        outer_tools_dir = OUTER_WORKSPACE_DIR / "tools"
+        if outer_tools_dir.exists():
+            for tm in TOOL_MAPPINGS:
+                (outer_tools_dir / tm["code_file"]).write_text((TOOLS_DIR / tm["code_file"]).read_text(encoding="utf-8"), encoding="utf-8")
+                (outer_tools_dir / tm["spec_file"]).write_text((TOOLS_DIR / tm["spec_file"]).read_text(encoding="utf-8"), encoding="utf-8")
+            if (TOOLS_DIR / "hadith_contract_helper.py").exists():
+                (outer_tools_dir / "hadith_contract_helper.py").write_text((TOOLS_DIR / "hadith_contract_helper.py").read_text(encoding="utf-8"), encoding="utf-8")
+            print(f"  -> Synced tools code & specs to outer workspace: {outer_tools_dir}")
+
     # Build Delivery Manifest
     print("\n--- 📜 Generating Delivery Manifest & Signatures ---")
     manifest = {
@@ -468,6 +496,15 @@ def build_all(check_only: bool = False):
                 "sha256": sha256_file(spec_p),
                 "size_bytes": spec_p.stat().st_size
             }
+
+    # Hash shared contract helper
+    contract_p = TOOLS_DIR / "hadith_contract_helper.py"
+    if contract_p.exists():
+        manifest["tool_sources"]["hadith_contract_helper"] = {
+            "file": "hadith_contract_helper.py",
+            "sha256": sha256_file(contract_p),
+            "size_bytes": contract_p.stat().st_size
+        }
 
     # Hash modular Isnad engine files
     for mod_fname in ISNAD_MODULE_FILES:

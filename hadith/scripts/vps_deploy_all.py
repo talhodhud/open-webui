@@ -458,7 +458,38 @@ def deploy_and_verify(
                     INSERT INTO model (id, user_id, base_model_id, name, params, meta, is_active, updated_at, created_at)
                     VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
                 """, (mid, admin_id, base_id, mname, params_json, meta_json, now, now))
-                print(f"  [CREATED] Model: {mid} ({mname})")
+        # 4. Deploy Knowledge Collection (if knowledge table exists)
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge'")
+        if cur.fetchone():
+            print("\n" + "=" * 75)
+            print(" 📚 STEP 5.5: DEPLOYING KNOWLEDGE COLLECTIONS TO DATABASE")
+            print("=" * 75)
+            k_id = "bayan-islam-guide-v1"
+            k_name = "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة"
+            k_desc = "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)"
+            k_meta = json.dumps({
+                "version": "1.0",
+                "review_status": "verified",
+                "source": "planning/islam_topic_taxonomy_v1.json",
+                "topics_count": 6,
+                "lesson_packs": "planning/bayan_lesson_packs_v1.json"
+            }, ensure_ascii=False)
+            k_data = json.dumps({"topics": 6, "lessons": 18, "type": "official_curriculum"}, ensure_ascii=False)
+
+            cur.execute("SELECT id FROM knowledge WHERE id = ?", (k_id,))
+            if cur.fetchone():
+                cur.execute("""
+                    UPDATE knowledge
+                    SET name = ?, description = ?, meta = ?, data = ?, updated_at = ?
+                    WHERE id = ?
+                """, (k_name, k_desc, k_meta, k_data, now, k_id))
+                print(f"  [UPDATED] Knowledge Collection: {k_id}")
+            else:
+                cur.execute("""
+                    INSERT INTO knowledge (id, user_id, name, description, meta, created_at, updated_at, data)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (k_id, admin_id, k_name, k_desc, k_meta, now, now, k_data))
+                print(f"  [CREATED] Knowledge Collection: {k_id}")
 
         conn.commit()
 
@@ -561,6 +592,16 @@ def deploy_and_verify(
         if "hadith_bayan_topics" not in pilot_tools:
             raise ValueError("Verification Failed: hadith_bayan_topics tool missing from pilot toolIds!")
         print(f"\n  ✅ Verified Pilot Specifics: bayan-unified-pilot wires all 8 canonical skills and all required tools.")
+
+        # D. Verify Knowledge Collection (if table exists)
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge'")
+        if cur.fetchone():
+            print("\n[D] Verifying Knowledge Collections in Database...")
+            cur.execute("SELECT id, name FROM knowledge WHERE id = 'bayan-islam-guide-v1'")
+            k_row = cur.fetchone()
+            if not k_row:
+                raise ValueError("Verification Failed: Knowledge collection 'bayan-islam-guide-v1' missing after deploy!")
+            print(f"  ✅ Verified Knowledge Collection: {k_row[0]} ('{k_row[1]}')")
 
     except Exception as e:
         print(f"\n❌ CRITICAL DEPLOYMENT FAILURE: {e}")

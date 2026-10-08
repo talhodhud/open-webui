@@ -363,7 +363,16 @@
         "memory": false,
         "builtin_tools": false
       },
-      "knowledge": null,
+      "knowledge": [
+        {
+          "id": "bayan-islam-guide-v1",
+          "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
+          "type": "collection",
+          "description": "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)",
+          "version": "1.0",
+          "review_status": "verified"
+        }
+      ],
       "toolIds": [
         "hadith_bayan_topics",
         "hadith_corpus_search"
@@ -591,7 +600,16 @@
         "status_updates": true,
         "builtin_tools": true
       },
-      "knowledge": null,
+      "knowledge": [
+        {
+          "id": "bayan-islam-guide-v1",
+          "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
+          "type": "collection",
+          "description": "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)",
+          "version": "1.0",
+          "review_status": "verified"
+        }
+      ],
       "toolIds": [
         "hadith_corpus_search",
         "hadith_takhrij",

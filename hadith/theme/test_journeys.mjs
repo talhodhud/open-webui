@@ -13,7 +13,9 @@ import {
   normalizeFormat,
   getJourney,
   AUDIENCE_MAP,
-  FORMAT_MAP
+  FORMAT_MAP,
+  buildRouteSelectorItems,
+  formatNarratorEvidenceDetails
 } from './src/journeys.ts';
 import { TOPIC_EVIDENCE } from './src/topicEvidence.ts';
 
@@ -236,3 +238,104 @@ test('evidence records retain source verification without asserting scholarly ap
     }
   }
 });
+
+test('dynamic route selector handles 0, 1, 3, and 4 paths and generates teacher labels', () => {
+  // Absence of graph / 0 paths: null (hidden)
+  assert.equal(buildRouteSelectorItems(undefined), null);
+  assert.equal(buildRouteSelectorItems([]), null);
+
+  // Single path (1 path): null (hidden)
+  assert.equal(buildRouteSelectorItems([{ path_id: 'path_1', teacher_name: 'محمد بن عباد' }]), null);
+
+  // Three paths (Muslim 32:8 case): 4 buttons ("جميع الطرق" + 3 path buttons)
+  const threePaths = [
+    { path_id: 'path_1', teacher_name: 'محمد بن عباد' },
+    { path_id: 'path_2', teacher_name: 'إسحاق بن إبراهيم' },
+    { path_id: 'path_3', teacher_name: 'ابن أبي خلف' }
+  ];
+  const items3 = buildRouteSelectorItems(threePaths);
+  assert.ok(items3);
+  assert.equal(items3.length, 4);
+  assert.equal(items3[0].id, 'all');
+  assert.equal(items3[0].label, 'جميع الطرق');
+  assert.equal(items3[1].id, 'path_1');
+  assert.ok(items3[1].label.includes('محمد بن عباد'));
+  assert.equal(items3[2].id, 'path_2');
+  assert.ok(items3[2].label.includes('إسحاق بن إبراهيم'));
+  assert.equal(items3[3].id, 'path_3');
+  assert.ok(items3[3].label.includes('ابن أبي خلف'));
+
+  // Four paths: 5 buttons
+  const fourPaths = [
+    { path_id: 'p_1', teacher_name: 'مالك' },
+    { path_id: 'p_2', teacher_name: 'سفيان الثوري' },
+    { path_id: 'p_3', teacher_name: 'شعبة' },
+    { path_id: 'p_4', teacher_name: 'حماد بن زيد' }
+  ];
+  const items4 = buildRouteSelectorItems(fourPaths);
+  assert.ok(items4);
+  assert.equal(items4.length, 5);
+  assert.equal(items4[4].id, 'p_4');
+  assert.ok(items4[4].label.includes('حماد بن زيد'));
+});
+
+test('narrator evidence details format separates Ibn Hajar and al-Dhahabi and handles missing evidence', () => {
+  // 1. Fully documented narrator with separate Ibn Hajar and al-Dhahabi
+  const documented = formatNarratorEvidenceDetails({
+    raw_text: 'سعيد بن أبي بردة',
+    occurrence_id: 'itqan:muslim:32:8:6900c9057c27',
+    mention_id: 'm_04',
+    source_span: [48, 63],
+    source_span_text: 'سعيد بن أبي بردة',
+    canonical_name: 'سعيد بن أبي بردة بن أبي موسى الأشعري',
+    identity_status: 'resolved',
+    grade_text: 'ثقة',
+    ibn_hajar: 'ثقة كوفي من الطبقة الثالثة (تقريب التهذيب 2384)',
+    dhahabi: 'ثقة حجة وثقه النسائي وابن معين (الكاشف 1928)'
+  });
+
+  assert.equal(documented.raw_text, 'سعيد بن أبي بردة');
+  assert.equal(documented.occurrence_id, 'itqan:muslim:32:8:6900c9057c27');
+  assert.equal(documented.mention_id, 'm_04');
+  assert.ok(documented.source_span_display.includes('[48, 63]'));
+  assert.equal(documented.canonical_name, 'سعيد بن أبي بردة بن أبي موسى الأشعري');
+  assert.equal(documented.identity_status, 'هوية مثبتة بدليل');
+  assert.ok(documented.ibn_hajar.includes('تقريب التهذيب'));
+  assert.ok(documented.dhahabi.includes('الكاشف'));
+  assert.equal(documented.has_evidence, true);
+  assert.equal(documented.missing_evidence_note, undefined);
+
+  // 2. Unresolved / missing evidence narrator (e.g. unknown relative or unverified person)
+  const undocumented = formatNarratorEvidenceDetails({
+    raw_text: 'رجل',
+    occurrence_id: 'itqan:muslim:32:8:6900c9057c27',
+    mention_id: 'm_09',
+    identity_status: 'unresolved'
+  });
+
+  assert.equal(undocumented.raw_text, 'رجل');
+  assert.equal(undocumented.identity_status, 'هوية لم تُحسم في البيانات (تحتاج دليلاً)');
+  assert.equal(undocumented.ibn_hajar, 'غير مسجل في بيانات التقريب');
+  assert.equal(undocumented.dhahabi, 'غير مسجل في بيانات الكاشف');
+  assert.equal(undocumented.has_evidence, false);
+  assert.ok(undocumented.missing_evidence_note.includes('لا يتوفر دليل صريح'));
+});
+
+test('followup URL preserves occurrenceIds across re-search preventing record divergence', () => {
+  const url = new URL(buildFollowupURL('http://localhost:8080', 'hajj-arafah', 0, {
+    mode: 'unified',
+    routeKind: 'specific_path',
+    selectedPathId: 'path_2',
+    occurrenceIds: ['itqan:muslim:32:8:6900c9057c27'],
+    mentionId: 'm_02',
+    anchorName: 'زكرياء بن عدي'
+  }));
+
+  assert.equal(url.searchParams.get('model'), 'bayan-unified-pilot');
+  assert.equal(url.searchParams.get('occurrenceIds'), 'itqan:muslim:32:8:6900c9057c27');
+  assert.equal(url.searchParams.get('selectedPathId'), 'path_2');
+  assert.ok(url.searchParams.get('q').includes('السجل المحدد: itqan:muslim:32:8:6900c9057c27'));
+  assert.ok(url.searchParams.get('q').includes('مسار الإسناد المحدد: path_2'));
+  assert.ok(url.searchParams.get('q').includes('زكرياء بن عدي'));
+});
+

@@ -128,8 +128,9 @@ class IsnadParser:
         s = re.sub(r'[ـ\s]*عليه\s*السلام[ـ\s]*', ' ', s)
         s = re.sub(r'[ـ\s]*(?:صلى|صلي)\s*الله\s*عليه\s*(?:وسلم|واله)?\s*', ' ', s)
         s = re.sub(r'\s*رحم[هة]\s*الله\s*', ' ', s)
+        s = re.sub(r'\s*(?:زوج\s+النبي|ام\s+المؤمنين)\s*', ' ', s)
         s = re.sub(r'[{}\[\]\(\)«»"“”‏:،,\.]', ' ', s)
-        s = re.sub(r'^(?:[وف]?(?:حدثنا|حدثني|اخبرنا|اخبرني|انبانا|سمعت|عن|قال|يقول)\s+)+', '', s)
+        s = re.sub(r'^(?:[وف]?(?:حدثنا|حدثني|اخبرنا|اخبرني|انبانا|سمعت|عن|ان|انها|انه|قال|يقول)\s+)+', '', s)
         s = re.sub(r'\s*(?:على|علي)\s+المنبر\s*', ' ', s)
         s = re.sub(r'\s+(?:يقول|يحدث|قال)\s*$', '', s)
         s = re.sub(r'^[،,\s\.]+|[،,\s\.]+$', '', s)
@@ -143,7 +144,7 @@ class IsnadParser:
 
     @classmethod
     def split_co_narrators(cls, stage_text: str) -> List[str]:
-        raw_parts = re.split(r'[,،\n]', stage_text)
+        raw_parts = [p.strip() for p in re.split(r'[\n]', stage_text) if p.strip()]
         results = []
         for p in raw_parts:
             p = p.strip()
@@ -187,6 +188,49 @@ class IsnadParser:
                 cleaned_results.append(c)
         return cleaned_results
 
+    @classmethod
+    def find_isnad_end(cls, clean_text: str) -> int:
+        """
+        Determines the structural boundary between Isnad and Matn:
+        1. Referral or variant notes at the end (نحو حديث فلان, بمثله, بمعناه, وليس في حديث...)
+        2. Quoted speech: Speech verbs (قال, قالت, يقول, انه قال, انها قالت) followed by quotes/colon
+        3. Prophetic terminus (عن/ان/سمعت النبي/رسول الله صلي الله عليه وسلم) followed by speech or action
+        4. Companion speech verb (قال/قالت) followed by narrative story verbs or dialog
+        """
+        # 1. Referral or variant notes
+        m_ref = re.search(r'(?:[،,\.\s]+|\b)(نحو\s+حديث|بمثله|بمعناه|وليس\s+في\s+حديث|زاد\s+في|وفي\s+رواية|غير\s+ان|وزاد)\b', clean_text)
+        ref_pos = m_ref.start() if m_ref else len(clean_text)
+
+        # 2. Quoted speech: Speech verb followed by quotes/colons
+        # Matches: قال "...", يقول : "...", قالت "...", قال ‏"‏...
+        m_quote = re.search(r'(?:[،,\.\s]+|\b)(?:قال|قالت|يقول|انه\s+قال|انها\s+قالت)\s*[:،,\.\s]*[\"\'«“\u200f]', clean_text)
+        if m_quote and m_quote.start() < ref_pos:
+            ref_pos = m_quote.start()
+
+        # 3. Prophetic terminus:
+        prophet_pattern = r'(?:عن|ان|سمعت|روي)\s+(?:النبي|رسول\s+الله)(?:\s+صلي\s+الله\s+عليه\s+وسلم|\s+عليه\s+السلام)?'
+        m_prophet = re.search(prophet_pattern, clean_text)
+        if m_prophet and m_prophet.start() < ref_pos:
+            after_prophet = clean_text[m_prophet.end():ref_pos]
+            m_after = re.search(r'^\s*(?:[،,\.\s]+|\b)(?:قال|قالت|يقول|انه\s+قال|يحدث|خطبنا|كان|نهي|امر|سئل|دخل|رايت|اتي|لما|اذا)\b', after_prophet)
+            if m_after:
+                end_candidate = m_prophet.end()
+                if end_candidate < ref_pos:
+                    ref_pos = end_candidate
+            else:
+                m_q = re.search(r'[\"\'«“\u200f]', after_prophet)
+                if m_q:
+                    end_candidate = m_prophet.end() + m_q.start()
+                    if end_candidate < ref_pos:
+                        ref_pos = end_candidate
+
+        # 4. Companion speech verb before narrative story verbs or dialog:
+        m_story = re.search(r'(?:[،,\.\s]+|\b)(?:قال|قالت)\s+(?:دخل|دخلت|دخلنا|رهط|لما|خسفت|كسفت|نودي|سالت|رايت|اتي|اتاني|جاء|جاءه|خرج|خطب|كنا|انما|من\s+كان|من\s+حج)\b', clean_text)
+        if m_story and m_story.start() < ref_pos:
+            ref_pos = m_story.start()
+
+        return ref_pos
+
     def parse(self, text: str) -> ParsedIsnad:
         # Keep original text without stripping to preserve exact caller offsets
         orig_text = text
@@ -204,10 +248,8 @@ class IsnadParser:
         for mv in m_var:
             variant_notes.append(mv.group(1).strip())
 
-        # Strip matn body and trailing notes
-        matn_markers = r'(?:[،,\.\s]+|\b)(?:يقول\s*:\s*["\'«»]|نحو\s+حديث|بمثله|بمعناه|وليس\s+في\s+حديث|زاد\s+في|وفي\s+رواية|غير\s+ان|وزاد|وقال|لما\s+كسفت|كسفت|خسفت|نودي|ان\s+الشمس|ان\s+رسول|ان\s+النبي|قال\s+رسول|قالت\s+دخل|دخل\s+رهط|قالت\s+ما\s+سجدت|انما\s+الاعمال|من\s+حج|من\s+كان\s+يؤمن|بشروا|يسرا)\b'
-        m_matn = re.search(matn_markers, clean_text)
-        isnad_clean_end = m_matn.start() if m_matn else len(clean_text)
+        # Strip matn body and trailing notes via structural analysis
+        isnad_clean_end = self.find_isnad_end(clean_text)
         isnad_clean = clean_text[:isnad_clean_end]
 
         # 2. Check Tahweel and Convergence
@@ -298,7 +340,7 @@ class IsnadParser:
         branch_id: str,
         is_stem: bool = False
     ) -> List[List[ExtractedMention]]:
-        verbs_pattern = r'(?:^|(?<=[\s،,]))([وف]?(?:حدثنا|حدثني|حدثه|حدثهم|اخبرنا|اخبرني|اخبره|اخبرهم|انبانا|سمعت|سمعنا|سمع|انه سمع|انها سمعت|يخبر|يروي|عن|قال(?:\s+قال)?))(?=\s+)'
+        verbs_pattern = r'(?:^|(?<=[\s،,]))([وف]?(?:حدثنا|حدثني|حدثه|حدثهم|اخبرنا|اخبرني|اخبره|اخبرهم|انبانا|سمعت|سمعنا|سمع|انه سمع|انها سمعت|يخبر|يروي|عن|انها|انه|ان|قال(?:\s+قال)?))(?=\s+)'
         v_matches = list(re.finditer(verbs_pattern, chunk_clean))
 
         stages = []

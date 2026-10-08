@@ -491,10 +491,16 @@ class Tools:
             except (ValueError, TypeError):
                 parsed_hadith_number = 0
                 if not occurrence_id:
+                    s_hn = str(hadith_number).strip()
+                    if ":" in s_hn:
+                        parts = s_hn.split(":")
+                        warning_msg = f"الرقم المركب '{hadith_number}' يشير إلى (الفصل {parts[0]}، الموضع {parts[1]}). يرجى تمرير رقم الحديث كعدد صحيح، أو تحديد الباب عبر معامل chapter={parts[0]}، أو استخدام معرف السجل occurrence_id للتحديد الدقيق."
+                    else:
+                        warning_msg = f"رقم الحديث '{hadith_number}' غير صالح. يجب تمرير عدد صحيح أو معرف السجل المستقر occurrence_id."
                     return to_json_str(build_response(
-                        status="invalid_input",
+                        status="invalid_reference",
                         data={"book": book, "hadith_number": hadith_number, "occurrence_id": occurrence_id},
-                        warnings=[f"رقم الحديث '{hadith_number}' غير صالح."]
+                        warnings=[warning_msg]
                     ))
         hadith_number = parsed_hadith_number
         text = ""
@@ -640,11 +646,36 @@ class Tools:
         )
         if path_id:
             matching = [p for p in graph.paths if p.path_id == path_id]
-            if matching:
-                graph.paths = matching
-                path_node_ids = {n["id"] for n in matching[0].nodes}
-                graph.nodes = [n for n in graph.nodes if n["id"] in path_node_ids]
-                graph.edges = matching[0].edges
+            if not matching:
+                avail_ids = [p.path_id for p in graph.paths]
+                return to_json_str(build_response(
+                    status="invalid_reference",
+                    data={
+                        "book": graph.book,
+                        "hadith_number": graph.hadith_number,
+                        "occurrence_id": resolved_occ_id,
+                        "requested_path_id": path_id,
+                        "available_path_ids": avail_ids,
+                        "paths_count": len(graph.paths)
+                    },
+                    evidence={
+                        'source_name': 'Itqan Verified Canonical Isnads',
+                        'locator': resolved_occ_id or f'{book}:{hadith_number}',
+                        'database_path': self.valves.DB_PATH,
+                    },
+                    coverage={
+                        'complete': False,
+                        'selected_path_id': None,
+                        'available_path_ids': avail_ids,
+                        'routes_discovered': len(graph.paths),
+                        'biography_coverage_note': 'المسار المطلوب غير موجود ضمن مسارات الحديث المثبتة'
+                    },
+                    warnings=[f"مسار الإسناد المطلوب '{path_id}' غير موجود. المسارات المتاحة لهذا الحديث هي: {', '.join(avail_ids)}."]
+                ))
+            graph.paths = matching
+            path_node_ids = {n["id"] for n in matching[0].nodes}
+            graph.nodes = [n for n in graph.nodes if n["id"] in path_node_ids]
+            graph.edges = matching[0].edges
         graph_dict = graph.to_dict()
         mermaid_diagram = MermaidRenderer.render(graph)
         is_valid_dag, validation_errors = validate_isnad_graph(graph_dict, text)
@@ -658,6 +689,7 @@ class Tools:
             'is_branched': graph.is_branched,
             'referral_note': graph.referral_note,
             'variant_notes': graph.variant_notes,
+            'selected_path_id': path_id if path_id else None,
             'paths_count': len(graph.paths),
             'paths': [p.to_dict() for p in graph.paths],
             'nodes': graph.nodes,
@@ -681,8 +713,10 @@ class Tools:
             },
             coverage={
                 'complete': is_valid_dag,
+                'selected_path_id': path_id if path_id else None,
                 'routes_discovered': len(graph.paths),
-                'nodes_count': len(graph.nodes)
+                'nodes_count': len(graph.nodes),
+                'biography_coverage_note': 'اكتمال الرسم الطوبولوجي للمسار لا يعني اكتمال توثيق كافة رواته'
             },
             warnings=validation_errors if validation_errors else []
         ))
