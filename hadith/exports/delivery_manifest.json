@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "release_tag": "v2.0.0-rc1",
-  "generated_at": "2026-10-08T09:28:37Z",
+  "generated_at": "2026-10-08T09:38:15Z",
   "description": "Bayan Al-Sunnah Canonical Delivery Manifest with Cryptographic Integrity Checksums",
   "components": {
     "tools_export": {
@@ -157,8 +157,8 @@
     },
     "test_journeys.mjs": {
       "file": "hadith/theme/test_journeys.mjs",
-      "sha256": "d24b37170d5015cd4e19a328b623015249306bc361fc37cd9d3afdd71bb6d552",
-      "size_bytes": 15713
+      "sha256": "5c1bdcbb7e89aa043d7d54228c1d729569f941839e8d481bfddd880a295679e7",
+      "size_bytes": 21760
     },
     "src/journeys.ts": {
       "file": "hadith/theme/src/journeys.ts",
@@ -167,8 +167,8 @@
     },
     "src/nativeVariant.ts": {
       "file": "hadith/theme/src/nativeVariant.ts",
-      "sha256": "610b069c6bf43bc34f2269069c52dbc63e724204b1ab87eea6db9d1b78d93cd1",
-      "size_bytes": 32033
+      "sha256": "8fe06cdc10e137c5ec041dd9f6d4e184dcc6b1f6b9934293f029172fd053c7a8",
+      "size_bytes": 35698
     },
     "src/nativeVariant.css": {
       "file": "hadith/theme/src/nativeVariant.css",

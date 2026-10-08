@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {
   JOURNEYS,
   TOPIC_JOURNEYS,
@@ -338,4 +339,89 @@ test('followup URL preserves occurrenceIds across re-search preventing record di
   assert.ok(url.searchParams.get('q').includes('مسار الإسناد المحدد: path_2'));
   assert.ok(url.searchParams.get('q').includes('زكرياء بن عدي'));
 });
+
+test('three baseline cases enforce thematic integrity and reject false fallback occurrences', () => {
+  // Case 1: prayer-call ("الصلاة جامعة") must NOT inject Bukhari 1:1 (Niyyah / Hadith al-Niyyah)
+  const prayerFollowup0 = new URL(buildFollowupURL('http://localhost:8080', 'prayer-call', 0, { mode: 'unified' }));
+  const prayerFollowup1 = new URL(buildFollowupURL('http://localhost:8080', 'prayer-call', 1, { mode: 'unified' }));
+  for (const url of [prayerFollowup0, prayerFollowup1]) {
+    assert.equal(url.searchParams.get('occurrenceIds'), null);
+    assert.equal(url.searchParams.get('model'), 'bayan-unified-pilot');
+    const prompt = url.searchParams.get('q');
+    assert.equal(prompt.includes('itqan:bukhari:1:1:bf026de7e155'), false, 'Must not inject Bukhari 1:1 into prayer-call');
+    assert.equal(prompt.includes('السجل المحدد:'), false, 'Must not claim pinned occurrence when none selected');
+    assert.ok(prompt.includes('استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم'));
+    assert.ok(prompt.includes('إذا لم يتحدد النص المقصود فاعرض المرشحين للاختيار'));
+  }
+
+  // Case 2: hajj-arafah ("الحج عرفة") must NOT inject Muslim 32:8 (Jihad) or invented Tirmidhi 814
+  const hajjFollowup0 = new URL(buildFollowupURL('http://localhost:8080', 'hajj-arafah', 0, { mode: 'unified' }));
+  const hajjFollowup1 = new URL(buildFollowupURL('http://localhost:8080', 'hajj-arafah', 1, { mode: 'unified' }));
+  for (const url of [hajjFollowup0, hajjFollowup1]) {
+    assert.equal(url.searchParams.get('occurrenceIds'), null);
+    assert.equal(url.searchParams.get('model'), 'bayan-unified-pilot');
+    const prompt = url.searchParams.get('q');
+    assert.equal(prompt.includes('itqan:muslim:32:8:6900c9057c27'), false, 'Must not inject Muslim 32:8 into hajj-arafah');
+    assert.equal(prompt.includes('itqan:tirmidhi:814:d13e'), false, 'Must not inject non-existent Tirmidhi 814');
+    assert.equal(prompt.includes('السجل المحدد:'), false, 'Must not claim pinned occurrence when none selected');
+    assert.ok(prompt.includes('استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم'));
+  }
+
+  // Case 3: abu-hurairah (رواة أبي هريرة) must NOT inject Bukhari 78:55 (Aisha Kindness)
+  const abuFollowup0 = new URL(buildFollowupURL('http://localhost:8080', 'abu-hurairah', 0, { mode: 'unified' }));
+  const abuFollowup1 = new URL(buildFollowupURL('http://localhost:8080', 'abu-hurairah', 1, { mode: 'unified' }));
+  for (const url of [abuFollowup0, abuFollowup1]) {
+    assert.equal(url.searchParams.get('occurrenceIds'), null);
+    assert.equal(url.searchParams.get('model'), 'bayan-unified-pilot');
+    const prompt = url.searchParams.get('q');
+    assert.equal(prompt.includes('itqan:bukhari:78:55:022c1dbdd753'), false, 'Must not inject Bukhari 78:55 into abu-hurairah');
+    assert.equal(prompt.includes('السجل المحدد:'), false, 'Must not claim pinned occurrence when none selected');
+    assert.ok(prompt.includes('استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم'));
+  }
+});
+
+test('baseline cases preserve authentic tool-retrieved occurrences when explicitly available', () => {
+  // Genuine prayer-call occurrence: Kusuf chapter
+  const validPrayerCallId = 'itqan:bukhari:16:6:d710c3563c5d';
+  const urlPrayer = new URL(buildFollowupURL('http://localhost:8080', 'prayer-call', 0, {
+    mode: 'unified',
+    occurrenceIds: [validPrayerCallId]
+  }));
+  assert.equal(urlPrayer.searchParams.get('occurrenceIds'), validPrayerCallId);
+  assert.ok(urlPrayer.searchParams.get('q').includes(`السجل المحدد: ${validPrayerCallId}`));
+
+  // Genuine hajj-arafah occurrence: Tirmidhi Tafsir chapter
+  const validHajjId = 'itqan:tirmidhi:9:82:73c9b344bb4d';
+  const urlHajj = new URL(buildFollowupURL('http://localhost:8080', 'hajj-arafah', 0, {
+    mode: 'unified',
+    occurrenceIds: [validHajjId]
+  }));
+  assert.equal(urlHajj.searchParams.get('occurrenceIds'), validHajjId);
+  assert.ok(urlHajj.searchParams.get('q').includes(`السجل المحدد: ${validHajjId}`));
+});
+
+test('theme code eliminates DEFAULT_CASE_OCCURRENCES, updates route notices, and scopes click interactions', () => {
+  const sourcePath = new URL('./src/nativeVariant.ts', import.meta.url);
+  const source = fs.readFileSync(sourcePath, 'utf8');
+
+  // R4-01: False fallback map is completely deleted
+  assert.equal(source.includes('DEFAULT_CASE_OCCURRENCES'), false, 'DEFAULT_CASE_OCCURRENCES must be completely deleted');
+
+  // R4-02: Route isolation notice says 'اختير الطريق:' rather than asserting 'تم عزل' before action
+  assert.ok(source.includes('اختير الطريق: ${selectedPathId}'), 'Notice must say اختير الطريق');
+  assert.equal(source.includes('تم عزل ${selectedPathId}'), false, 'Old ungrounded notice تم عزل must be removed');
+
+  // R4-02: Node click interaction scoped strictly to enabled variant and #chat-pane
+  assert.ok(source.includes("document.documentElement.hasAttribute('data-athar-chat-v2')"), 'Click listener must check data-athar-chat-v2 attribute');
+  assert.ok(source.includes('#chat-pane'), 'Click listener must be scoped to #chat-pane');
+
+  // R4-02: renderContext updates on tool payload arrival via dynamic signature
+  assert.ok(source.includes('getGraphSignature'), 'renderContext must track dynamic graph signature');
+  assert.ok(source.includes('lastContextSignature'), 'renderContext must use signature for cache invalidation');
+
+  // Native WebUI toggling contract: disabling variant removes attributes and restores native experience
+  assert.ok(source.includes("document.documentElement.toggleAttribute('data-athar-chat-v2',enabled&&chat)"), 'toggleAttribute must respect enabled state');
+  assert.ok(source.includes('audiencePanel.remove()'), 'Disabling variant must clean up custom panels');
+});
+
 

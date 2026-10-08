@@ -19,10 +19,14 @@ import { localizeAuthPage } from './authLocalizer';
 
 type Audience='topics'|'learn'|'research';
 
-const DEFAULT_CASE_OCCURRENCES: Record<string, string[]> = {
-  'prayer-call': ['itqan:bukhari:16:6:d710c3563c5d'],
-  'hajj-arafah': ['itqan:tirmidhi:9:82:73c9b344bb4d'],
-  'abu-hurairah': ['itqan:bukhari:10:45:dd5f9500f564']
+export type ActiveGraphData = {
+  occurrence_id?: string;
+  message_id?: string;
+  graph_id?: string;
+  paths: GraphPath[];
+  nodes: Map<string, NarratorNodeDetails>;
+  nodeIdMap: Map<string, NarratorNodeDetails>;
+  mentionIdMap: Map<string, NarratorNodeDetails>;
 };
 
 const paths:Record<string,string>={book:'M12 5v16M3 3h5a4 4 0 0 1 4 2 4 4 0 0 1 4-2h5v16h-5a4 4 0 0 0-4 2 4 4 0 0 0-4-2H3Z',layers:'m12 3 10 6-10 6L2 9Zm-9 11 9 5 9-5m-18 5 9 5 9-5',branch:'M6 6v9a4 4 0 0 0 4 4h5M6 8h8a4 4 0 0 0 4-4M3 3a3 3 0 1 0 6 0 3 3 0 0 0-6 0M15 3a3 3 0 1 0 6 0 3 3 0 0 0-6 0M15 19a3 3 0 1 0 6 0 3 3 0 0 0-6 0',person:'M20 21v-2a7 7 0 0 0-14 0v2M8 7a5 5 0 1 0 10 0A5 5 0 0 0 8 7',arrow:'M19 12H5m6-6-6 6 6 6',close:'m6 6 12 12M6 18 18 6',play:'m8 4 12 8-12 8Z'};
@@ -49,9 +53,9 @@ export function createNativeVariant(){
   let routeKind: 'all_paths' | 'specific_path' = 'all_paths';
   let activeMentionId: string | undefined = undefined;
   let activeAnchorName: string | undefined = undefined;
-  let activeGraphData: { occurrence_id?: string; paths: GraphPath[]; nodes: Map<string, NarratorNodeDetails> } | null = null;
+  let activeGraphData: ActiveGraphData | null = null;
   let active=getJourney(new URLSearchParams(location.search).get('case'));
-  let pendingLaunch=!!active;let lastPath=location.pathname;let lastContext='';
+  let pendingLaunch=!!active;let lastPath=location.pathname;let lastContextCase='';let lastContextSignature='';
   const caseMap:Record<string,string>=readCaseMap();if(!active)active=getJourney(caseMap[location.pathname]);
 
   function readCaseMap(){try{const v=JSON.parse(sessionStorage.getItem('bayan-case-map')||'{}');return v&&typeof v==='object'&&!Array.isArray(v)?v:{};}catch{return {};}}
@@ -91,40 +95,45 @@ export function createNativeVariant(){
     }return view;
   }
 
-  function normalizeGraphPayload(payload: any): { occurrence_id?: string; paths: GraphPath[]; nodes: Map<string, NarratorNodeDetails> } | null {
+  function normalizeGraphPayload(payload: any): ActiveGraphData | null {
     if (!payload || typeof payload !== 'object') return null;
     const d = payload.data || payload;
     const occurrence_id = d.occurrence_id || payload.occurrence_id;
+    const message_id = payload.message_id || payload.id || d.message_id;
+    const graph_id = d.graph_id || payload.graph_id;
     const paths: GraphPath[] = d.paths || payload.paths || [];
     const nodesArr = d.nodes || payload.nodes || d.graph?.nodes || [];
     const nodes = new Map<string, NarratorNodeDetails>();
+    const nodeIdMap = new Map<string, NarratorNodeDetails>();
+    const mentionIdMap = new Map<string, NarratorNodeDetails>();
 
     if (Array.isArray(nodesArr)) {
       for (const n of nodesArr) {
-        const raw = (n.raw_name || n.name || n.canonical_name || n.id || '').trim();
-        if (raw) {
-          nodes.set(raw, {
-            raw_text: n.raw_name || n.name || raw,
-            occurrence_id: occurrence_id || n.occurrence_id,
-            mention_id: n.mention_id,
-            source_span: n.source_span,
-            source_span_text: n.source_span_text,
-            canonical_name: n.canonical_name,
-            identity_status: n.identity_status || n.status,
-            candidates: n.candidates,
-            grade_text: n.grade || n.grade_ar,
-            grade_source: n.grade_source,
-            ibn_hajar: n.ibn_hajar,
-            dhahabi: n.dhahabi,
-            anchor_name: n.anchor_name
-          });
-        }
+        const raw = (n.raw_text || n.name || n.canonical_name || n.id || '').trim();
+        const details: NarratorNodeDetails = {
+          raw_text: n.raw_text || n.name || raw,
+          occurrence_id: occurrence_id || n.occurrence_id,
+          mention_id: n.mention_id,
+          source_span: n.source_span,
+          source_span_text: n.source_span_text,
+          canonical_name: n.canonical_name,
+          identity_status: n.identity_status || n.status,
+          candidates: n.candidates,
+          grade_text: n.grade || n.grade_ar,
+          grade_source: n.grade_source,
+          ibn_hajar: n.ibn_hajar,
+          dhahabi: n.dhahabi,
+          anchor_name: n.anchor_name
+        };
+        if (raw) nodes.set(raw, details);
+        if (n.id) nodeIdMap.set(String(n.id).toLowerCase(), details);
+        if (n.mention_id) mentionIdMap.set(String(n.mention_id), details);
       }
     }
-    return { occurrence_id, paths, nodes };
+    return { occurrence_id, message_id, graph_id, paths, nodes, nodeIdMap, mentionIdMap };
   }
 
-  function extractActiveGraphData(): { occurrence_id?: string; paths: GraphPath[]; nodes: Map<string, NarratorNodeDetails> } | null {
+  function extractActiveGraphData(): ActiveGraphData | null {
     if (typeof window !== 'undefined' && (window as any).__BAYAN_GRAPH__) {
       return normalizeGraphPayload((window as any).__BAYAN_GRAPH__);
     }
@@ -191,15 +200,29 @@ export function createNativeVariant(){
   }
 
   function resolveNarratorDetailsFromDOM(text:string,el:HTMLElement):NarratorNodeDetails{
-    if(activeGraphData&&activeGraphData.nodes){
-      for(const [key,n]of activeGraphData.nodes.entries()){
-        if(key===text||text.includes(key)||key.includes(text)){
-          return n;
-        }
+    // 1. Exact lookup by mention_id if present
+    const mid=el.getAttribute('data-mention-id')||el.dataset?.mentionId;
+    if(mid&&activeGraphData?.mentionIdMap?.has(mid)){
+      return activeGraphData.mentionIdMap.get(mid)!;
+    }
+
+    // 2. Exact lookup by node_id / narrator_id
+    const nidAttr=el.getAttribute('data-node-id')||el.dataset?.nodeId||el.getAttribute('data-narrator-id')||el.dataset?.narratorId;
+    if(nidAttr&&activeGraphData?.nodeIdMap?.has(nidAttr.toLowerCase())){
+      return activeGraphData.nodeIdMap.get(nidAttr.toLowerCase())!;
+    }
+
+    // 3. Exact lookup by Mermaid SVG element ID (e.g. flowchart-N1_1_A-123 or flowchart-NS_1-456)
+    if(el.id&&activeGraphData?.nodeIdMap){
+      const m=el.id.match(/^flowchart-([a-zA-Z0-9_]+)(?:-\d+)?$/);
+      if(m&&activeGraphData.nodeIdMap.has(m[1].toLowerCase())){
+        return activeGraphData.nodeIdMap.get(m[1].toLowerCase())!;
       }
     }
+
+    // 4. Element data attributes if explicitly set
     const ds=el.dataset;
-    if(ds&&(ds.rawText||ds.narratorId||ds.canonicalName)){
+    if(ds&&(ds.mentionId||ds.canonicalName||ds.narratorId)){
       return {
         raw_text:ds.rawText||text,
         occurrence_id:ds.occurrenceId||activeGraphData?.occurrence_id,
@@ -211,19 +234,32 @@ export function createNativeVariant(){
         dhahabi:ds.dhahabi
       };
     }
+
+    // 5. Exact text lookup against activeGraphData nodes
+    if(activeGraphData?.nodes?.has(text)){
+      return activeGraphData.nodes.get(text)!;
+    }
+
+    // 6. Honest unresolved record; NEVER invent or assume occurrence_id from unrelated default cases
     return {
       raw_text:text,
-      occurrence_id:activeGraphData?.occurrence_id||(active?DEFAULT_CASE_OCCURRENCES[active.id]?.[0]:undefined),
+      occurrence_id:activeGraphData?.occurrence_id,
       identity_status:'unresolved'
     };
   }
 
   document.addEventListener('click',event=>{
-    const target=(event.target as HTMLElement)?.closest('.node, g.node, [data-narrator-id], .bayan-narrator-node, g[id^="flowchart-"]');
+    if(!enabled)return;
+    if(!document.documentElement.hasAttribute('data-athar-chat-v2'))return;
+    const chatPane=document.getElementById('chat-pane');
+    if(!chatPane)return;
+    const target=(event.target as HTMLElement)?.closest('#chat-pane .node, #chat-pane g.node, #chat-pane [data-narrator-id], #chat-pane .bayan-narrator-node, #chat-pane g[id^="flowchart-"]');
     if(target&&!demoDialog.open){
       const text=target.textContent?.trim().replace(/\s+/g,' ')||'';
       if(text){
         const details=resolveNarratorDetailsFromDOM(text,target as HTMLElement);
+        activeMentionId=details.mention_id;
+        activeAnchorName=details.anchor_name||details.canonical_name;
         openNarratorDrawer(details);
       }
     }
@@ -291,23 +327,53 @@ export function createNativeVariant(){
     const pathBar=followupPanel.querySelector('.bayan-route-selector');
     if(pathBar)updatePathSelection(pathBar as HTMLElement);
 
-    // Modify/filter visible SVG elements in DOM
+    // Modify/filter visible SVG elements in DOM based on actual graph membership
     const svgs=document.querySelectorAll<SVGElement>('#chat-pane svg, .mermaid svg');
+    const selectedPath=selectedPathId?activeGraphData?.paths?.find(p=>p.path_id===selectedPathId):null;
+    const pathNodeIds=new Set<string>();
+    const pathNodeNames=new Set<string>();
+    if(selectedPath&&Array.isArray(selectedPath.nodes)){
+      for(const n of selectedPath.nodes){
+        if(n.id)pathNodeIds.add(String(n.id).toLowerCase());
+        const nm=(n.name||n.raw_text||n.canonical_name||'').trim();
+        if(nm)pathNodeNames.add(nm);
+      }
+    }
+
     svgs.forEach(svg=>{
       if(selectedPathId){
         svg.setAttribute('data-selected-path',selectedPathId);
-        svg.querySelectorAll<SVGElement>('.node, g.node').forEach(nodeEl=>{
-          const nodePath=nodeEl.getAttribute('data-path-id');
-          if(nodePath&&nodePath!==selectedPathId&&nodePath!=='shared'){
-            nodeEl.style.opacity='0.35';
-          }else{
+        svg.querySelectorAll<SVGElement>('.node, g.node, g[id^="flowchart-"]').forEach(nodeEl=>{
+          let inPath=false;
+          const m=nodeEl.id?nodeEl.id.match(/^flowchart-([a-zA-Z0-9_]+)(?:-\d+)?$/):null;
+          const elNodeId=m?m[1].toLowerCase():'';
+          const dataNodeId=(nodeEl.getAttribute('data-node-id')||nodeEl.getAttribute('data-path-id')||'').toLowerCase();
+          const nodeText=(nodeEl.textContent||'').trim();
+
+          if(elNodeId&&pathNodeIds.has(elNodeId))inPath=true;
+          else if(dataNodeId&&(pathNodeIds.has(dataNodeId)||dataNodeId===selectedPathId.toLowerCase()||dataNodeId==='shared'))inPath=true;
+          else if(pathNodeNames.size>0){
+            for(const name of pathNodeNames){
+              if(nodeText.includes(name)){
+                inPath=true;
+                break;
+              }
+            }
+          }
+
+          if(inPath){
             nodeEl.style.opacity='1';
+            nodeEl.style.filter='';
+          }else{
+            nodeEl.style.opacity='0.22';
+            nodeEl.style.filter='grayscale(60%)';
           }
         });
       }else{
         svg.removeAttribute('data-selected-path');
-        svg.querySelectorAll<SVGElement>('.node, g.node').forEach(nodeEl=>{
+        svg.querySelectorAll<SVGElement>('.node, g.node, g[id^="flowchart-"]').forEach(nodeEl=>{
           nodeEl.style.opacity='1';
+          nodeEl.style.filter='';
         });
       }
     });
@@ -317,9 +383,7 @@ export function createNativeVariant(){
     }));
 
     if(active){
-      const activeOccurrences=activeGraphData?.occurrence_id
-        ?[activeGraphData.occurrence_id]
-        :(DEFAULT_CASE_OCCURRENCES[active.id]||[]);
+      const activeOccurrences=activeGraphData?.occurrence_id?[activeGraphData.occurrence_id]:[];
 
       const buttons=followupPanel.querySelectorAll<HTMLButtonElement>('button:not(.bayan-route-btn)');
       const followupsToRender=active.track==='islam'
@@ -339,16 +403,42 @@ export function createNativeVariant(){
         }
       });
       followupPanel.dataset.notice=selectedPathId
-        ?`تم عزل ${selectedPathId}. انقر على أي مسودة لتحميل هذا الطريق.`
+        ?`اختير الطريق: ${selectedPathId}. انقر على أي مسودة لتحميل هذا الطريق.`
         :'تم عرض جميع الطرق.';
     }
   }
 
+  function getGraphSignature(graph:ActiveGraphData|null):string{
+    if(!graph)return 'none';
+    const occ=graph.occurrence_id||'no-occ';
+    const pathsKey=graph.paths.map(p=>`${p.path_id}:${p.teacher_name||''}`).join('|');
+    return `${occ}:${graph.paths.length}:${pathsKey}:${graph.nodes.size}`;
+  }
+
   function renderContext(){
-    const key=active?.id||'none';if(lastContext===key)return;lastContext=key;contextPanel.replaceChildren();followupPanel.replaceChildren();delete followupPanel.dataset.notice;
+    const caseKey=active?.id||'none';
+    const currentGraph=extractActiveGraphData();
+    const graphSig=getGraphSignature(currentGraph);
+    const signature=`${caseKey}::${graphSig}`;
+
+    if(lastContextSignature===signature)return;
+
+    const prevOcc=activeGraphData?.occurrence_id;
+    const newOcc=currentGraph?.occurrence_id;
+    if(caseKey!==lastContextCase||prevOcc!==newOcc){
+      selectedPathId=undefined;
+      routeKind='all_paths';
+      activeMentionId=undefined;
+      activeAnchorName=undefined;
+    }
+
+    lastContextCase=caseKey;
+    lastContextSignature=signature;
+    activeGraphData=currentGraph;
+
+    contextPanel.replaceChildren();followupPanel.replaceChildren();delete followupPanel.dataset.notice;
     contextPanel.append(element('span','bayan-context-brand',BRAND.name));if(active)contextPanel.append(element('span','bayan-context-case',active.title));contextPanel.append(button('','الحالات التطبيقية',openGallery));
     if(active){
-      activeGraphData=extractActiveGraphData();
       const availablePaths=activeGraphData?.paths||[];
       const selectorItems=buildRouteSelectorItems(availablePaths);
       if(selectorItems){
@@ -364,9 +454,7 @@ export function createNativeVariant(){
         followupPanel.append(pathBar);
       }
       followupPanel.append(element('span','','افتح مسودة متخصصة لهذه الحالة'));
-      const activeOccurrences=activeGraphData?.occurrence_id
-        ?[activeGraphData.occurrence_id]
-        :(DEFAULT_CASE_OCCURRENCES[active.id]||[]);
+      const activeOccurrences=activeGraphData?.occurrence_id?[activeGraphData.occurrence_id]:[];
 
       const followupsToRender=active.track==='islam'?active.followups.filter(f=>f.task!=='isnad_graph'):active.followups;
       followupsToRender.forEach((item,index)=>{
@@ -388,7 +476,7 @@ export function createNativeVariant(){
     if(location.pathname===lastPath)return;
     if(pendingLaunch&&/^\/c\//.test(location.pathname)&&active){caseMap[location.pathname]=active.id;try{sessionStorage.setItem('bayan-case-map',JSON.stringify(caseMap));}catch{}pendingLaunch=false;}
     else{active=getJourney(caseMap[location.pathname]);pendingLaunch=false;}
-    lastPath=location.pathname;lastContext='';
+    lastPath=location.pathname;lastContextCase='';lastContextSignature='';
   }
 
   function refresh(){
