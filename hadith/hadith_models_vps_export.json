@@ -368,9 +368,11 @@
           "id": "bayan-islam-guide-v1",
           "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
           "type": "collection",
-          "description": "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)",
+          "description": "موارد المنهج التعليمي والتعريف بالإسلام للموضوعات الستة (مسودة استرشادية قيد المراجعة العلمية)",
           "version": "1.0",
-          "review_status": "verified"
+          "review_status": "needs_review",
+          "scholarly_approved": false,
+          "source": "planning/islam_topic_taxonomy_v1.json"
         }
       ],
       "toolIds": [
@@ -605,9 +607,11 @@
           "id": "bayan-islam-guide-v1",
           "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
           "type": "collection",
-          "description": "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)",
+          "description": "موارد المنهج التعليمي والتعريف بالإسلام للموضوعات الستة (مسودة استرشادية قيد المراجعة العلمية)",
           "version": "1.0",
-          "review_status": "verified"
+          "review_status": "needs_review",
+          "scholarly_approved": false,
+          "source": "planning/islam_topic_taxonomy_v1.json"
         }
       ],
       "toolIds": [

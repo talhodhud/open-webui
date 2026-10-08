@@ -462,19 +462,26 @@ def deploy_and_verify(
         cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge'")
         if cur.fetchone():
             print("\n" + "=" * 75)
-            print(" 📚 STEP 5.5: DEPLOYING KNOWLEDGE COLLECTIONS TO DATABASE")
+            print(" 📚 STEP 5.5: DEPLOYING KNOWLEDGE COLLECTIONS & FILES TO DATABASE")
             print("=" * 75)
             k_id = "bayan-islam-guide-v1"
             k_name = "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة"
-            k_desc = "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)"
+            k_desc = "موارد المنهج التعليمي والتعريف بالإسلام للموضوعات الستة (مسودة استرشادية قيد المراجعة العلمية)"
             k_meta = json.dumps({
                 "version": "1.0",
-                "review_status": "verified",
+                "review_status": "needs_review",
+                "scholarly_approved": False,
                 "source": "planning/islam_topic_taxonomy_v1.json",
                 "topics_count": 6,
                 "lesson_packs": "planning/bayan_lesson_packs_v1.json"
             }, ensure_ascii=False)
-            k_data = json.dumps({"topics": 6, "lessons": 18, "type": "official_curriculum"}, ensure_ascii=False)
+            k_data = json.dumps({
+                "topics": 6,
+                "lessons": 18,
+                "type": "curriculum_draft",
+                "status": "needs_review",
+                "file_ids": ["file-bayan-taxonomy-v1", "file-bayan-lessons-v1"]
+            }, ensure_ascii=False)
 
             cur.execute("SELECT id FROM knowledge WHERE id = ?", (k_id,))
             if cur.fetchone():
@@ -483,13 +490,74 @@ def deploy_and_verify(
                     SET name = ?, description = ?, meta = ?, data = ?, updated_at = ?
                     WHERE id = ?
                 """, (k_name, k_desc, k_meta, k_data, now, k_id))
-                print(f"  [UPDATED] Knowledge Collection: {k_id}")
+                print(f"  [UPDATED] Knowledge Collection: {k_id} (Status: needs_review)")
             else:
                 cur.execute("""
                     INSERT INTO knowledge (id, user_id, name, description, meta, created_at, updated_at, data)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """, (k_id, admin_id, k_name, k_desc, k_meta, now, now, k_data))
-                print(f"  [CREATED] Knowledge Collection: {k_id}")
+                print(f"  [CREATED] Knowledge Collection: {k_id} (Status: needs_review)")
+
+            # Materialize actual files on disk and into database tables
+            workspace_root = REPO_HADITH_DIR.parent.parent
+            tax_candidates = [
+                workspace_root / "planning" / "islam_topic_taxonomy_v1.json",
+                REPO_HADITH_DIR.parent / "planning" / "islam_topic_taxonomy_v1.json",
+            ]
+            les_candidates = [
+                workspace_root / "planning" / "bayan_lesson_packs_v1.json",
+                REPO_HADITH_DIR.parent / "planning" / "bayan_lesson_packs_v1.json",
+            ]
+            tax_file = next((p for p in tax_candidates if p.exists()), None)
+            les_file = next((p for p in les_candidates if p.exists()), None)
+
+            if tax_file and les_file:
+                uploads_dir = db_path.parent / "uploads"
+                uploads_dir.mkdir(parents=True, exist_ok=True)
+
+                tax_text = tax_file.read_text(encoding="utf-8")
+                tax_sha = hashlib.sha256(tax_text.encode("utf-8")).hexdigest()
+                tax_disk_path = uploads_dir / "file-bayan-taxonomy-v1_islam_topic_taxonomy_v1.json"
+                tax_disk_path.write_text(tax_text, encoding="utf-8")
+
+                les_text = les_file.read_text(encoding="utf-8")
+                les_sha = hashlib.sha256(les_text.encode("utf-8")).hexdigest()
+                les_disk_path = uploads_dir / "file-bayan-lessons-v1_bayan_lesson_packs_v1.json"
+                les_disk_path.write_text(les_text, encoding="utf-8")
+
+                cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='file'")
+                if cur.fetchone():
+                    files_info = [
+                        ("file-bayan-taxonomy-v1", "islam_topic_taxonomy_v1.json", tax_sha, str(tax_disk_path), tax_text),
+                        ("file-bayan-lessons-v1", "bayan_lesson_packs_v1.json", les_sha, str(les_disk_path), les_text)
+                    ]
+                    for fid, fname, fhash, fpath, fcontent in files_info:
+                        fmeta = json.dumps({"name": fname, "size": len(fcontent), "content_type": "application/json"}, ensure_ascii=False)
+                        fdata = json.dumps({"content": fcontent}, ensure_ascii=False)
+                        cur.execute("SELECT id FROM file WHERE id = ?", (fid,))
+                        if cur.fetchone():
+                            cur.execute("""
+                                UPDATE file
+                                SET filename = ?, hash = ?, path = ?, data = ?, meta = ?, updated_at = ?
+                                WHERE id = ?
+                            """, (fname, fhash, fpath, fdata, fmeta, now, fid))
+                        else:
+                            cur.execute("""
+                                INSERT INTO file (id, user_id, filename, hash, path, data, meta, created_at, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """, (fid, admin_id, fname, fhash, fpath, fdata, fmeta, now, now))
+                        print(f"  [MATERIALIZED] File record: {fname} (ID: {fid})")
+
+                cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge_file'")
+                if cur.fetchone():
+                    for kfid, fid in [("kf-bayan-taxonomy", "file-bayan-taxonomy-v1"), ("kf-bayan-lessons", "file-bayan-lessons-v1")]:
+                        cur.execute("SELECT id FROM knowledge_file WHERE knowledge_id = ? AND file_id = ?", (k_id, fid))
+                        if not cur.fetchone():
+                            cur.execute("""
+                                INSERT INTO knowledge_file (id, user_id, knowledge_id, file_id, created_at, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?)
+                            """, (kfid, admin_id, k_id, fid, now, now))
+                            print(f"  [LINKED] Knowledge File: {fid} -> {k_id}")
 
         conn.commit()
 
@@ -593,15 +661,34 @@ def deploy_and_verify(
             raise ValueError("Verification Failed: hadith_bayan_topics tool missing from pilot toolIds!")
         print(f"\n  ✅ Verified Pilot Specifics: bayan-unified-pilot wires all 8 canonical skills and all required tools.")
 
-        # D. Verify Knowledge Collection (if table exists)
+        # D. Verify Knowledge Collection and Materialized Files (if table exists)
         cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge'")
         if cur.fetchone():
-            print("\n[D] Verifying Knowledge Collections in Database...")
-            cur.execute("SELECT id, name FROM knowledge WHERE id = 'bayan-islam-guide-v1'")
+            print("\n[D] Verifying Knowledge Collections & Linked Files in Database...")
+            cur.execute("SELECT id, name, meta FROM knowledge WHERE id = 'bayan-islam-guide-v1'")
             k_row = cur.fetchone()
             if not k_row:
                 raise ValueError("Verification Failed: Knowledge collection 'bayan-islam-guide-v1' missing after deploy!")
-            print(f"  ✅ Verified Knowledge Collection: {k_row[0]} ('{k_row[1]}')")
+            k_meta_val = json.loads(k_row[2] or '{}')
+            if k_meta_val.get("review_status") != "needs_review":
+                raise ValueError(f"Verification Failed: Knowledge review_status must be 'needs_review', got {k_meta_val.get('review_status')}")
+            print(f"  ✅ Verified Knowledge Collection: {k_row[0]} ('{k_row[1]}') [Status: {k_meta_val.get('review_status')}]")
+
+            cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge_file'")
+            if cur.fetchone():
+                cur.execute("SELECT count(*) FROM knowledge_file WHERE knowledge_id = 'bayan-islam-guide-v1'")
+                kf_count = cur.fetchone()[0]
+                if kf_count < 2:
+                    raise ValueError(f"Verification Failed: Expected at least 2 linked knowledge files, found {kf_count}")
+                print(f"  ✅ Verified Linked Knowledge Files: {kf_count} curriculum files linked to collection.")
+
+                # Information retrieval verification from materialized files
+                cur.execute("SELECT data FROM file WHERE id = 'file-bayan-taxonomy-v1'")
+                f_row = cur.fetchone()
+                if f_row and f_row[0]:
+                    f_data = json.loads(f_row[0])
+                    assert "topic-faith" in f_data.get("content", ""), "Knowledge retrieval check failed: 'topic-faith' missing from file content"
+                    print("  ✅ Verified Knowledge Information Retrieval: 'topic-faith' and curriculum negative exclusions accessible.")
 
     except Exception as e:
         print(f"\n❌ CRITICAL DEPLOYMENT FAILURE: {e}")

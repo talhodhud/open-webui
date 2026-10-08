@@ -262,15 +262,17 @@ def load_canonical_models() -> list:
     assert len(pilot["meta"]["skillIds"]) == 8, f"Pilot must wire 8 skills, found {len(pilot['meta']['skillIds'])}"
     assert "hadith_bayan_topics" in pilot["meta"]["toolIds"], "Topics tool missing in pilot!"
 
-    # Bind canonical knowledge collection for Bayan Islam Guide
+    # Bind canonical knowledge collection for Bayan Islam Guide (Curriculum Draft)
     bayan_knowledge = [
         {
             "id": "bayan-islam-guide-v1",
             "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
             "type": "collection",
-            "description": "موارد المنهج الموثقة والتعريف بالإسلام للموضوعات الستة (الإصدار 1.0 - مراجعة معتمدة)",
+            "description": "موارد المنهج التعليمي والتعريف بالإسلام للموضوعات الستة (مسودة استرشادية قيد المراجعة العلمية)",
             "version": "1.0",
-            "review_status": "verified"
+            "review_status": "needs_review",
+            "scholarly_approved": False,
+            "source": "planning/islam_topic_taxonomy_v1.json"
         }
     ]
     islam_guide = next((m for m in models if m["id"] == "hadith-islam-guide"), None)

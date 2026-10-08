@@ -20,9 +20,9 @@ import { localizeAuthPage } from './authLocalizer';
 type Audience='topics'|'learn'|'research';
 
 const DEFAULT_CASE_OCCURRENCES: Record<string, string[]> = {
-  'prayer-call': ['itqan:bukhari:1:1:bf026de7e155'],
-  'hajj-arafah': ['itqan:muslim:32:8:6900c9057c27', 'itqan:tirmidhi:814:d13e'],
-  'abu-hurairah': ['itqan:bukhari:78:55:022c1dbdd753']
+  'prayer-call': ['itqan:bukhari:16:6:d710c3563c5d'],
+  'hajj-arafah': ['itqan:tirmidhi:9:82:73c9b344bb4d'],
+  'abu-hurairah': ['itqan:bukhari:10:45:dd5f9500f564']
 };
 
 const paths:Record<string,string>={book:'M12 5v16M3 3h5a4 4 0 0 1 4 2 4 4 0 0 1 4-2h5v16h-5a4 4 0 0 0-4 2 4 4 0 0 0-4-2H3Z',layers:'m12 3 10 6-10 6L2 9Zm-9 11 9 5 9-5m-18 5 9 5 9-5',branch:'M6 6v9a4 4 0 0 0 4 4h5M6 8h8a4 4 0 0 0 4-4M3 3a3 3 0 1 0 6 0 3 3 0 0 0-6 0M15 3a3 3 0 1 0 6 0 3 3 0 0 0-6 0M15 19a3 3 0 1 0 6 0 3 3 0 0 0-6 0',person:'M20 21v-2a7 7 0 0 0-14 0v2M8 7a5 5 0 1 0 10 0A5 5 0 0 0 8 7',arrow:'M19 12H5m6-6-6 6 6 6',close:'m6 6 12 12M6 18 18 6',play:'m8 4 12 8-12 8Z'};
