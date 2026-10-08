@@ -42,6 +42,7 @@ import hmac
 import urllib.request
 import urllib.error
 from pathlib import Path
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, Tuple, List
 
 # Ensure UTF-8 output
@@ -93,19 +94,31 @@ def index_and_verify_knowledge_api(
     admin_id: str,
     secret_key: Optional[str],
     collection_id: str = "bayan-islam-guide-v1",
-    file_ids: List[str] = None
+    file_ids: Optional[List[str]] = None,
+    evidence_output_path: Optional[Path] = None
 ) -> Tuple[bool, Dict[str, Any]]:
     """
     Invokes Open WebUI's live retrieval indexing API (/api/v1/retrieval/process/file)
     and verifies actual knowledge search retrieval (/api/v1/retrieval/query/collection).
-    Returns (success, evidence_dict).
+
+    Guarantees:
+    1. Strict Indexing Gate: Requires 100% of target files to be indexed successfully.
+       Any file processing failure immediately aborts verification and returns False.
+    2. Origin Source Conformance: Documents returned must belong strictly to expected
+       canonical files ('islam_topic_taxonomy_v1.json', 'bayan_lesson_packs_v1.json').
+       Any unexpected or stale collection sources (e.g., 'old.json') fail verification.
+    3. Semantic Content Verification: Validates that returned snippets contain expected
+       authentic hadith texts, topic descriptors, and exclusion rules.
+    4. Sanitized Evidence: Outputs dated evidence artifact without credentials/tokens.
     """
     if file_ids is None:
         file_ids = ["file-bayan-taxonomy-v1", "file-bayan-lessons-v1"]
 
     evidence: Dict[str, Any] = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "webui_url": webui_url,
         "collection_id": collection_id,
+        "file_ids": file_ids,
         "processed_files": [],
         "retrieval_queries": {},
         "status": "unverified"
@@ -120,7 +133,7 @@ def index_and_verify_knowledge_api(
     health_url = f"{webui_url.rstrip('/')}/api/version"
     try:
         req = urllib.request.Request(health_url)
-        with urllib.request.urlopen(req, timeout=3) as resp:
+        with urllib.request.urlopen(req, timeout=5) as resp:
             if resp.status != 200:
                 print(f"  ⚠️ [Knowledge API] Open WebUI health check returned HTTP {resp.status}")
                 evidence["status"] = "server_unhealthy"
@@ -139,29 +152,85 @@ def index_and_verify_knowledge_api(
     # 1. Trigger process_file for each file
     print(f"\n[Knowledge API] Triggering Open WebUI Vector Indexing via /api/v1/retrieval/process/file...")
     process_url = f"{webui_url.rstrip('/')}/api/v1/retrieval/process/file"
+    successful_processed = 0
+
     for fid in file_ids:
         payload = json.dumps({"file_id": fid, "collection_name": collection_id}).encode("utf-8")
         try:
             req = urllib.request.Request(process_url, data=payload, headers=headers)
             with urllib.request.urlopen(req, timeout=60) as resp:
-                res_data = json.loads(resp.read().decode("utf-8"))
-                evidence["processed_files"].append({
-                    "file_id": fid,
-                    "status_code": resp.status,
-                    "response": res_data
-                })
-                print(f"  ✅ [Indexed] File '{fid}' into collection '{collection_id}' (Status: {resp.status})")
+                if resp.status == 200:
+                    res_data = json.loads(resp.read().decode("utf-8"))
+                    evidence["processed_files"].append({
+                        "file_id": fid,
+                        "status_code": resp.status,
+                        "response": res_data
+                    })
+                    successful_processed += 1
+                    print(f"  ✅ [Indexed] File '{fid}' into collection '{collection_id}' (Status: {resp.status})")
+                else:
+                    print(f"  ❌ [Error] Failed indexing file '{fid}': HTTP {resp.status}")
+                    evidence["processed_files"].append({
+                        "file_id": fid,
+                        "status_code": resp.status,
+                        "error": f"HTTP {resp.status}"
+                    })
         except Exception as e:
             print(f"  ❌ [Error] Failed indexing file '{fid}': {e}")
             evidence["processed_files"].append({"file_id": fid, "error": str(e)})
 
+    # Strict gate: ALL files must be processed successfully
+    if successful_processed != len(file_ids):
+        print(f"  ❌ [Knowledge API] Indexing failed: only {successful_processed}/{len(file_ids)} files processed successfully.")
+        evidence["status"] = "failed_file_processing"
+        return False, evidence
+
     # 2. Query collection with real test queries
     print(f"\n[Knowledge API] Verifying Knowledge Query Retrieval via /api/v1/retrieval/query/collection...")
     query_url = f"{webui_url.rstrip('/')}/api/v1/retrieval/query/collection"
-    test_queries = ["faith_intention", "الأعمال بالنيات", "كتاب الأيمان والنذور"]
+    expected_sources = {"islam_topic_taxonomy_v1.json", "bayan_lesson_packs_v1.json"}
+    test_queries_spec = [
+        {
+            "query": "faith_intention",
+            "desc": "درس النية الموضوعي",
+            "expected_keyword": "النية",
+            "expected_source": "bayan_lesson_packs_v1.json"
+        },
+        {
+            "query": "bukhari:1:1:bf026de7e155",
+            "desc": "شاهد حديث النية الصحيح",
+            "expected_keyword": "الْأَعْمَالُ بِالنِّيَّاتِ",
+            "expected_source": "bayan_lesson_packs_v1.json"
+        },
+        {
+            "query": "HadeethEnc 4560",
+            "desc": "شرح حديث النية المعتمد",
+            "expected_keyword": "النية الخالصة",
+            "expected_source": "bayan_lesson_packs_v1.json"
+        },
+        {
+            "query": "topic-mercy",
+            "desc": "موضوع الرحمة وحسن الخلق",
+            "expected_keyword": "topic-mercy",
+            "expected_source": "islam_topic_taxonomy_v1.json"
+        },
+        {
+            "query": "b5e57ce2441d",
+            "desc": "شاهد درس الرحمة المقيد",
+            "expected_keyword": "66132",
+            "expected_source": "bayan_lesson_packs_v1.json"
+        },
+        {
+            "query": "negative_exclusion_rules",
+            "desc": "قواعد الاستبعاد السلبي",
+            "expected_keyword": "negative_exclusion",
+            "expected_source": "bayan_lesson_packs_v1.json"
+        }
+    ]
     retrieval_ok = True
 
-    for tq in test_queries:
+    for spec in test_queries_spec:
+        tq = spec["query"]
         payload = json.dumps({"collection_names": [collection_id], "query": tq, "k": 2}).encode("utf-8")
         try:
             req = urllib.request.Request(query_url, data=payload, headers=headers)
@@ -169,25 +238,78 @@ def index_and_verify_knowledge_api(
                 qres = json.loads(resp.read().decode("utf-8"))
                 docs = qres.get("documents", [[]])[0]
                 metas = qres.get("metadatas", [[]])[0]
+
                 if not docs or len(docs) == 0:
-                    print(f"  ❌ Query '{tq}' returned 0 documents!")
+                    print(f"  ❌ Query '{tq}' ({spec['desc']}) returned 0 documents!")
+                    retrieval_ok = False
+                    evidence["retrieval_queries"][tq] = {"error": "no_documents_returned", "desc": spec["desc"]}
+                    continue
+
+                query_sources = [m.get("source") for m in metas] if metas else []
+                invalid_sources = [s for s in query_sources if s not in expected_sources]
+                if invalid_sources:
+                    print(f"  ❌ Query '{tq}' returned documents from unexpected source(s): {invalid_sources}!")
+                    retrieval_ok = False
+                    evidence["retrieval_queries"][tq] = {
+                        "error": "unexpected_source",
+                        "invalid_sources": invalid_sources,
+                        "desc": spec["desc"]
+                    }
+                    continue
+
+                first_src = metas[0].get("source") if metas else "unknown"
+                first_snip = docs[0][:150].replace("\n", " ").strip()
+                kw = spec["expected_keyword"]
+                keyword_matched = any(kw in d for d in docs)
+
+                if not keyword_matched:
+                    print(f"  ❌ Query '{tq}' docs did not contain expected keyword: '{kw}'!")
                     retrieval_ok = False
                 else:
-                    first_src = metas[0].get("source") if metas else "unknown"
-                    first_snip = docs[0][:150].replace("\n", " ").strip()
-                    print(f"  ✅ Query '{tq}' matched {len(docs)} documents | Source: {first_src}")
+                    print(f"  ✅ Query '{tq}' ({spec['desc']}) matched {len(docs)} docs | Source: {first_src} | Keyword '{kw}': OK")
                     print(f"     Snippet: {first_snip}...")
+
                 evidence["retrieval_queries"][tq] = {
+                    "desc": spec["desc"],
                     "docs_count": len(docs),
-                    "sources": [m.get("source") for m in metas] if metas else [],
+                    "sources": query_sources,
+                    "keyword_checked": kw,
+                    "keyword_matched": keyword_matched,
                     "snippets": [d[:200] for d in docs]
                 }
         except Exception as e:
             print(f"  ❌ Query '{tq}' failed with error: {e}")
             retrieval_ok = False
-            evidence["retrieval_queries"][tq] = {"error": str(e)}
+            evidence["retrieval_queries"][tq] = {"error": str(e), "desc": spec["desc"]}
 
-    evidence["status"] = "verified" if retrieval_ok else "partial_or_failed"
+    if retrieval_ok:
+        evidence["status"] = "verified"
+        evidence["verified_at"] = datetime.now(timezone.utc).isoformat()
+    else:
+        evidence["status"] = "partial_or_failed"
+
+    # Persist evidence artifact without credentials
+    save_dirs = [
+        REPO_HADITH_DIR / "planning",
+        REPO_HADITH_DIR.parent / "planning",
+        REPO_HADITH_DIR.parent.parent / "planning"
+    ]
+    if evidence_output_path:
+        save_dirs.insert(0, evidence_output_path.parent)
+
+    evidence_filename = "knowledge_indexing_and_retrieval_evidence_2026-10-09.json"
+    written_paths = set()
+    for sdir in save_dirs:
+        if sdir.exists() and sdir.is_dir() and sdir.name == "planning":
+            out_file = sdir / evidence_filename
+            if out_file not in written_paths:
+                try:
+                    out_file.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
+                    written_paths.add(out_file)
+                    print(f"  📄 [Evidence Saved] {out_file.name} -> {out_file.parent}")
+                except Exception as e:
+                    print(f"  ⚠️ Failed writing evidence to {out_file}: {e}")
+
     return retrieval_ok, evidence
 
 
@@ -493,7 +615,8 @@ def deploy_and_verify(
     webui_url: Optional[str] = None,
     explicit_admin_id: Optional[str] = None,
     skip_backup: bool = False,
-    preflight_only: bool = False
+    preflight_only: bool = False,
+    allow_unverified_install: bool = False
 ) -> bool:
     """
     Deploys tools, skills, and models to Open WebUI with gating preflight,
@@ -704,7 +827,7 @@ def deploy_and_verify(
                 ]
                 for fid, fname, fhash, fpath, fcontent in files_info:
                     fmeta = json.dumps({"name": fname, "size": len(fcontent), "content_type": "application/json", "collection_name": k_id}, ensure_ascii=False)
-                    fdata = json.dumps({"content": fcontent, "status": "completed", "error": None}, ensure_ascii=False)
+                    fdata = json.dumps({"content": fcontent, "status": "pending_processing", "error": None}, ensure_ascii=False)
                     cur.execute("SELECT id FROM file WHERE id = ?", (fid,))
                     if cur.fetchone():
                         cur.execute("""
@@ -717,7 +840,7 @@ def deploy_and_verify(
                             INSERT INTO file (id, user_id, filename, hash, path, data, meta, created_at, updated_at)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (fid, admin_id, fname, fhash, fpath, fdata, fmeta, now, now))
-                    print(f"  [MATERIALIZED] File record: {fname} (ID: {fid})")
+                    print(f"  [MATERIALIZED] File record: {fname} (ID: {fid}, Initial Status: pending_processing)")
 
             cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='knowledge_file'")
             if cur.fetchone():
@@ -742,6 +865,25 @@ def deploy_and_verify(
             collection_id="bayan-islam-guide-v1",
             file_ids=["file-bayan-taxonomy-v1", "file-bayan-lessons-v1"]
         )
+
+        # Update file statuses ONLY upon confirmed successful indexing
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='file'")
+        if cur.fetchone():
+            if indexing_ok:
+                for fid, fname, fhash, fpath, fcontent in files_info:
+                    fdata_completed = json.dumps({"content": fcontent, "status": "completed", "error": None}, ensure_ascii=False)
+                    cur.execute("UPDATE file SET data = ?, updated_at = ? WHERE id = ?", (fdata_completed, int(time.time()), fid))
+                conn.commit()
+                print("  ✅ [DB] Updated file table rows status to 'completed' after confirmed vector indexing.")
+            else:
+                if not allow_unverified_install:
+                    raise ValueError(
+                        f"CRITICAL: Knowledge indexing & retrieval verification failed (Status: {retrieval_evidence.get('status')}). "
+                        "Full deployment acceptance requires successful file processing and retrieval. "
+                        "To perform an offline or unverified install, pass --allow-unverified-install."
+                    )
+                else:
+                    print(f"  ⚠️ [DB] Retaining file rows as 'pending_processing' due to --allow-unverified-install.")
 
         # -------------------------------------------------------------
         # 4. Mandatory Read-After-Write Verification
@@ -871,16 +1013,20 @@ def deploy_and_verify(
                     raise ValueError(f"Verification Failed: Expected 2 materialized file rows, found {len(f_rows)}")
                 for fid, fdata_str, fmeta_str in f_rows:
                     fdata_obj = json.loads(fdata_str or '{}')
-                    if fdata_obj.get("status") != "completed":
-                        raise ValueError(f"Verification Failed: File {fid} status is not 'completed': {fdata_obj.get('status')}")
+                    if indexing_ok:
+                        if fdata_obj.get("status") != "completed":
+                            raise ValueError(f"Verification Failed: File {fid} status is not 'completed': {fdata_obj.get('status')}")
+                    else:
+                        if fdata_obj.get("status") == "completed":
+                            raise ValueError(f"Verification Failed: File {fid} status is prematurely marked 'completed' without confirmed indexing!")
                     assert "content" in fdata_obj and len(fdata_obj["content"]) > 1000, f"File {fid} content is empty!"
-                print("  ✅ Verified File Table Records: Status 'completed' with stored content.")
+                print(f"  ✅ Verified File Table Records: Status '{fdata_obj.get('status')}' with stored content.")
 
-                # Verify live retrieval evidence if server was available
+                # Verify live retrieval evidence
                 if retrieval_evidence.get("status") == "verified":
                     print("  ✅ Verified Live Knowledge Retrieval: Open WebUI vector query returned valid curriculum excerpts and citations.")
-                elif retrieval_evidence.get("status") == "partial_or_failed":
-                    raise ValueError("Verification Failed: Open WebUI Knowledge retrieval query returned 0 documents or failed!")
+                elif not allow_unverified_install:
+                    raise ValueError(f"Verification Failed: Knowledge retrieval status is '{retrieval_evidence.get('status')}', expected 'verified'!")
 
     except Exception as e:
         print(f"\n❌ CRITICAL DEPLOYMENT FAILURE: {e}")
@@ -915,6 +1061,7 @@ def main():
     parser.add_argument("--rollback", default=None, help="Restore database from snapshot backup and exit")
     parser.add_argument("--preflight-only", action="store_true", help="Run gating preflight checks without writing to DB")
     parser.add_argument("--skip-backup", action="store_true", help="Skip pre-deploy snapshot creation")
+    parser.add_argument("--allow-unverified-install", action="store_true", help="Allow DB installation to succeed without verified live knowledge indexing (status remains pending_processing)")
     args = parser.parse_args()
 
     print("=" * 75)
@@ -956,7 +1103,8 @@ def main():
         webui_url=args.webui_url,
         explicit_admin_id=args.admin_id,
         skip_backup=args.skip_backup,
-        preflight_only=args.preflight_only
+        preflight_only=args.preflight_only,
+        allow_unverified_install=args.allow_unverified_install
     )
     sys.exit(0 if success else 1)
 
