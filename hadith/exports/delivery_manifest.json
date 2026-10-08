@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0.0",
   "release_tag": "v2.0.0-rc1",
-  "generated_at": "2026-10-08T09:38:15Z",
+  "generated_at": "2026-10-08T11:11:45Z",
   "description": "Bayan Al-Sunnah Canonical Delivery Manifest with Cryptographic Integrity Checksums",
   "components": {
     "tools_export": {
@@ -287,12 +287,12 @@
   },
   "planning_assets": {
     "islam_topic_taxonomy_v1.json": {
-      "file": "C:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\planning\\islam_topic_taxonomy_v1.json",
+      "file": "hadith/planning/islam_topic_taxonomy_v1.json",
       "sha256": "ff0ab4072618c453a8e10671b41b409186c938fdcaa43b106ded80c73cad04da",
       "size_bytes": 13979
     },
     "bayan_lesson_packs_v1.json": {
-      "file": "C:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\planning\\bayan_lesson_packs_v1.json",
+      "file": "hadith/planning/bayan_lesson_packs_v1.json",
       "sha256": "8b19f51e4a03e85c7461aef0f78fe7f8a8f53530d12c96dfc4e051be5dac70aa",
       "size_bytes": 128889
     }

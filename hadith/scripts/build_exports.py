@@ -369,7 +369,7 @@ def check_manifest_integrity() -> bool:
             print(f"  ✅ Verified isnad module: {mname} (SHA: {actual_sha[:12]}...)")
 
     # 5. Verify UI theme assets
-    print("\n[5/5] Verifying UI Theme Assets...")
+    print("\n[5/6] Verifying UI Theme Assets...")
     theme_assets = manifest.get("theme_assets", {})
     for aname, ainfo in theme_assets.items():
         expected_sha = ainfo.get("sha256")
@@ -380,6 +380,21 @@ def check_manifest_integrity() -> bool:
                 errors.append(f"SHA mismatch for theme asset {aname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
             else:
                 print(f"  ✅ Verified theme asset: {aname} (SHA: {actual_sha[:12]}...)")
+
+    # 6. Verify in-repo planning assets
+    print("\n[6/6] Verifying In-Repo Planning Assets...")
+    planning_assets = manifest.get("planning_assets", {})
+    for pname, pinfo in planning_assets.items():
+        expected_sha = pinfo.get("sha256")
+        target = REPO_HADITH_DIR / "planning" / pname
+        if not target.exists():
+            errors.append(f"Planning asset missing in repo: {target}")
+            continue
+        actual_sha = sha256_file(target)
+        if actual_sha != expected_sha:
+            errors.append(f"SHA mismatch for planning asset {pname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
+        else:
+            print(f"  ✅ Verified planning asset: {pname} (SHA: {actual_sha[:12]}...)")
 
     if errors:
         print("\n" + "=" * 75)
@@ -545,18 +560,17 @@ def build_all(check_only: bool = False):
             if fp:
                 manifest["databases"][dbp.name] = fp
 
-    # Hash planning assets if available
-    planning_candidates = [
-        REPO_ROOT.parent / "planning" / "islam_topic_taxonomy_v1.json",
-        REPO_ROOT.parent / "planning" / "bayan_lesson_packs_v1.json"
-    ]
-    for ap in planning_candidates:
-        if ap.exists():
-            manifest["planning_assets"][ap.name] = {
-                "file": str(ap),
-                "sha256": sha256_file(ap),
-                "size_bytes": ap.stat().st_size
-            }
+    # Hash canonical in-repo planning assets
+    in_repo_planning = REPO_HADITH_DIR / "planning"
+    for pname in ["islam_topic_taxonomy_v1.json", "bayan_lesson_packs_v1.json"]:
+        ap = in_repo_planning / pname
+        if not ap.exists():
+            raise FileNotFoundError(f"Missing canonical planning asset in repo: {ap}")
+        manifest["planning_assets"][pname] = {
+            "file": f"hadith/planning/{pname}",
+            "sha256": sha256_file(ap),
+            "size_bytes": ap.stat().st_size
+        }
 
     manifest_json = json.dumps(manifest, ensure_ascii=False, indent=2)
     manifest_path_exports = EXPORTS_DIR / "delivery_manifest.json"
