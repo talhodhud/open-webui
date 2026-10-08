@@ -6,11 +6,11 @@ Rules:
 1. Renders raw mention names with authentic labels.
 2. Annotates resolved relatives and kunyas with evidence-based titles.
 3. Renders ambiguous/unresolved mentions honestly without fabricated titles.
-4. Outputs clean Mermaid syntax with standard class definitions.
+4. Escapes quotes and brackets to ensure syntax-safe Mermaid flowcharts without raw HTML.
 """
 
+import re
 from typing import List, Dict, Any
-from .graph import IsnadGraph
 
 CLASS_DEFINITIONS = [
     "    classDef prophet fill:#18181b,stroke:#f59e0b,stroke-width:2px,color:#fef3c7,rx:10px,ry:10px;",
@@ -22,6 +22,13 @@ CLASS_DEFINITIONS = [
     "    classDef ambiguous fill:#27272a,stroke:#71717a,stroke-width:1.5px,color:#f4f4f5,rx:6px,ry:6px;",
     "    classDef unknown fill:#27272a,stroke:#52525b,stroke-width:1.5px,color:#e4e4e7,rx:6px,ry:6px;"
 ]
+
+def sanitize_label(text: str) -> str:
+    if not text:
+        return ""
+    clean = re.sub(r'<[^>]+>', ' ', text)
+    clean = clean.replace('"', '#quot;').replace('[', '&#91;').replace(']', '&#93;')
+    return re.sub(r'\s+', ' ', clean).strip()
 
 class MermaidRenderer:
     @classmethod
@@ -36,29 +43,30 @@ class MermaidRenderer:
         for node in nodes:
             nid = node["id"]
             kind = node.get("kind", "mention")
-            raw_text = node.get("raw_text") or node.get("name", "")
-            canonical_name = node.get("canonical_name")
-            grade = node.get("grade", "غير محدد")
+            raw_text = sanitize_label(node.get("raw_text") or node.get("name", ""))
+            canonical_name = sanitize_label(node.get("canonical_name") or "")
+            grade = sanitize_label(node.get("grade", "غير محدد"))
             status = node.get("status", "unknown")
 
             if kind == "prophet":
-                lines.append(f'    {nid}(["{raw_text}<br/><small>خاتم الأنبياء والمرسلين</small>"]):::{status}')
+                lines.append(f'    {nid}(["{raw_text} (خاتم الأنبياء والمرسلين)"]):::{status}')
             elif kind == "collection":
-                lines.append(f'    {nid}["{raw_text}<br/><small>حديث {h_num}</small>"]:::{status}')
+                h_desc = f" (حديث {h_num})" if h_num else ""
+                lines.append(f'    {nid}["{raw_text}{h_desc}"]:::{status}')
             elif raw_text in ("أبيه", "ابيه", "أبوه", "ابوه", "جده", "عمه", "خالته"):
                 # Relative mention
                 if node.get("identity_status") == "resolved" and canonical_name:
-                    lines.append(f'    {nid}["<b>{raw_text}</b><br/><small>({canonical_name} · {grade})</small>"]:::{status}')
+                    lines.append(f'    {nid}["{raw_text} ({canonical_name} · {grade})"]:::{status}')
                 else:
-                    lines.append(f'    {nid}["{raw_text}<br/><small>(مبهم · الهوية تحتاج دليلاً)</small>"]:::{status}')
+                    lines.append(f'    {nid}["{raw_text} (مبهم · الهوية تحتاج دليلاً)"]:::unknown')
             elif status == "sahabi":
-                lines.append(f'    {nid}["<b>{raw_text} رضي الله عنه</b><br/><small>{grade}</small>"]:::sahabi')
+                lines.append(f'    {nid}["{raw_text} رضي الله عنه ({grade})"]:::sahabi')
             elif status == "ambiguous":
-                lines.append(f'    {nid}["{raw_text}<br/><small>(متعدد المرشحين يحتاج تمييزاً)</small>"]:::ambiguous')
+                lines.append(f'    {nid}["{raw_text} (متعدد المرشحين يحتاج تمييزاً)"]:::ambiguous')
             elif status == "unknown":
-                lines.append(f'    {nid}["{raw_text}<br/><small>({grade})</small>"]:::unknown')
+                lines.append(f'    {nid}["{raw_text} ({grade})"]:::unknown')
             else:
-                lines.append(f'    {nid}["{raw_text}<br/><small>({grade})</small>"]:::{status}')
+                lines.append(f'    {nid}["{raw_text} ({grade})"]:::{status}')
 
         # Render Edges
         for edge in edges:
@@ -66,7 +74,8 @@ class MermaidRenderer:
             tgt = edge["target"]
             term = edge.get("transmission_term")
             if term and term != "أخرجه في مصنفه":
-                lines.append(f'    {src} -->|{term}| {tgt}')
+                clean_term = sanitize_label(term)
+                lines.append(f'    {src} -->|{clean_term}| {tgt}')
             else:
                 lines.append(f'    {src} --> {tgt}')
 
@@ -77,4 +86,3 @@ class MermaidRenderer:
 
 def render_mermaid(graph: Any) -> str:
     return MermaidRenderer.render(graph)
-

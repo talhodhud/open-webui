@@ -222,7 +222,7 @@
       },
       "knowledge": null,
       "toolIds": [
-        "hadith_phrase_poc"
+        "hadith_corpus_search"
       ],
       "suggestion_prompts": [
         {

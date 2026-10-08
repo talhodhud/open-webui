@@ -41,6 +41,9 @@ export interface JourneyContract {
   track: TrackKind;
   originTrack?: TrackKind;
   routeKind?: 'all_paths' | 'specific_path';
+  selectedPathId?: string;
+  mentionId?: string;
+  anchorName?: string;
   caseId?: string;
   topicId?: string;
   task: string;
@@ -239,6 +242,9 @@ export interface RouteOptions {
   occurrenceIds?: string[];
   evidenceIds?: string[];
   routeKind?: 'all_paths' | 'specific_path';
+  selectedPathId?: string;
+  mentionId?: string;
+  anchorName?: string;
 }
 
 export function buildJourneyContract(id: string, options: RouteOptions = {}): JourneyContract {
@@ -266,6 +272,9 @@ export function buildJourneyContract(id: string, options: RouteOptions = {}): Jo
     track: journey.track,
     originTrack: journey.track,
     routeKind: options.routeKind || 'all_paths',
+    selectedPathId: options.selectedPathId,
+    mentionId: options.mentionId,
+    anchorName: options.anchorName,
     caseId: journey.id,
     topicId: journey.topic ? journey.id : undefined,
     task: journey.task,
@@ -297,7 +306,10 @@ export function buildFollowupContract(id: string, index: number, options: RouteO
     modelId: targetModel,
     track: followTrack,
     originTrack: journey.track,
-    routeKind: options.routeKind || 'all_paths',
+    routeKind: options.routeKind || (options.selectedPathId ? 'specific_path' : 'all_paths'),
+    selectedPathId: options.selectedPathId,
+    mentionId: options.mentionId,
+    anchorName: options.anchorName,
     caseId: journey.id,
     topicId: journey.topic ? journey.id : undefined,
     task: action.task || 'followup',
@@ -321,7 +333,9 @@ export function buildFollowupURL(origin: string, id: string, index: number, opti
   const modelId = isUnified ? 'bayan-unified-pilot' : (action.modelId || FOLLOWUP_MODELS[id]?.[index] || journey.modelId);
   const skillTag = isUnified && action.unifiedSkillId ? `<$${action.unifiedSkillId}> ` : '';
   const occText = options.occurrenceIds && options.occurrenceIds.length > 0 ? `\nالسجل المحدد: ${options.occurrenceIds.join(', ')}` : '';
-  const prompt = `${skillTag}الموضوع: ${journey.title}. سؤال الحالة الأصلي: ${journey.question}\nالمطلوب الآن: ${action.prompt}${occText}\nهذه مسودة مستقلة ولا تتضمن نتائج المحادثة السابقة. استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم. إذا لم يتحدد النص المقصود فاعرض المرشحين للاختيار. اعرض ما استرجعته فقط، وأبقِ الفجوات والالتباس وحالة المراجعة ظاهرة، ولا تفترض منتهى نبويًا لكل أثر.`;
+  const pathText = options.selectedPathId ? `\nمسار الإسناد المحدد: ${options.selectedPathId}` : '';
+  const anchorText = options.anchorName ? `\nالراوي المستهدف للتحقيق (صاحب الضمير): ${options.anchorName}` : (options.mentionId ? `\nالراوي المستهدف: ${options.mentionId}` : '');
+  const prompt = `${skillTag}الموضوع: ${journey.title}. سؤال الحالة الأصلي: ${journey.question}\nالمطلوب الآن: ${action.prompt}${occText}${pathText}${anchorText}\nهذه مسودة مستقلة ولا تتضمن نتائج المحادثة السابقة. استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم. إذا لم يتحدد النص المقصود فاعرض المرشحين للاختيار. اعرض ما استرجعته فقط، وأبقِ الفجوات والالتباس وحالة المراجعة ظاهرة، ولا تفترض منتهى نبويًا لكل أثر.`;
   
   const url = new URL(buildJourneyURL(origin, id, options.submit ?? false, prompt, options));
   url.searchParams.set('model', modelId);
@@ -381,6 +395,10 @@ export function buildJourneyURL(
   if (options.occurrenceIds && options.occurrenceIds.length > 0) {
     searchParams.set('occurrenceIds', options.occurrenceIds.join(','));
   }
+  if (options.routeKind) searchParams.set('routeKind', options.routeKind);
+  if (options.selectedPathId) searchParams.set('selectedPathId', options.selectedPathId);
+  if (options.mentionId) searchParams.set('mentionId', options.mentionId);
+  if (options.anchorName) searchParams.set('anchorName', options.anchorName);
   url.search = searchParams.toString();
   return url.toString();
 }

@@ -1,12 +1,12 @@
 {
-  "manifest_version": "1.0.0",
+  "manifest_version": "2.0.0",
   "release_tag": "v2.0.0-rc1",
-  "generated_at": "2026-10-07T11:49:13Z",
+  "generated_at": "2026-10-08T04:10:34Z",
   "description": "Bayan Al-Sunnah Canonical Delivery Manifest with Cryptographic Integrity Checksums",
   "components": {
     "tools_export": {
       "file": "hadith_tools_vps_export.json",
-      "sha256": "4bb900f47fabed4f174ad38885fa338b8b485a912bbe57cf1e0de69e753711cf",
+      "sha256": "7dd60dc126880f45cfd07e162815253809bd54966e9d19131096113520898282",
       "count": 6,
       "items": [
         "hadith_corpus_search",
@@ -19,7 +19,7 @@
     },
     "skills_export": {
       "file": "hadith_skills_vps_export.json",
-      "sha256": "fb4351194725470df70bdf6cffeaf7ffe9161e45c118ea60a080639ab35e87e5",
+      "sha256": "7e5bbf6d2d45f91c23e1ad9657bad065505c589c2cd9bd7fc839fe97b50732f4",
       "count": 8,
       "items": [
         "hadith-mermaid-architect",
@@ -34,7 +34,7 @@
     },
     "models_export": {
       "file": "hadith_models_vps_export.json",
-      "sha256": "5766723c54b5825a489f2289546dc51f724b8d21137b6b479004bbd3947c4a23",
+      "sha256": "d8a91fcc73e1bacf8b91cb4adc245ce707e8b19b14adfe17ea8a92f948127125",
       "count": 8,
       "items": [
         "hadith-model-1",
@@ -66,13 +66,13 @@
     },
     "hadith_isnad_tree": {
       "file": "hadith_isnad_tree_tool.py",
-      "sha256": "24085e865fcb2c84513e7fd8089959b9bd5d83a13595f912cbea167d237efe89",
-      "size_bytes": 48839
+      "sha256": "2e1ebe300a5a8be2de187581f03863790a1b1e9d8f657a07a5d131e4f578853e",
+      "size_bytes": 34360
     },
     "hadith_narrator": {
       "file": "hadith_narrator_tool.py",
-      "sha256": "d9c2d8fe0ba4ae5fa1a49eeea90368f3c1599a939c299b9fb7a66b54c09f15e1",
-      "size_bytes": 85090
+      "sha256": "1d18e1082a632ffbe9b5686a68496ab72dfb6e9ec32a18501e61e8f56fb43d48",
+      "size_bytes": 86445
     },
     "hadith_bayan_topics": {
       "file": "hadith_bayan_topics_tool.py",
@@ -80,11 +80,92 @@
       "size_bytes": 21262
     }
   },
+  "tool_specs": {
+    "hadith_corpus_search": {
+      "file": "hadith_corpus_search.json",
+      "sha256": "fb0034194f31096be8ecc9acab1b7b3f0cdac35db24fd2b13c336aa708a0516a",
+      "size_bytes": 35817
+    },
+    "hadith_takhrij": {
+      "file": "hadith_takhrij.json",
+      "sha256": "e9862969a7b5d9729026f0916ca1b36ff13fca07c3c7209dbbb35654c9b3123c",
+      "size_bytes": 10544
+    },
+    "hadith_sharh_vocab": {
+      "file": "hadith_sharh_vocab.json",
+      "sha256": "3cf4fee98c1f130a75725c8b31ab32183dacbd6826ec10f5bd0cab9f3516ab36",
+      "size_bytes": 30153
+    },
+    "hadith_isnad_tree": {
+      "file": "hadith_isnad_tree.json",
+      "sha256": "76b4cd30405c1adfe86320f150300c08236bca32e7a3ef8e1249eacdd6b56c1c",
+      "size_bytes": 38150
+    },
+    "hadith_narrator": {
+      "file": "hadith_narrator.json",
+      "sha256": "9fd48c7f814cbc42c1293cc07b4296decbc02d5d3ea86d797dc0be4d5fdd2223",
+      "size_bytes": 97182
+    },
+    "hadith_bayan_topics": {
+      "file": "hadith_bayan_topics.json",
+      "sha256": "e829d6d54df98d06f7d075955ed04ad1e7d96d8344e5f8be183025588ee1e637",
+      "size_bytes": 24763
+    }
+  },
+  "isnad_modules": {
+    "__init__.py": {
+      "file": "hadith/isnad/__init__.py",
+      "sha256": "42639edf02db8865b67d1517bbc522b08f34c7ceb789040eed6bb0a9ec364939",
+      "size_bytes": 1088
+    },
+    "parser.py": {
+      "file": "hadith/isnad/parser.py",
+      "sha256": "654054c4d19fd102d3cfb1eacac086036268a2cc8340217f76346d6b26f23c80",
+      "size_bytes": 18259
+    },
+    "resolver.py": {
+      "file": "hadith/isnad/resolver.py",
+      "sha256": "5eeadd6bf403b968cda1c700ee894228a0b69442e3d3c0c482fe0b8b1e7ca3ad",
+      "size_bytes": 19261
+    },
+    "graph.py": {
+      "file": "hadith/isnad/graph.py",
+      "sha256": "f0ce6a1e072ebad419f055d8d0b18fa56536c03c508d76a55d46d22013f34c9c",
+      "size_bytes": 26409
+    },
+    "render_mermaid.py": {
+      "file": "hadith/isnad/render_mermaid.py",
+      "sha256": "a2beba48e8d5837e8757785200b9baaa74b325e4df1aa547ddb68a48e9dde85e",
+      "size_bytes": 4294
+    },
+    "validation.py": {
+      "file": "hadith/isnad/validation.py",
+      "sha256": "6b35aeea4998439b057cf2354255b23a3ddee7f0c49a4a83e4465a1f4192a46c",
+      "size_bytes": 3874
+    }
+  },
+  "theme_assets": {
+    "package.json": {
+      "file": "hadith/theme/package.json",
+      "sha256": "bda8c33fa4f8e6edd5ebf5354f4bfcf97b9f50964fe410306c40869cb579d0ad",
+      "size_bytes": 570
+    },
+    "test_journeys.mjs": {
+      "file": "hadith/theme/test_journeys.mjs",
+      "sha256": "a1b28608b737b8ced2f28ca5042be4e7873faed093373f86968375300e5a9a39",
+      "size_bytes": 10728
+    },
+    "src/journeys.ts": {
+      "file": "hadith/theme/src/journeys.ts",
+      "sha256": "458e0873df854bbf46f9e493aed2a07824b23495c5ab9529e5728f79fcca602a",
+      "size_bytes": 22169
+    }
+  },
   "databases": {
     "hadith_rijal.db": {
       "path": "C:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\hadith_rijal.db",
-      "file_size_bytes": 1035395072,
-      "sha256": "2117b27027a7b025a37fc94656c56f32f33d0a8d3a4835593807e22dbd0512da",
+      "file_size_bytes": 1035411456,
+      "sha256": "c9df3b489fe3a94f6376b79a4ff2b1226e5a5b3a07e0460059216c3a0dc13b43",
       "tables": [
         "arsanad_narrators",
         "hadith_connections",
@@ -103,6 +184,7 @@
         "isnad_relative_map",
         "isnad_transmissions",
         "isnad_transmissions_old",
+        "isnad_transmissions_staging",
         "narrator_scholars",
         "narrator_scholars_fts",
         "narrator_scholars_fts_config",
@@ -138,6 +220,7 @@
         "isnad_relative_map": 80,
         "isnad_transmissions": 560279,
         "isnad_transmissions_old": 455592,
+        "isnad_transmissions_staging": 20,
         "narrator_scholars": 1524,
         "narrator_scholars_fts": 1524,
         "narrator_scholars_fts_config": 1,
@@ -152,7 +235,7 @@
         "narrators_fts_data": 3278,
         "narrators_fts_docsize": 115735,
         "narrators_fts_idx": 2010,
-        "sqlite_sequence": 10,
+        "sqlite_sequence": 11,
         "sqlite_stat1": 1
       }
     },
@@ -190,8 +273,8 @@
     },
     "bayan_lesson_packs_v1.json": {
       "file": "C:\\Users\\mhdal\\OneDrive\\AI\\Hadith KSA\\planning\\bayan_lesson_packs_v1.json",
-      "sha256": "cf1275fc4a454b281fa9264b57ba174c6cfe6369d68227b0f320867967f9a730",
-      "size_bytes": 128849
+      "sha256": "8b19f51e4a03e85c7461aef0f78fe7f8a8f53530d12c96dfc4e051be5dac70aa",
+      "size_bytes": 128889
     }
   }
 }

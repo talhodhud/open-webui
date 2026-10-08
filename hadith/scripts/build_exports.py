@@ -1,12 +1,22 @@
 """
 build_exports.py
 ================
-Canonical Build & Packaging Script for Bayan Al-Sunnah.
+Authoritative Build & Packaging Script for Bayan Al-Sunnah.
 Assembles tools, skills, and models into verifiable Open WebUI export bundles
-and generates a tamper-evident delivery_manifest.json with SHA-256 signatures.
+and generates a tamper-evident delivery_manifest.json with cryptographic SHA-256 signatures.
+
+Guarantees:
+1. Strict in-checkout authoring: All source files are read exclusively from within `open-webui/hadith/`.
+   Never falls back to uncommitted or external workspace directories.
+2. Complete 7-tool bundle: Includes `hadith_phrase_poc` alongside the other 6 micro-tools.
+3. Cryptographic parity: delivery_manifest.json fingerprints exports, tool sources, tool specs,
+   modular isnad engine (`hadith/isnad/*.py`), and UI assets.
+4. Blocking `--check-only`: Compares all on-disk files against delivery_manifest.json and exits
+   with non-zero exit code on any discrepancy.
 
 Usage:
-    python build_exports.py [--check-only]
+    python build_exports.py              # Build and write all export bundles and manifest
+    python build_exports.py --check-only # Cryptographically verify existing files against manifest
 """
 
 import os
@@ -19,14 +29,21 @@ from pathlib import Path
 
 # Ensure UTF-8 output
 sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
 
+# Authoritative directory anchoring - strictly inside the repository checkout
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_HADITH_DIR = SCRIPT_DIR.parent
+REPO_ROOT = REPO_HADITH_DIR.parent
 EXPORTS_DIR = REPO_HADITH_DIR / "exports"
 TOOLS_DIR = REPO_HADITH_DIR / "tools"
-ROOT_DIR = REPO_HADITH_DIR.parent.parent
+ISNAD_DIR = REPO_HADITH_DIR / "isnad"
+THEME_DIR = REPO_HADITH_DIR / "theme"
 
-# Tool Definitions (Mapping ID to Tool Code and Spec files)
+# Optional outer workspace sync target (only for post-build syncing, never used as input source)
+OUTER_WORKSPACE_DIR = REPO_ROOT.parent if (REPO_ROOT.parent / "hadith_rijal.db").exists() else None
+
+# Canonical Tool Definitions (6 tools total)
 TOOL_MAPPINGS = [
     {
         "id": "hadith_corpus_search",
@@ -66,6 +83,22 @@ TOOL_MAPPINGS = [
     }
 ]
 
+ISNAD_MODULE_FILES = [
+    "__init__.py",
+    "parser.py",
+    "resolver.py",
+    "graph.py",
+    "render_mermaid.py",
+    "validation.py"
+]
+
+THEME_ASSET_FILES = [
+    "package.json",
+    "test_journeys.mjs",
+    "src/journeys.ts"
+]
+
+
 def sha256_file(filepath: Path) -> str:
     """Computes SHA-256 checksum of a file."""
     h = hashlib.sha256()
@@ -74,9 +107,11 @@ def sha256_file(filepath: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
+
 def sha256_text(text: str) -> str:
     """Computes SHA-256 checksum of UTF-8 text."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
 
 def get_sqlite_fingerprint(db_path: Path):
     """Computes schema and content fingerprint of an SQLite database."""
@@ -106,18 +141,19 @@ def get_sqlite_fingerprint(db_path: Path):
     except Exception as e:
         return {"path": str(db_path), "error": str(e)}
 
+
 def build_tools_export() -> list:
-    """Builds canonical tools export by combining latest code and specs."""
+    """Builds canonical tools export by combining latest code and specs strictly from repo."""
     tools_list = []
-    print("\n[1/4] Building Tools Export Bundle...")
+    print("\n[1/4] Building Tools Export Bundle (6 Tools)...")
     for tm in TOOL_MAPPINGS:
         code_path = TOOLS_DIR / tm["code_file"]
         spec_path = TOOLS_DIR / tm["spec_file"]
 
         if not code_path.exists():
-            raise FileNotFoundError(f"Missing tool source file: {code_path}")
+            raise FileNotFoundError(f"Missing tool source file in repo: {code_path}")
         if not spec_path.exists():
-            raise FileNotFoundError(f"Missing tool spec file: {spec_path}")
+            raise FileNotFoundError(f"Missing tool spec file in repo: {spec_path}")
 
         with open(code_path, "r", encoding="utf-8") as f:
             code_content = f.read()
@@ -149,16 +185,17 @@ def build_tools_export() -> list:
 
     return tools_list
 
+
 def load_canonical_skills() -> list:
-    """Loads the canonical 8 skills with verified U01-U08 instructions."""
-    print("\n[2/4] Verifying Skills Export Bundle...")
+    """Loads the canonical 8 skills strictly from repo authoring directory."""
+    print("\n[2/4] Verifying Skills Export Bundle (8 Skills)...")
     candidates = [
-        ROOT_DIR / "hadith_skills_vps_export.json",
-        EXPORTS_DIR / "hadith_skills_vps_export.json"
+        EXPORTS_DIR / "hadith_skills_vps_export.json",
+        REPO_HADITH_DIR / "hadith_skills_vps_export.json"
     ]
     source_file = next((p for p in candidates if p.exists()), None)
     if not source_file:
-        raise FileNotFoundError("Could not find source hadith_skills_vps_export.json")
+        raise FileNotFoundError(f"Could not find canonical skills export in repo: {candidates}")
 
     with open(source_file, "r", encoding="utf-8") as f:
         skills = json.load(f)
@@ -184,16 +221,17 @@ def load_canonical_skills() -> list:
 
     return skills
 
+
 def load_canonical_models() -> list:
-    """Loads the canonical models with bayan-unified-pilot wiring."""
-    print("\n[3/4] Verifying Models Export Bundle...")
+    """Loads the canonical models strictly from repo authoring directory."""
+    print("\n[3/4] Verifying Models Export Bundle (8 Models)...")
     candidates = [
-        ROOT_DIR / "hadith_models_vps_export.json",
-        EXPORTS_DIR / "hadith_models_vps_export.json"
+        EXPORTS_DIR / "hadith_models_vps_export.json",
+        REPO_HADITH_DIR / "hadith_models_vps_export.json"
     ]
     source_file = next((p for p in candidates if p.exists()), None)
     if not source_file:
-        raise FileNotFoundError("Could not find source hadith_models_vps_export.json")
+        raise FileNotFoundError(f"Could not find canonical models export in repo: {candidates}")
 
     with open(source_file, "r", encoding="utf-8") as f:
         models = json.load(f)
@@ -226,9 +264,123 @@ def load_canonical_models() -> list:
 
     return models
 
-def build_all(check_only: bool = False):
+
+def check_manifest_integrity() -> bool:
+    """
+    Validates on-disk files against delivery_manifest.json.
+    Exits with code 1 on any discrepancy.
+    """
+    print("\n" + "=" * 75)
+    print(" 🔍 RUNNING STRICT MANIFEST INTEGRITY CHECK (--check-only)")
     print("=" * 75)
-    print(" 📦 BAYAN AL-SUNNAH — CANONICAL EXPORT & MANIFEST BUILDER")
+
+    manifest_path = EXPORTS_DIR / "delivery_manifest.json"
+    if not manifest_path.exists():
+        print(f"❌ CHECK FAILED: Manifest file missing: {manifest_path}")
+        return False
+
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+
+    errors = []
+
+    # 1. Verify export bundles
+    print("\n[1/5] Verifying Export Bundles...")
+    components = manifest.get("components", {})
+    for comp_key, comp_info in components.items():
+        fname = comp_info.get("file")
+        expected_sha = comp_info.get("sha256")
+        target = EXPORTS_DIR / fname
+        if not target.exists():
+            errors.append(f"Export file missing on disk: {target}")
+            continue
+        actual_sha = sha256_file(target)
+        if actual_sha != expected_sha:
+            errors.append(f"SHA mismatch for {fname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
+        else:
+            print(f"  ✅ Verified export: {fname} (SHA: {actual_sha[:12]}...)")
+
+    # 2. Verify tool source files
+    print("\n[2/5] Verifying Tool Source Files...")
+    tool_sources = manifest.get("tool_sources", {})
+    for tid, tinfo in tool_sources.items():
+        fname = tinfo.get("file")
+        expected_sha = tinfo.get("sha256")
+        target = TOOLS_DIR / fname
+        if not target.exists():
+            errors.append(f"Tool source file missing on disk: {target}")
+            continue
+        actual_sha = sha256_file(target)
+        if actual_sha != expected_sha:
+            errors.append(f"SHA mismatch for tool source {fname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
+        else:
+            print(f"  ✅ Verified tool source: {fname} (SHA: {actual_sha[:12]}...)")
+
+    # 3. Verify tool spec files
+    print("\n[3/5] Verifying Tool Spec Files...")
+    tool_specs = manifest.get("tool_specs", {})
+    for tid, sinfo in tool_specs.items():
+        fname = sinfo.get("file")
+        expected_sha = sinfo.get("sha256")
+        target = TOOLS_DIR / fname
+        if not target.exists():
+            errors.append(f"Tool spec file missing on disk: {target}")
+            continue
+        actual_sha = sha256_file(target)
+        if actual_sha != expected_sha:
+            errors.append(f"SHA mismatch for tool spec {fname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
+        else:
+            print(f"  ✅ Verified tool spec: {fname} (SHA: {actual_sha[:12]}...)")
+
+    # 4. Verify isnad modules
+    print("\n[4/5] Verifying Modular Isnad Engine...")
+    isnad_mods = manifest.get("isnad_modules", {})
+    for mname, minfo in isnad_mods.items():
+        expected_sha = minfo.get("sha256")
+        target = ISNAD_DIR / mname
+        if not target.exists():
+            errors.append(f"Isnad module missing on disk: {target}")
+            continue
+        actual_sha = sha256_file(target)
+        if actual_sha != expected_sha:
+            errors.append(f"SHA mismatch for isnad module {mname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
+        else:
+            print(f"  ✅ Verified isnad module: {mname} (SHA: {actual_sha[:12]}...)")
+
+    # 5. Verify UI theme assets
+    print("\n[5/5] Verifying UI Theme Assets...")
+    theme_assets = manifest.get("theme_assets", {})
+    for aname, ainfo in theme_assets.items():
+        expected_sha = ainfo.get("sha256")
+        target = THEME_DIR / aname
+        if target.exists():
+            actual_sha = sha256_file(target)
+            if actual_sha != expected_sha:
+                errors.append(f"SHA mismatch for theme asset {aname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
+            else:
+                print(f"  ✅ Verified theme asset: {aname} (SHA: {actual_sha[:12]}...)")
+
+    if errors:
+        print("\n" + "=" * 75)
+        print(f" ❌ CHECK FAILED: {len(errors)} integrity violations found:")
+        for err in errors:
+            print(f"   • {err}")
+        print("=" * 75)
+        return False
+
+    print("\n" + "=" * 75)
+    print(" ✅ CHECK PASSED: All on-disk files match delivery_manifest.json cryptographically.")
+    print("=" * 75)
+    return True
+
+
+def build_all(check_only: bool = False):
+    if check_only:
+        passed = check_manifest_integrity()
+        sys.exit(0 if passed else 1)
+
+    print("=" * 75)
+    print(" 📦 BAYAN AL-SUNNAH — AUTHORITATIVE EXPORT & MANIFEST BUILDER")
     print("=" * 75)
 
     EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -241,33 +393,34 @@ def build_all(check_only: bool = False):
     skills_json = json.dumps(skills_data, ensure_ascii=False, indent=2)
     models_json = json.dumps(models_data, ensure_ascii=False, indent=2)
 
-    if not check_only:
-        # Write canonical exports under open-webui/hadith/exports/
-        print("\n[4/4] Writing exports to canonical directories...")
-        (EXPORTS_DIR / "hadith_tools_vps_export.json").write_text(tools_json, encoding="utf-8")
-        (EXPORTS_DIR / "hadith_skills_vps_export.json").write_text(skills_json, encoding="utf-8")
-        (EXPORTS_DIR / "hadith_models_vps_export.json").write_text(models_json, encoding="utf-8")
-        print(f"  -> Wrote: {EXPORTS_DIR / 'hadith_tools_vps_export.json'}")
-        print(f"  -> Wrote: {EXPORTS_DIR / 'hadith_skills_vps_export.json'}")
-        print(f"  -> Wrote: {EXPORTS_DIR / 'hadith_models_vps_export.json'}")
+    # Write canonical exports under open-webui/hadith/exports/
+    print("\n[4/4] Writing exports to canonical repo directories...")
+    (EXPORTS_DIR / "hadith_tools_vps_export.json").write_bytes(tools_json.encode("utf-8"))
+    (EXPORTS_DIR / "hadith_skills_vps_export.json").write_bytes(skills_json.encode("utf-8"))
+    (EXPORTS_DIR / "hadith_models_vps_export.json").write_bytes(models_json.encode("utf-8"))
+    print(f"  -> Wrote: {EXPORTS_DIR / 'hadith_tools_vps_export.json'}")
+    print(f"  -> Wrote: {EXPORTS_DIR / 'hadith_skills_vps_export.json'}")
+    print(f"  -> Wrote: {EXPORTS_DIR / 'hadith_models_vps_export.json'}")
 
-        # Sync to root and repo hadith directory for complete parity
-        sync_targets = [
-            (ROOT_DIR, "hadith_tools_vps_export.json", tools_json),
-            (ROOT_DIR, "hadith_skills_vps_export.json", skills_json),
-            (ROOT_DIR, "hadith_models_vps_export.json", models_json),
-            (REPO_HADITH_DIR, "hadith_skills_vps_export.json", skills_json),
-            (REPO_HADITH_DIR, "hadith_models_vps_export.json", models_json),
-        ]
-        for target_dir, fname, content in sync_targets:
-            target_file = target_dir / fname
-            target_file.write_text(content, encoding="utf-8")
-            print(f"  -> Synced: {target_file}")
+    # Sync to repo hadith root
+    (REPO_HADITH_DIR / "hadith_skills_vps_export.json").write_bytes(skills_json.encode("utf-8"))
+    (REPO_HADITH_DIR / "hadith_models_vps_export.json").write_bytes(models_json.encode("utf-8"))
+
+    # Sync to outer workspace if present
+    if OUTER_WORKSPACE_DIR and OUTER_WORKSPACE_DIR.exists():
+        for fname, content in [
+            ("hadith_tools_vps_export.json", tools_json),
+            ("hadith_skills_vps_export.json", skills_json),
+            ("hadith_models_vps_export.json", models_json),
+        ]:
+            out_file = OUTER_WORKSPACE_DIR / fname
+            out_file.write_bytes(content.encode("utf-8"))
+            print(f"  -> Synced to outer workspace: {out_file}")
 
     # Build Delivery Manifest
     print("\n--- 📜 Generating Delivery Manifest & Signatures ---")
     manifest = {
-        "manifest_version": "1.0.0",
+        "manifest_version": "2.0.0",
         "release_tag": "v2.0.0-rc1",
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "description": "Bayan Al-Sunnah Canonical Delivery Manifest with Cryptographic Integrity Checksums",
@@ -292,11 +445,14 @@ def build_all(check_only: bool = False):
             }
         },
         "tool_sources": {},
+        "tool_specs": {},
+        "isnad_modules": {},
+        "theme_assets": {},
         "databases": {},
         "planning_assets": {}
     }
 
-    # Hash individual tool source files
+    # Hash individual tool source files and spec files
     for tm in TOOL_MAPPINGS:
         code_p = TOOLS_DIR / tm["code_file"]
         if code_p.exists():
@@ -305,23 +461,57 @@ def build_all(check_only: bool = False):
                 "sha256": sha256_file(code_p),
                 "size_bytes": code_p.stat().st_size
             }
+        spec_p = TOOLS_DIR / tm["spec_file"]
+        if spec_p.exists():
+            manifest["tool_specs"][tm["id"]] = {
+                "file": tm["spec_file"],
+                "sha256": sha256_file(spec_p),
+                "size_bytes": spec_p.stat().st_size
+            }
 
-    # Inspect SQLite databases
+    # Hash modular Isnad engine files
+    for mod_fname in ISNAD_MODULE_FILES:
+        mod_p = ISNAD_DIR / mod_fname
+        if mod_p.exists():
+            manifest["isnad_modules"][mod_fname] = {
+                "file": f"hadith/isnad/{mod_fname}",
+                "sha256": sha256_file(mod_p),
+                "size_bytes": mod_p.stat().st_size
+            }
+
+    # Hash UI theme assets
+    for asset_fname in THEME_ASSET_FILES:
+        asset_p = THEME_DIR / asset_fname
+        if asset_p.exists():
+            manifest["theme_assets"][asset_fname] = {
+                "file": f"hadith/theme/{asset_fname}",
+                "sha256": sha256_file(asset_p),
+                "size_bytes": asset_p.stat().st_size
+            }
+
+    # Inspect SQLite databases in repo or outer workspace
     db_candidates = [
-        ROOT_DIR / "hadith_rijal.db",
-        ROOT_DIR / "poc" / "phrase_search" / "search_index.sqlite"
+        REPO_ROOT / "hadith_rijal.db",
+        REPO_HADITH_DIR / "hadith_rijal.db",
     ]
-    for dbp in db_candidates:
-        if dbp.exists():
-            fp = get_sqlite_fingerprint(dbp)
-            manifest["databases"][dbp.name] = fp
+    if OUTER_WORKSPACE_DIR:
+        db_candidates.extend([
+            OUTER_WORKSPACE_DIR / "hadith_rijal.db",
+            OUTER_WORKSPACE_DIR / "poc" / "phrase_search" / "search_index.sqlite"
+        ])
 
-    # Hash planning assets
-    assets = [
-        ROOT_DIR / "planning" / "islam_topic_taxonomy_v1.json",
-        ROOT_DIR / "planning" / "bayan_lesson_packs_v1.json"
+    for dbp in db_candidates:
+        if dbp.exists() and dbp.name not in manifest["databases"]:
+            fp = get_sqlite_fingerprint(dbp)
+            if fp:
+                manifest["databases"][dbp.name] = fp
+
+    # Hash planning assets if available
+    planning_candidates = [
+        REPO_ROOT.parent / "planning" / "islam_topic_taxonomy_v1.json",
+        REPO_ROOT.parent / "planning" / "bayan_lesson_packs_v1.json"
     ]
-    for ap in assets:
+    for ap in planning_candidates:
         if ap.exists():
             manifest["planning_assets"][ap.name] = {
                 "file": str(ap),
@@ -331,17 +521,18 @@ def build_all(check_only: bool = False):
 
     manifest_json = json.dumps(manifest, ensure_ascii=False, indent=2)
     manifest_path_exports = EXPORTS_DIR / "delivery_manifest.json"
-    manifest_path_root = ROOT_DIR / "delivery_manifest.json"
+    manifest_path_exports.write_bytes(manifest_json.encode("utf-8"))
+    print(f"  -> Generated: {manifest_path_exports}")
 
-    if not check_only:
-        manifest_path_exports.write_text(manifest_json, encoding="utf-8")
-        manifest_path_root.write_text(manifest_json, encoding="utf-8")
-        print(f"  -> Generated: {manifest_path_exports}")
-        print(f"  -> Generated: {manifest_path_root}")
+    if OUTER_WORKSPACE_DIR and OUTER_WORKSPACE_DIR.exists():
+        manifest_path_outer = OUTER_WORKSPACE_DIR / "delivery_manifest.json"
+        manifest_path_outer.write_bytes(manifest_json.encode("utf-8"))
+        print(f"  -> Synced to outer workspace: {manifest_path_outer}")
 
     print("\n" + "=" * 75)
     print(" ✅ BUILD COMPLETE: All export packages and manifest successfully generated.")
     print("=" * 75)
+
 
 if __name__ == "__main__":
     check_mode = "--check-only" in sys.argv

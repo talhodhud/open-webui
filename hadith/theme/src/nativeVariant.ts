@@ -23,6 +23,8 @@ export function createNativeVariant(){
  const authCases=element('div','bayan-auth-cases');for(const item of JOURNEYS){const b=button('','',()=>openDemo(item));b.append(icon(item.icon),document.createTextNode(item.title),icon('arrow'));authCases.append(b);}authIntro.append(authCases,element('small','','مشروع بيان السنة'));
  const authTopic=button('bayan-auth-topic','رحلة التعريف بالإسلام · استكشف الموضوعات',()=>openGallery(true));authIntro.insertBefore(authTopic,authCases);
  let enabled=false;let audience:Audience='topics';const marked=new Set<HTMLElement>();
+ let selectedPathId: string | undefined = undefined;
+ let routeKind: 'all_paths' | 'specific_path' = 'all_paths';
  let active=getJourney(new URLSearchParams(location.search).get('case'));
  let pendingLaunch=!!active;let lastPath=location.pathname;let lastContext='';
  const caseMap:Record<string,string>=readCaseMap();if(!active)active=getJourney(caseMap[location.pathname]);
@@ -61,6 +63,24 @@ export function createNativeVariant(){
    const copy=button('','انسخ النص ومصدره',async()=>{try{await navigator.clipboard.writeText(`${record.text}\n\n${names[record.collection]} — ${record.chapter}\nالموضع المحلي: ${record.position}\n${record.id}\n${record.url}\nمطابق للفهرس المحلي؛ يحتاج اختيار الشاهد وشرحه إلى مراجعة علمية.`);copy.textContent='نُسخ النص مع مصدره';}catch{copy.textContent='تعذر النسخ؛ حدّد النص لنسخه';}});
    tools.append(link,copy,button('','حضّر فتح السجل بالأداة',()=>launchDestination(buildEvidenceURL(location.origin,record.id,{mode:'unified'}))));item.append(tools);view.append(item);
   }return view;
+ }
+ function openNarratorDrawer(name:string, details?:{canonical?:string,anchor?:string,grade?:string,status?:string}){
+  if(!demoDialog.isConnected)document.body.append(demoDialog);demoDialog.replaceChildren();
+  const close=button('bayan-close','',()=>demoDialog.close());close.setAttribute('aria-label','أغلق درج الدليل');close.append(icon('close'));
+  const content=element('div','bayan-demo-content');content.append(close,element('span','bayan-kicker','درج دليل الراوي والتحقيق'));
+  const title=element('h2','',name);content.append(title);
+  const card=element('div','bayan-narrator-card');
+  card.append(element('p','','اللفظ التراثي في الإسناد: '+name));
+  if(details?.canonical)card.append(element('p','','التعيين المعتمد: '+details.canonical));
+  if(details?.anchor)card.append(element('p','','صاحب الضمير والسياق: '+details.anchor));
+  const gradeStr=details?.grade||'غير محدد بدليل صريح';
+  card.append(element('p','','رتبة الجرح والتعديل: '+gradeStr));
+  const statusStr=details?.status==='resolved'?'هوية مثبتة بدليل':'هوية لم تُحسم في البيانات (تحتاج دليلاً)';
+  const statusBadge=element('span',details?.status==='resolved'?'bayan-badge-resolved':'bayan-badge-unresolved',statusStr);
+  const reviewBadge=element('span','bayan-badge-review','تحليل جزئي يحتاج مراجعة علمية (needs_review)');
+  card.append(statusBadge,document.createTextNode(' '),reviewBadge);
+  content.append(card);demoDialog.append(content);
+  if(!demoDialog.open)demoDialog.showModal();close.focus();
  }
  function openDemo(journey:Journey){
   if(!demoDialog.isConnected)document.body.append(demoDialog);demoDialog.replaceChildren();
@@ -108,10 +128,53 @@ export function createNativeVariant(){
    const top=element('span','athar-v2-card-top');top.append(icon(journey.icon),element('small','',journey.category));card.append(top,element('strong','',journey.title),element('span','athar-v2-card-description',journey[audience==='research'?'research':'learn']));const action=element('span','bayan-card-action',isTopics?'صمّم رحلتك':'استعرض التجربة');action.append(icon('arrow'));card.append(action);grid.append(card);
   }cardsPanel.append(grid,status);status.textContent=isTopics?'٦ موضوعات · ١٣ شاهدًا مطابقًا للفهرس المحلي · المادة التعليمية قيد المراجعة.':'اختر حالة لتشاهد السؤال وخطوات التجربة، أو اكتب سؤالك مباشرة.';
  }
+ function updatePathSelection(pathBar:HTMLElement){
+  for(const b of pathBar.querySelectorAll<HTMLButtonElement>('.bayan-route-btn')){
+   const r=b.dataset.route;
+   b.setAttribute('aria-pressed',String(r==='all_paths'?!selectedPathId:selectedPathId===r));
+  }
+ }
  function renderContext(){
   const key=active?.id||'none';if(lastContext===key)return;lastContext=key;contextPanel.replaceChildren();followupPanel.replaceChildren();delete followupPanel.dataset.notice;
   contextPanel.append(element('span','bayan-context-brand',BRAND.name));if(active)contextPanel.append(element('span','bayan-context-case',active.title));contextPanel.append(button('','الحالات التطبيقية',openGallery));
-  if(active){followupPanel.append(element('span','','افتح مسودة متخصصة لهذه الحالة'));const followupsToRender=active.track==='islam'?active.followups.filter(f=>f.task!=='isnad_graph'):active.followups;followupsToRender.forEach((item,index)=>{const b=button('',item.label,()=>launchDestination(buildFollowupURL(location.origin,active!.id,index,{mode:'unified'})));b.title='تُفتح مسودة بالنموذج المناسب مع إعادة استرجاع الأدلة';followupPanel.append(b);});}
+  if(active){
+   const hasGraph=active.followups.some(f=>f.task==='isnad_graph'||f.task==='compare');
+   if(hasGraph){
+    const pathBar=element('div','bayan-route-selector');
+    pathBar.setAttribute('role','group');
+    pathBar.setAttribute('aria-label','اختيار مسار الإسناد');
+    const allBtn=button('bayan-route-btn','جميع الطرق',()=>{
+     selectedPathId=undefined;
+     routeKind='all_paths';
+     updatePathSelection(pathBar);
+    });
+    allBtn.dataset.route='all_paths';
+    allBtn.setAttribute('aria-pressed',String(!selectedPathId));
+    pathBar.append(allBtn);
+    ['path_1','path_2','path_3'].forEach((pId,idx)=>{
+     const pBtn=button('bayan-route-btn',`الطريق ${idx+1}`,()=>{
+      selectedPathId=pId;
+      routeKind='specific_path';
+      updatePathSelection(pathBar);
+     });
+     pBtn.dataset.route=pId;
+     pBtn.setAttribute('aria-pressed',String(selectedPathId===pId));
+     pathBar.append(pBtn);
+    });
+    followupPanel.append(pathBar);
+   }
+   followupPanel.append(element('span','','افتح مسودة متخصصة لهذه الحالة'));
+   const followupsToRender=active.track==='islam'?active.followups.filter(f=>f.task!=='isnad_graph'):active.followups;
+   followupsToRender.forEach((item,index)=>{
+    const b=button('',item.label,()=>launchDestination(buildFollowupURL(location.origin,active!.id,index,{
+     mode:'unified',
+     routeKind,
+     selectedPathId
+    })));
+    b.title='تُفتح مسودة بالنموذج المناسب مع إعادة استرجاع الأدلة ومسار العرض المختار';
+    followupPanel.append(b);
+   });
+  }
  }
  function syncRoute(){
   if(location.pathname===lastPath)return;

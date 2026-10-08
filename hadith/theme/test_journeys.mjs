@@ -185,6 +185,36 @@ test('specialist follow-ups preserve occurrence identity and route explicitly', 
   assert.throws(() => buildFollowupURL('http://localhost:8080', 'prayer-call', 9));
 });
 
+test('route selection contract supports all_paths and specific_path with selectedPathId and anchor context', () => {
+  // Test specific path follow-up contract
+  const contract = buildFollowupContract('prayer-call', 0, {
+    mode: 'unified',
+    routeKind: 'specific_path',
+    selectedPathId: 'path_1',
+    anchorName: 'سعيد بن أبي بردة'
+  });
+
+  assert.equal(contract.version, 1);
+  assert.equal(contract.modelId, 'bayan-unified-pilot');
+  assert.equal(contract.track, 'research');
+  assert.equal(contract.routeKind, 'specific_path');
+  assert.equal(contract.selectedPathId, 'path_1');
+  assert.equal(contract.anchorName, 'سعيد بن أبي بردة');
+
+  // Test URL carrying route and anchor parameters
+  const url = new URL(buildFollowupURL('http://localhost:8080', 'prayer-call', 0, {
+    mode: 'unified',
+    routeKind: 'specific_path',
+    selectedPathId: 'path_1',
+    anchorName: 'سعيد بن أبي بردة'
+  }));
+
+  assert.equal(url.searchParams.get('routeKind'), 'specific_path');
+  assert.equal(url.searchParams.get('selectedPathId'), 'path_1');
+  assert.ok(url.searchParams.get('q').includes('مسار الإسناد المحدد: path_1'));
+  assert.ok(url.searchParams.get('q').includes('سعيد بن أبي بردة'));
+});
+
 test('validation rejects invalid audience, format, or invented occurrence ID', () => {
   assert.throws(() => normalizeAudience('invented_audience'), /Invalid audience/);
   assert.throws(() => normalizeFormat('invented_format'), /Invalid format/);

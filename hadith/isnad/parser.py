@@ -4,9 +4,9 @@ hadith.isnad.parser
 General Isnad tokenizer and structural parser.
 Extracts:
 1. Tahweel [ح] branches (zero, one, or multiple).
-2. Convergence points (كلاهما عن / جميعا عن / قالا عن).
+2. Convergence points (كلاهما عن / جميعا عن / قالا عن / جميعهم عن).
 3. Co-narrators coordinated with 'و' (e.g. إسحاق بن إبراهيم، وابن أبي خلف).
-4. Authentic character-level source spans on original diacritized text.
+4. Authentic character-level source spans on original text (preserving leading whitespace).
 5. Clean separation of referral notes (نحو حديث شعبة) and exception notes (وليس في حديث زيد...).
 6. Raw mention names without synthetic assumptions.
 """
@@ -55,8 +55,9 @@ class ExtractedMention:
 @dataclass
 class ParsedBranch:
     branch_id: str
-    # stages in textual order (compiler teacher -> ... -> common link teacher)
     stages: List[List[ExtractedMention]] = field(default_factory=list)
+    has_prophetic_endpoint: bool = False
+    prophetic_span: Optional[Tuple[int, int]] = None
 
 @dataclass
 class ParsedIsnad:
@@ -142,11 +143,6 @@ class IsnadParser:
 
     @classmethod
     def split_co_narrators(cls, stage_text: str) -> List[str]:
-        """
-        Splits coordinated co-narrators in a single stage, e.g.:
-        'إسحاق بن إبراهيم، وابن أبي خلف' -> ['إسحاق بن إبراهيم', 'ابن أبي خلف']
-        Respects native Waw names like 'وهب', 'وكيع'.
-        """
         raw_parts = re.split(r'[,،\n]', stage_text)
         results = []
         for p in raw_parts:
@@ -192,7 +188,8 @@ class IsnadParser:
         return cleaned_results
 
     def parse(self, text: str) -> ParsedIsnad:
-        orig_text = text.strip()
+        # Keep original text without stripping to preserve exact caller offsets
+        orig_text = text
         clean_text, clean_to_orig = self.build_char_mapping(orig_text)
 
         # 1. Extract and detach referral and exception notes
@@ -208,7 +205,7 @@ class IsnadParser:
             variant_notes.append(mv.group(1).strip())
 
         # Strip matn body and trailing notes
-        matn_markers = r'(?:[،,\.\s]+|\b)(?:يقول\s*:\s*["\'«»]|نحو\s+حديث|بمثله|بمعناه|وليس\s+في\s+حديث|زاد\s+في|وفي\s+رواية|غير\s+ان|وزاد|وقال|لما\s+كسفت|كسفت|خسفت|نودي|ان\s+الشمس|ان\s+رسول|ان\s+النبي|قال\s+رسول|قالت\s+ما\s+سجدت|انما\s+الاعمال|من\s+حج|من\s+كان\s+يؤمن|بشروا|يسرا)\b'
+        matn_markers = r'(?:[،,\.\s]+|\b)(?:يقول\s*:\s*["\'«»]|نحو\s+حديث|بمثله|بمعناه|وليس\s+في\s+حديث|زاد\s+في|وفي\s+رواية|غير\s+ان|وزاد|وقال|لما\s+كسفت|كسفت|خسفت|نودي|ان\s+الشمس|ان\s+رسول|ان\s+النبي|قال\s+رسول|قالت\s+دخل|دخل\s+رهط|قالت\s+ما\s+سجدت|انما\s+الاعمال|من\s+حج|من\s+كان\s+يؤمن|بشروا|يسرا)\b'
         m_matn = re.search(matn_markers, clean_text)
         isnad_clean_end = m_matn.start() if m_matn else len(clean_text)
         isnad_clean = clean_text[:isnad_clean_end]
@@ -220,7 +217,7 @@ class IsnadParser:
         t_matches = list(re.finditer(tahweel_regex, isnad_clean))
         c_match = re.search(conv_regex, isnad_clean)
 
-        is_branched = bool(t_matches and c_match and t_matches[0].start() < c_match.start())
+        is_branched = bool(t_matches or c_match)
 
         parsed = ParsedIsnad(
             original_text=orig_text,
@@ -230,41 +227,65 @@ class IsnadParser:
             is_branched=is_branched
         )
 
-        if is_branched and c_match:
-            # Segment branches
-            t_first = t_matches[0]
-            b1_chunk = isnad_clean[:t_first.start()]
-            b2_chunk = isnad_clean[t_first.end():c_match.start()]
+        # Case A: Tahweel with Convergence (e.g. Muslim 32:8, two_h_three_branches)
+        if c_match and t_matches and t_matches[0].start() < c_match.start():
+            relevant_t_matches = [tm for tm in t_matches if tm.start() < c_match.start()]
+            chunks = []
+            curr_pos = 0
+            for tm in relevant_t_matches:
+                chunks.append((curr_pos, tm.start()))
+                curr_pos = tm.end()
+            chunks.append((curr_pos, c_match.start()))
+
+            for b_idx, (c_start, c_end) in enumerate(chunks):
+                b_chunk = isnad_clean[c_start:c_end]
+                branch = ParsedBranch(branch_id=f"b{b_idx+1}")
+                branch.stages = self._extract_stages(b_chunk, clean_to_orig, orig_text, offset=c_start, branch_id=f"b{b_idx+1}")
+                parsed.branches.append(branch)
+
             stem_chunk = isnad_clean[c_match.end():]
-
-            # Parse Branch 1
-            branch_1 = ParsedBranch(branch_id="b1")
-            branch_1.stages = self._extract_stages(b1_chunk, clean_to_orig, orig_text, offset=0, branch_id="b1")
-            parsed.branches.append(branch_1)
-
-            # Parse Branch 2
-            branch_2 = ParsedBranch(branch_id="b2")
-            branch_2.stages = self._extract_stages(b2_chunk, clean_to_orig, orig_text, offset=t_first.end(), branch_id="b2")
-            parsed.branches.append(branch_2)
-
-            # Parse Common Stem
             stem_stages = self._extract_stages(stem_chunk, clean_to_orig, orig_text, offset=c_match.end(), branch_id="stem", is_stem=True)
             if stem_stages:
-                # The first stage of stem is the common link (e.g. سعيد بن أبي بردة)
                 parsed.common_link = stem_stages[0][0]
                 parsed.stem_stages = stem_stages[1:]
             else:
                 parsed.stem_stages = []
 
-            # Detect prophetic endpoint
             self._detect_prophetic_endpoint(stem_chunk, c_match.end(), clean_to_orig, orig_text, parsed)
 
+        # Case B: Tahweel without Convergence (unjoined parallel chains, e.g. h_without_join)
+        elif t_matches and not c_match:
+            chunks = []
+            curr_pos = 0
+            for tm in t_matches:
+                chunks.append((curr_pos, tm.start()))
+                curr_pos = tm.end()
+            chunks.append((curr_pos, len(isnad_clean)))
+
+            has_any_prophet = False
+            for b_idx, (c_start, c_end) in enumerate(chunks):
+                b_chunk = isnad_clean[c_start:c_end]
+                branch = ParsedBranch(branch_id=f"b{b_idx+1}")
+                branch.stages = self._extract_stages(b_chunk, clean_to_orig, orig_text, offset=c_start, branch_id=f"b{b_idx+1}")
+                p_span = self._detect_prophetic_in_chunk(b_chunk, c_start, clean_to_orig, orig_text)
+                if p_span:
+                    branch.has_prophetic_endpoint = True
+                    branch.prophetic_span = p_span
+                    has_any_prophet = True
+                    if not parsed.prophetic_span:
+                        parsed.prophetic_span = p_span
+                parsed.branches.append(branch)
+
+            parsed.has_prophetic_endpoint = has_any_prophet
+
+        # Case C: Single isnad (no Tahweel)
         else:
-            # Single-chain isnad
             single_branch = ParsedBranch(branch_id="primary")
             single_branch.stages = self._extract_stages(isnad_clean, clean_to_orig, orig_text, offset=0, branch_id="primary")
             parsed.branches.append(single_branch)
             self._detect_prophetic_endpoint(isnad_clean, 0, clean_to_orig, orig_text, parsed)
+            if single_branch.stages and len(single_branch.stages[0]) > 1:
+                parsed.is_branched = True
 
         return parsed
 
@@ -300,7 +321,7 @@ class IsnadParser:
                     norm_text=norm_n,
                     source_span=s_span,
                     transmission_term="عن",
-                    transmission_span=(0, 0),
+                    transmission_span=(s_span[0], s_span[0]),
                     is_relative=is_rel,
                     relation_type=rel_type,
                     branch_id=branch_id,
@@ -322,7 +343,6 @@ class IsnadParser:
             if not seg_text:
                 continue
 
-            # Split co-narrators if any (conjunction Waw)
             co_names = self.split_co_narrators(seg_text)
             stage_mentions = []
 
@@ -331,7 +351,6 @@ class IsnadParser:
                 if norm_n in ('النبي', 'رسول الله') or 'رسول الله' in norm_n or norm_n in NON_NARRATOR_WORDS or len(norm_n) < 2:
                     continue
 
-                # Locate authentic span within chunk
                 sub_pos = chunk_clean.find(co_name, seg_start)
                 if sub_pos != -1:
                     c_s = offset + sub_pos
@@ -374,13 +393,25 @@ class IsnadParser:
         orig_text: str,
         parsed: ParsedIsnad
     ):
-        prophetic_pattern = r'(?:سمعت|سمعنا|قال|يقول|يحدث|روى|عن|ان|انه\s+سمع|انها\s+سمعت)\s+(?:رسول\s+الل[هة]|النبي)'
-        m_prophet = re.search(prophetic_pattern, tail_clean)
-        if m_prophet:
+        p_span = self._detect_prophetic_in_chunk(tail_clean, offset, clean_to_orig, orig_text)
+        if p_span:
             parsed.has_prophetic_endpoint = True
-            c_s = offset + m_prophet.start()
-            c_e = offset + m_prophet.end()
-            parsed.prophetic_span = self.get_orig_slice(c_s, c_e, clean_to_orig, orig_text)
+            parsed.prophetic_span = p_span
         else:
             parsed.has_prophetic_endpoint = False
             parsed.prophetic_span = None
+
+    def _detect_prophetic_in_chunk(
+        self,
+        chunk: str,
+        offset: int,
+        clean_to_orig: List[int],
+        orig_text: str
+    ) -> Optional[Tuple[int, int]]:
+        prophetic_pattern = r'(?:سمعت|سمعنا|قال|يقول|يحدث|روى|عن|ان|انه\s+سمع|انها\s+سمعت)\s+(?:رسول\s+الل[هة]|النبي)'
+        m_prophet = re.search(prophetic_pattern, chunk)
+        if m_prophet:
+            c_s = offset + m_prophet.start()
+            c_e = offset + m_prophet.end()
+            return self.get_orig_slice(c_s, c_e, clean_to_orig, orig_text)
+        return None
