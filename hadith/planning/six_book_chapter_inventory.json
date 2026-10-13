@@ -1,0 +1,2021 @@
+{
+  "basis": "Source chapter titles only; not a reviewed thematic classification of matn",
+  "chapters": [
+    {
+      "collection": "abudawud",
+      "chapter_file": "1.json",
+      "chapter_title": "كتاب الطهارة",
+      "occurrence_count": 390
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "10.json",
+      "chapter_title": "كتاب اللقطة",
+      "occurrence_count": 20
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "11.json",
+      "chapter_title": "كتاب المناسك",
+      "occurrence_count": 325
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "12.json",
+      "chapter_title": "كتاب النكاح",
+      "occurrence_count": 129
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "13.json",
+      "chapter_title": "كتاب الطلاق",
+      "occurrence_count": 138
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "14.json",
+      "chapter_title": "كتاب الصوم",
+      "occurrence_count": 164
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "15.json",
+      "chapter_title": "كتاب الجهاد",
+      "occurrence_count": 311
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "16.json",
+      "chapter_title": "كتاب الضحايا",
+      "occurrence_count": 56
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "17.json",
+      "chapter_title": "كتاب الصيد",
+      "occurrence_count": 18
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "18.json",
+      "chapter_title": "كتاب الوصايا",
+      "occurrence_count": 23
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "19.json",
+      "chapter_title": "كتاب الفرائض",
+      "occurrence_count": 43
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "2.json",
+      "chapter_title": "كتاب الصلاة",
+      "occurrence_count": 771
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "20.json",
+      "chapter_title": "كتاب الخراج والإمارة والفىء",
+      "occurrence_count": 161
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "21.json",
+      "chapter_title": "كتاب الجنائز",
+      "occurrence_count": 153
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "22.json",
+      "chapter_title": "كتاب الأيمان والنذور",
+      "occurrence_count": 84
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "23.json",
+      "chapter_title": "كتاب البيوع",
+      "occurrence_count": 90
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "24.json",
+      "chapter_title": "كتاب الإجارة",
+      "occurrence_count": 155
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "25.json",
+      "chapter_title": "كتاب الأقضية",
+      "occurrence_count": 70
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "26.json",
+      "chapter_title": "كتاب العلم",
+      "occurrence_count": 28
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "27.json",
+      "chapter_title": "كتاب الأشربة",
+      "occurrence_count": 67
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "28.json",
+      "chapter_title": "كتاب الأطعمة",
+      "occurrence_count": 119
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "29.json",
+      "chapter_title": "كتاب الطب",
+      "occurrence_count": 49
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "3.json",
+      "chapter_title": "كتاب الاستسقاء",
+      "occurrence_count": 37
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "30.json",
+      "chapter_title": "كتاب الكهانة و التطير",
+      "occurrence_count": 22
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "31.json",
+      "chapter_title": "كتاب العتق",
+      "occurrence_count": 43
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "32.json",
+      "chapter_title": "كتاب الحروف والقراءات",
+      "occurrence_count": 40
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "33.json",
+      "chapter_title": "كتاب الحمَّام",
+      "occurrence_count": 11
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "34.json",
+      "chapter_title": "كتاب اللباس",
+      "occurrence_count": 139
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "35.json",
+      "chapter_title": "كتاب الترجل",
+      "occurrence_count": 55
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "36.json",
+      "chapter_title": "كتاب الخاتم",
+      "occurrence_count": 26
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "37.json",
+      "chapter_title": "كتاب الفتن والملاحم",
+      "occurrence_count": 39
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "38.json",
+      "chapter_title": "كتاب المهدى",
+      "occurrence_count": 13
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "39.json",
+      "chapter_title": "كتاب الملاحم",
+      "occurrence_count": 60
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "4.json",
+      "chapter_title": "كتاب صلاة السفر",
+      "occurrence_count": 52
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "40.json",
+      "chapter_title": "كتاب الحدود",
+      "occurrence_count": 143
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "41.json",
+      "chapter_title": "كتاب الديات",
+      "occurrence_count": 102
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "42.json",
+      "chapter_title": "كتاب السنة",
+      "occurrence_count": 177
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "43.json",
+      "chapter_title": "كتاب الأدب",
+      "occurrence_count": 502
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "5.json",
+      "chapter_title": "كتاب التطوع",
+      "occurrence_count": 121
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "6.json",
+      "chapter_title": "كتاب شهر رمضان",
+      "occurrence_count": 30
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "7.json",
+      "chapter_title": "كتاب سجود القرآن",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "8.json",
+      "chapter_title": "كتاب الوتر",
+      "occurrence_count": 140
+    },
+    {
+      "collection": "abudawud",
+      "chapter_file": "9.json",
+      "chapter_title": "كتاب الزكاة",
+      "occurrence_count": 145
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "1.json",
+      "chapter_title": "كتاب بدء الوحى",
+      "occurrence_count": 7
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "10.json",
+      "chapter_title": "كتاب الأذان",
+      "occurrence_count": 266
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "11.json",
+      "chapter_title": "كتاب الجمعة",
+      "occurrence_count": 65
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "12.json",
+      "chapter_title": "كتاب صلاة الخوف",
+      "occurrence_count": 6
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "13.json",
+      "chapter_title": "كتاب العيدين",
+      "occurrence_count": 37
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "14.json",
+      "chapter_title": "كتاب الوتر",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "15.json",
+      "chapter_title": "كتاب الاستسقاء",
+      "occurrence_count": 34
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "16.json",
+      "chapter_title": "كتاب الكسوف",
+      "occurrence_count": 24
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "17.json",
+      "chapter_title": "كتاب سجود القرآن",
+      "occurrence_count": 13
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "18.json",
+      "chapter_title": "كتاب التقصير",
+      "occurrence_count": 39
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "19.json",
+      "chapter_title": "كتاب التهجد",
+      "occurrence_count": 63
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "2.json",
+      "chapter_title": "كتاب الإيمان",
+      "occurrence_count": 51
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "20.json",
+      "chapter_title": "كتاب فضل الصلاة فى مسجد مكة والمدينة",
+      "occurrence_count": 9
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "21.json",
+      "chapter_title": "كتاب العمل فى الصلاة",
+      "occurrence_count": 27
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "22.json",
+      "chapter_title": "كتاب السهو",
+      "occurrence_count": 14
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "23.json",
+      "chapter_title": "كتاب الجنائز",
+      "occurrence_count": 148
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "24.json",
+      "chapter_title": "كتاب الزكاة",
+      "occurrence_count": 112
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "25.json",
+      "chapter_title": "كتاب الحج",
+      "occurrence_count": 247
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "26.json",
+      "chapter_title": "كتاب العمرة",
+      "occurrence_count": 30
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "27.json",
+      "chapter_title": "كتاب المحصر",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "28.json",
+      "chapter_title": "كتاب جزاء الصيد",
+      "occurrence_count": 46
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "29.json",
+      "chapter_title": "كتاب فضائل المدينة",
+      "occurrence_count": 24
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "3.json",
+      "chapter_title": "كتاب العلم",
+      "occurrence_count": 76
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "30.json",
+      "chapter_title": "كتاب الصوم",
+      "occurrence_count": 112
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "31.json",
+      "chapter_title": "كتاب صلاة التراويح",
+      "occurrence_count": 6
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "32.json",
+      "chapter_title": "كتاب فضل ليلة القدر",
+      "occurrence_count": 11
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "33.json",
+      "chapter_title": "كتاب الاعتكاف",
+      "occurrence_count": 21
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "34.json",
+      "chapter_title": "كتاب البيوع",
+      "occurrence_count": 184
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "35.json",
+      "chapter_title": "كتاب السلم",
+      "occurrence_count": 16
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "36.json",
+      "chapter_title": "كتاب الشفعة",
+      "occurrence_count": 3
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "37.json",
+      "chapter_title": "كتاب الإجارة",
+      "occurrence_count": 25
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "38.json",
+      "chapter_title": "كتاب الحوالات",
+      "occurrence_count": 3
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "39.json",
+      "chapter_title": "كتاب الكفالة",
+      "occurrence_count": 9
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "4.json",
+      "chapter_title": "كتاب الوضوء",
+      "occurrence_count": 113
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "40.json",
+      "chapter_title": "كتاب الوكالة",
+      "occurrence_count": 18
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "41.json",
+      "chapter_title": "كتاب المزارعة",
+      "occurrence_count": 28
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "42.json",
+      "chapter_title": "كتاب المساقاة",
+      "occurrence_count": 31
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "43.json",
+      "chapter_title": "كتاب فى الاستقراض",
+      "occurrence_count": 24
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "44.json",
+      "chapter_title": "كتاب الخصومات",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "45.json",
+      "chapter_title": "كتاب فى اللقطة",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "46.json",
+      "chapter_title": "كتاب المظالم",
+      "occurrence_count": 43
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "47.json",
+      "chapter_title": "كتاب الشركة",
+      "occurrence_count": 22
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "48.json",
+      "chapter_title": "كتاب الرهن",
+      "occurrence_count": 8
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "49.json",
+      "chapter_title": "كتاب العتق",
+      "occurrence_count": 41
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "5.json",
+      "chapter_title": "كتاب الغسل",
+      "occurrence_count": 45
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "50.json",
+      "chapter_title": "كتاب المكاتب",
+      "occurrence_count": 6
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "51.json",
+      "chapter_title": "كتاب الهبة وفضلها والتحريض عليها",
+      "occurrence_count": 68
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "52.json",
+      "chapter_title": "كتاب الشهادات",
+      "occurrence_count": 50
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "53.json",
+      "chapter_title": "كتاب الصلح",
+      "occurrence_count": 20
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "54.json",
+      "chapter_title": "كتاب الشروط",
+      "occurrence_count": 24
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "55.json",
+      "chapter_title": "كتاب الوصايا",
+      "occurrence_count": 44
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "56.json",
+      "chapter_title": "كتاب الجهاد والسير",
+      "occurrence_count": 294
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "57.json",
+      "chapter_title": "كتاب فرض الخمس",
+      "occurrence_count": 63
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "58.json",
+      "chapter_title": "كتاب الجزية والموادعة",
+      "occurrence_count": 30
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "59.json",
+      "chapter_title": "كتاب بدء الخلق",
+      "occurrence_count": 131
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "6.json",
+      "chapter_title": "كتاب الحيض",
+      "occurrence_count": 37
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "60.json",
+      "chapter_title": "كتاب أحاديث الأنبياء",
+      "occurrence_count": 154
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "61.json",
+      "chapter_title": "كتاب المناقب",
+      "occurrence_count": 151
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "62.json",
+      "chapter_title": "كتاب فضائل أصحاب النبى صلى الله عليه وسلم",
+      "occurrence_count": 120
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "63.json",
+      "chapter_title": "كتاب مناقب الأنصار",
+      "occurrence_count": 172
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "64.json",
+      "chapter_title": "كتاب المغازى",
+      "occurrence_count": 488
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "65.json",
+      "chapter_title": "كتاب التفسير",
+      "occurrence_count": 499
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "66.json",
+      "chapter_title": "كتاب فضائل القرآن",
+      "occurrence_count": 87
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "67.json",
+      "chapter_title": "كتاب النكاح",
+      "occurrence_count": 183
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "68.json",
+      "chapter_title": "كتاب الطلاق",
+      "occurrence_count": 95
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "69.json",
+      "chapter_title": "كتاب النفقات",
+      "occurrence_count": 22
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "7.json",
+      "chapter_title": "كتاب التيمم",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "70.json",
+      "chapter_title": "كتاب الأطعمة",
+      "occurrence_count": 95
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "71.json",
+      "chapter_title": "كتاب العقيقة",
+      "occurrence_count": 9
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "72.json",
+      "chapter_title": "كتاب الذبائح والصيد",
+      "occurrence_count": 69
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "73.json",
+      "chapter_title": "كتاب الأضاحي",
+      "occurrence_count": 30
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "74.json",
+      "chapter_title": "كتاب الأشربة",
+      "occurrence_count": 65
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "75.json",
+      "chapter_title": "كتاب المرضى",
+      "occurrence_count": 37
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "76.json",
+      "chapter_title": "كتاب الطب",
+      "occurrence_count": 93
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "77.json",
+      "chapter_title": "كتاب اللباس",
+      "occurrence_count": 185
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "78.json",
+      "chapter_title": "كتاب الأدب",
+      "occurrence_count": 250
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "79.json",
+      "chapter_title": "كتاب الاستئذان",
+      "occurrence_count": 75
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "8.json",
+      "chapter_title": "كتاب الصلاة",
+      "occurrence_count": 167
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "80.json",
+      "chapter_title": "كتاب الدعوات",
+      "occurrence_count": 106
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "81.json",
+      "chapter_title": "كتاب الرقاق",
+      "occurrence_count": 181
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "82.json",
+      "chapter_title": "كتاب القدر",
+      "occurrence_count": 26
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "83.json",
+      "chapter_title": "كتاب الأيمان والنذور",
+      "occurrence_count": 84
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "84.json",
+      "chapter_title": "كتاب كفارات الأيمان",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "85.json",
+      "chapter_title": "كتاب الفرائض",
+      "occurrence_count": 47
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "86.json",
+      "chapter_title": "كتاب الحدود",
+      "occurrence_count": 81
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "87.json",
+      "chapter_title": "كتاب الديات",
+      "occurrence_count": 55
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "88.json",
+      "chapter_title": "كتاب استتابة المرتدين والمعاندين وقتالهم",
+      "occurrence_count": 21
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "89.json",
+      "chapter_title": "كتاب الإكراه",
+      "occurrence_count": 13
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "9.json",
+      "chapter_title": "كتاب مواقيت الصلاة",
+      "occurrence_count": 77
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "90.json",
+      "chapter_title": "كتاب الحيل",
+      "occurrence_count": 28
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "91.json",
+      "chapter_title": "كتاب التعبير",
+      "occurrence_count": 61
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "92.json",
+      "chapter_title": "كتاب الفتن",
+      "occurrence_count": 83
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "93.json",
+      "chapter_title": "كتاب الأحكام",
+      "occurrence_count": 84
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "94.json",
+      "chapter_title": "كتاب التمنى",
+      "occurrence_count": 20
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "95.json",
+      "chapter_title": "كتاب أخبار الآحاد",
+      "occurrence_count": 21
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "96.json",
+      "chapter_title": "كتاب الاعتصام بالكتاب والسنة",
+      "occurrence_count": 97
+    },
+    {
+      "collection": "bukhari",
+      "chapter_file": "97.json",
+      "chapter_title": "كتاب التوحيد",
+      "occurrence_count": 188
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "1.json",
+      "chapter_title": "كتاب الطهارة وسننها",
+      "occurrence_count": 400
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "10.json",
+      "chapter_title": "كتاب الطلاق",
+      "occurrence_count": 74
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "11.json",
+      "chapter_title": "كتاب الكفارات",
+      "occurrence_count": 47
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "12.json",
+      "chapter_title": "كتاب التجارات",
+      "occurrence_count": 171
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "13.json",
+      "chapter_title": "كتاب الأحكام",
+      "occurrence_count": 67
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "14.json",
+      "chapter_title": "كتاب الهبات",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "15.json",
+      "chapter_title": "كتاب الصدقات",
+      "occurrence_count": 46
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "16.json",
+      "chapter_title": "كتاب الرهون",
+      "occurrence_count": 57
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "17.json",
+      "chapter_title": "كتاب الشفعة",
+      "occurrence_count": 11
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "18.json",
+      "chapter_title": "كتاب اللقطة",
+      "occurrence_count": 10
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "19.json",
+      "chapter_title": "كتاب العتق",
+      "occurrence_count": 21
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "2.json",
+      "chapter_title": "كتاب الصلاة",
+      "occurrence_count": 39
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "20.json",
+      "chapter_title": "كتاب الحدود",
+      "occurrence_count": 82
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "21.json",
+      "chapter_title": "كتاب الديات",
+      "occurrence_count": 80
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "22.json",
+      "chapter_title": "كتاب الوصايا",
+      "occurrence_count": 24
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "23.json",
+      "chapter_title": "كتاب الفرائض",
+      "occurrence_count": 34
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "24.json",
+      "chapter_title": "كتاب الجهاد",
+      "occurrence_count": 129
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "25.json",
+      "chapter_title": "كتاب المناسك",
+      "occurrence_count": 238
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "26.json",
+      "chapter_title": "كتاب الأضاحي",
+      "occurrence_count": 42
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "27.json",
+      "chapter_title": "كتاب الذبائح",
+      "occurrence_count": 38
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "28.json",
+      "chapter_title": "كتاب الصيد",
+      "occurrence_count": 51
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "29.json",
+      "chapter_title": "كتاب الأطعمة",
+      "occurrence_count": 120
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "3.json",
+      "chapter_title": "كتاب الأذان والسنة فيها",
+      "occurrence_count": 29
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "30.json",
+      "chapter_title": "كتاب الأشربة",
+      "occurrence_count": 65
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "31.json",
+      "chapter_title": "كتاب الطب",
+      "occurrence_count": 114
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "32.json",
+      "chapter_title": "كتاب اللباس",
+      "occurrence_count": 107
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "33.json",
+      "chapter_title": "كتاب الأدب",
+      "occurrence_count": 170
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "34.json",
+      "chapter_title": "كتاب الدعاء",
+      "occurrence_count": 66
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "35.json",
+      "chapter_title": "كتاب تعبير الرؤيا",
+      "occurrence_count": 34
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "36.json",
+      "chapter_title": "كتاب الفتن",
+      "occurrence_count": 175
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "37.json",
+      "chapter_title": "كتاب الزهد",
+      "occurrence_count": 242
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "38.json",
+      "chapter_title": "38.json",
+      "occurrence_count": 242
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "4.json",
+      "chapter_title": "كتاب المساجد والجماعات",
+      "occurrence_count": 68
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "5.json",
+      "chapter_title": "كتاب إقامة الصلاة والسنة فيها",
+      "occurrence_count": 630
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "6.json",
+      "chapter_title": "كتاب الجنائز",
+      "occurrence_count": 205
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "7.json",
+      "chapter_title": "كتاب الصيام",
+      "occurrence_count": 145
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "8.json",
+      "chapter_title": "كتاب الزكاة",
+      "occurrence_count": 62
+    },
+    {
+      "collection": "ibnmajah",
+      "chapter_file": "9.json",
+      "chapter_title": "كتاب النكاح",
+      "occurrence_count": 171
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "1.json",
+      "chapter_title": "كتاب الإيمان",
+      "occurrence_count": 439
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "10.json",
+      "chapter_title": "كتاب الكسوف",
+      "occurrence_count": 31
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "11.json",
+      "chapter_title": "كتاب الجنائز",
+      "occurrence_count": 138
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "12.json",
+      "chapter_title": "كتاب الزكاة",
+      "occurrence_count": 231
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "13.json",
+      "chapter_title": "كتاب الصيام",
+      "occurrence_count": 285
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "14.json",
+      "chapter_title": "كتاب الاعتكاف",
+      "occurrence_count": 11
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "15.json",
+      "chapter_title": "كتاب الحج",
+      "occurrence_count": 601
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "16.json",
+      "chapter_title": "كتاب النكاح",
+      "occurrence_count": 169
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "17.json",
+      "chapter_title": "كتاب الرضاع",
+      "occurrence_count": 84
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "18.json",
+      "chapter_title": "كتاب الطلاق",
+      "occurrence_count": 87
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "19.json",
+      "chapter_title": "كتاب اللعان",
+      "occurrence_count": 27
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "2.json",
+      "chapter_title": "كتاب الطهارة",
+      "occurrence_count": 144
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "20.json",
+      "chapter_title": "كتاب العتق",
+      "occurrence_count": 30
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "21.json",
+      "chapter_title": "كتاب البيوع",
+      "occurrence_count": 160
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "22.json",
+      "chapter_title": "كتاب المساقاة",
+      "occurrence_count": 178
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "23.json",
+      "chapter_title": "كتاب الفرائض",
+      "occurrence_count": 23
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "24.json",
+      "chapter_title": "كتاب الهبات",
+      "occurrence_count": 41
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "25.json",
+      "chapter_title": "كتاب الوصية",
+      "occurrence_count": 31
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "26.json",
+      "chapter_title": "كتاب النذر",
+      "occurrence_count": 18
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "27.json",
+      "chapter_title": "كتاب الأيمان",
+      "occurrence_count": 88
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "28.json",
+      "chapter_title": "كتاب القسامة والمحاربين والقصاص والديات",
+      "occurrence_count": 56
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "29.json",
+      "chapter_title": "كتاب الحدود",
+      "occurrence_count": 72
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "3.json",
+      "chapter_title": "كتاب الحيض",
+      "occurrence_count": 157
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "30.json",
+      "chapter_title": "كتاب الأقضية",
+      "occurrence_count": 28
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "31.json",
+      "chapter_title": "كتاب اللقطة",
+      "occurrence_count": 20
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "32.json",
+      "chapter_title": "كتاب الجهاد والسير",
+      "occurrence_count": 182
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "33.json",
+      "chapter_title": "كتاب الإمارة",
+      "occurrence_count": 266
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "34.json",
+      "chapter_title": "كتاب الصيد والذبائح وما يؤكل من الحيوان",
+      "occurrence_count": 92
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "35.json",
+      "chapter_title": "كتاب الأضاحى",
+      "occurrence_count": 62
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "36.json",
+      "chapter_title": "كتاب الأشربة",
+      "occurrence_count": 257
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "37.json",
+      "chapter_title": "كتاب اللباس والزينة",
+      "occurrence_count": 193
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "38.json",
+      "chapter_title": "كتاب الآداب",
+      "occurrence_count": 60
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "39.json",
+      "chapter_title": "كتاب السلام",
+      "occurrence_count": 212
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "4.json",
+      "chapter_title": "كتاب الصلاة",
+      "occurrence_count": 322
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "40.json",
+      "chapter_title": "كتاب الألفاظ من الأدب وغيرها",
+      "occurrence_count": 23
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "41.json",
+      "chapter_title": "كتاب الشعر",
+      "occurrence_count": 11
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "42.json",
+      "chapter_title": "كتاب الرؤيا",
+      "occurrence_count": 41
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "43.json",
+      "chapter_title": "كتاب الفضائل",
+      "occurrence_count": 226
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "44.json",
+      "chapter_title": "كتاب فضائل الصحابة رضى الله تعالى عنهم",
+      "occurrence_count": 328
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "45.json",
+      "chapter_title": "كتاب البر والصلة والآداب",
+      "occurrence_count": 217
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "46.json",
+      "chapter_title": "كتاب القدر",
+      "occurrence_count": 52
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "47.json",
+      "chapter_title": "كتاب العلم",
+      "occurrence_count": 30
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "48.json",
+      "chapter_title": "كتاب الذكر والدعاء والتوبة والاستغفار",
+      "occurrence_count": 127
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "49.json",
+      "chapter_title": "كتاب الرقاق",
+      "occurrence_count": 15
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "5.json",
+      "chapter_title": "كتاب الْمَسَاجِدِ وَمَوَاضِعِ الصَّلاَةِ",
+      "occurrence_count": 402
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "50.json",
+      "chapter_title": "كتاب التوبة",
+      "occurrence_count": 68
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "51.json",
+      "chapter_title": "كتاب صفات المنافقين وأحكامهم",
+      "occurrence_count": 21
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "52.json",
+      "chapter_title": "كتاب صفة القيامة والجنة والنار",
+      "occurrence_count": 82
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "53.json",
+      "chapter_title": "كتاب الجنة وصفة نعيمها وأهلها",
+      "occurrence_count": 103
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "54.json",
+      "chapter_title": "كتاب الفتن وأشراط الساعة",
+      "occurrence_count": 177
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "55.json",
+      "chapter_title": "كتاب الزهد والرقائق",
+      "occurrence_count": 96
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "56.json",
+      "chapter_title": "كتاب التفسير",
+      "occurrence_count": 40
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "57.json",
+      "chapter_title": "57.json",
+      "occurrence_count": 40
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "6.json",
+      "chapter_title": "كتاب صلاة المسافرين وقصرها",
+      "occurrence_count": 378
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "7.json",
+      "chapter_title": "كتاب الجمعة",
+      "occurrence_count": 93
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "8.json",
+      "chapter_title": "كتاب صلاة العيدين",
+      "occurrence_count": 24
+    },
+    {
+      "collection": "muslim",
+      "chapter_file": "9.json",
+      "chapter_title": "كتاب صلاة الاستسقاء‏",
+      "occurrence_count": 19
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "1.json",
+      "chapter_title": "كتاب الطهارة",
+      "occurrence_count": 325
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "10.json",
+      "chapter_title": "كتاب الإمامة",
+      "occurrence_count": 99
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "11.json",
+      "chapter_title": "كتاب الافتتاح",
+      "occurrence_count": 153
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "12.json",
+      "chapter_title": "كتاب التطبيق",
+      "occurrence_count": 150
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "13.json",
+      "chapter_title": "كتاب السهو",
+      "occurrence_count": 188
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "14.json",
+      "chapter_title": "كتاب الجمعة",
+      "occurrence_count": 69
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "15.json",
+      "chapter_title": "كتاب تقصير الصلاة فى السفر",
+      "occurrence_count": 26
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "16.json",
+      "chapter_title": "كتاب الكسوف",
+      "occurrence_count": 45
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "17.json",
+      "chapter_title": "كتاب الاستسقاء",
+      "occurrence_count": 25
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "18.json",
+      "chapter_title": "كتاب صلاة الخوف",
+      "occurrence_count": 27
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "19.json",
+      "chapter_title": "كتاب صلاة العيدين",
+      "occurrence_count": 42
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "2.json",
+      "chapter_title": "كتاب المياه",
+      "occurrence_count": 23
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "20.json",
+      "chapter_title": "كتاب قيام الليل وتطوع النهار",
+      "occurrence_count": 220
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "21.json",
+      "chapter_title": "كتاب الجنائز",
+      "occurrence_count": 272
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "22.json",
+      "chapter_title": "كتاب الصيام",
+      "occurrence_count": 345
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "23.json",
+      "chapter_title": "كتاب الزكاة",
+      "occurrence_count": 184
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "24.json",
+      "chapter_title": "كتاب مناسك الحج",
+      "occurrence_count": 467
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "25.json",
+      "chapter_title": "كتاب الجهاد",
+      "occurrence_count": 111
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "26.json",
+      "chapter_title": "كتاب النكاح",
+      "occurrence_count": 193
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "27.json",
+      "chapter_title": "كتاب الطلاق",
+      "occurrence_count": 174
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "28.json",
+      "chapter_title": "كتاب الخيل",
+      "occurrence_count": 33
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "29.json",
+      "chapter_title": "كتاب الإحباس",
+      "occurrence_count": 17
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "3.json",
+      "chapter_title": "كتاب الحيض والاستحاضة",
+      "occurrence_count": 48
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "30.json",
+      "chapter_title": "كتاب الوصايا",
+      "occurrence_count": 61
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "31.json",
+      "chapter_title": "كتاب النحل",
+      "occurrence_count": 16
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "32.json",
+      "chapter_title": "كتاب الهبة",
+      "occurrence_count": 18
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "33.json",
+      "chapter_title": "كتاب الرقبى",
+      "occurrence_count": 14
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "34.json",
+      "chapter_title": "كتاب العمرى",
+      "occurrence_count": 42
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "35.json",
+      "chapter_title": "كتاب الأيمان والنذور",
+      "occurrence_count": 96
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "36.json",
+      "chapter_title": "كتاب عشرة النساء",
+      "occurrence_count": 27
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "37.json",
+      "chapter_title": "كتاب تحريم الدم",
+      "occurrence_count": 167
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "38.json",
+      "chapter_title": "كتاب قسم الفىء",
+      "occurrence_count": 16
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "39.json",
+      "chapter_title": "كتاب البيعة",
+      "occurrence_count": 63
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "4.json",
+      "chapter_title": "كتاب الغسل والتيمم",
+      "occurrence_count": 53
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "40.json",
+      "chapter_title": "كتاب العقيقة",
+      "occurrence_count": 10
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "41.json",
+      "chapter_title": "كتاب الفرع والعتيرة",
+      "occurrence_count": 41
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "42.json",
+      "chapter_title": "كتاب الصيد والذبائح",
+      "occurrence_count": 98
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "43.json",
+      "chapter_title": "كتاب الضحايا",
+      "occurrence_count": 88
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "44.json",
+      "chapter_title": "كتاب البيوع",
+      "occurrence_count": 257
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "45.json",
+      "chapter_title": "كتاب القسامة",
+      "occurrence_count": 164
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "46.json",
+      "chapter_title": "كتاب قطع السارق",
+      "occurrence_count": 114
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "47.json",
+      "chapter_title": "كتاب الإيمان وشرائعه",
+      "occurrence_count": 55
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "48.json",
+      "chapter_title": "كتاب الزينة من السنن",
+      "occurrence_count": 339
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "49.json",
+      "chapter_title": "كتاب آداب القضاة",
+      "occurrence_count": 49
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "5.json",
+      "chapter_title": "كتاب الصلاة",
+      "occurrence_count": 46
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "50.json",
+      "chapter_title": "كتاب الاستعاذة",
+      "occurrence_count": 112
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "51.json",
+      "chapter_title": "كتاب الأشربة",
+      "occurrence_count": 220
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "52.json",
+      "chapter_title": "52.json",
+      "occurrence_count": 220
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "6.json",
+      "chapter_title": "كتاب المواقيت",
+      "occurrence_count": 132
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "7.json",
+      "chapter_title": "كتاب الأذان",
+      "occurrence_count": 62
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "8.json",
+      "chapter_title": "كتاب المساجد",
+      "occurrence_count": 54
+    },
+    {
+      "collection": "nasai",
+      "chapter_file": "9.json",
+      "chapter_title": "كتاب القبلة",
+      "occurrence_count": 35
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "1.json",
+      "chapter_title": "كتاب الطهارة عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 148
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "10.json",
+      "chapter_title": "كتاب الجنائز عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 115
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "11.json",
+      "chapter_title": "كتاب النكاح عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 67
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "12.json",
+      "chapter_title": "كتاب الرضاع",
+      "occurrence_count": 29
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "13.json",
+      "chapter_title": "كتاب الطلاق واللعان عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 31
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "14.json",
+      "chapter_title": "كتاب البيوع عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 125
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "15.json",
+      "chapter_title": "كتاب الأحكام عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 66
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "16.json",
+      "chapter_title": "كتاب الديات عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 39
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "17.json",
+      "chapter_title": "كتاب الحدود عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 47
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "18.json",
+      "chapter_title": "كتاب الصيد والذبائح عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 36
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "19.json",
+      "chapter_title": "كتاب الأضاحى عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 36
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "2.json",
+      "chapter_title": "كتاب الصلاة",
+      "occurrence_count": 304
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "20.json",
+      "chapter_title": "كتاب النذور والأيمان عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 26
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "21.json",
+      "chapter_title": "كتاب السير عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 83
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "22.json",
+      "chapter_title": "كتاب فضائل الجهاد عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 52
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "23.json",
+      "chapter_title": "كتاب الجهاد عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 53
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "24.json",
+      "chapter_title": "كتاب اللباس",
+      "occurrence_count": 76
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "25.json",
+      "chapter_title": "كتاب الأطعمة عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 78
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "26.json",
+      "chapter_title": "كتاب الأشربة عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 37
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "27.json",
+      "chapter_title": "كتاب البر والصلة عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 141
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "28.json",
+      "chapter_title": "كتاب الطب عن رسول اللَّهِ صلى الله عليه وسلم",
+      "occurrence_count": 53
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "29.json",
+      "chapter_title": "كتاب الفرائض عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 26
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "3.json",
+      "chapter_title": "أَبْوَابُ الْوِتْرِ",
+      "occurrence_count": 35
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "30.json",
+      "chapter_title": "كتاب الوصايا عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 9
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "31.json",
+      "chapter_title": "كتاب الولاء والهبة عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 9
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "32.json",
+      "chapter_title": "كتاب القدر عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 25
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "33.json",
+      "chapter_title": "كتاب الفتن عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 112
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "34.json",
+      "chapter_title": "كتاب الرؤيا عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 25
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "35.json",
+      "chapter_title": "كتاب الشهادات عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 10
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "36.json",
+      "chapter_title": "كتاب الزهد عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 112
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "37.json",
+      "chapter_title": "كتاب صفة القيامة والرقائق والورع عن رسول الله صلى الله",
+      "occurrence_count": 108
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "38.json",
+      "chapter_title": "كتاب صفة الجنة عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 50
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "39.json",
+      "chapter_title": "كتاب صفة جهنم عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 33
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "4.json",
+      "chapter_title": "كِتَاب الْجُمُعَةِ عَنْ رَسُولِ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ",
+      "occurrence_count": 42
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "40.json",
+      "chapter_title": "كتاب الإيمان عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 39
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "41.json",
+      "chapter_title": "كتاب العلم عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 43
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "42.json",
+      "chapter_title": "كتاب الاستئذان والآداب عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 48
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "43.json",
+      "chapter_title": "كتاب الأدب عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 135
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "44.json",
+      "chapter_title": "كتاب الأمثال عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 17
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "45.json",
+      "chapter_title": "كتاب ثواب القرآن عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 52
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "46.json",
+      "chapter_title": "كتاب القراءات عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 23
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "47.json",
+      "chapter_title": "كتاب تفسير القرآن عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 421
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "48.json",
+      "chapter_title": "كتاب الدعوات عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 244
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "49.json",
+      "chapter_title": "كتاب المناقب عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 356
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "5.json",
+      "chapter_title": "أَبْوَابُ الْعِيدَيْنِ عَنْ رَسُولِ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ",
+      "occurrence_count": 14
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "6.json",
+      "chapter_title": "أَبْوَابُ السَّفَرِ",
+      "occurrence_count": 73
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "7.json",
+      "chapter_title": "كتاب الزكاة عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 65
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "8.json",
+      "chapter_title": "كتاب الصوم عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 127
+    },
+    {
+      "collection": "tirmidhi",
+      "chapter_file": "9.json",
+      "chapter_title": "كتاب الحج عن رسول الله صلى الله عليه وسلم",
+      "occurrence_count": 158
+    }
+  ]
+}

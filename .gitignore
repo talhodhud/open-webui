@@ -316,3 +316,9 @@ cypress/screenshots
 *.sqlite3
 *.db
 
+# Local runtime backups contain private application state; never publish them.
+.bayan-runtime-backups/
+# Ship the verified Bayan theme bundle, even though upstream build output is ignored.
+!hadith/theme/dist/
+!hadith/theme/dist/hadith-theme.js
+

@@ -1,0 +1,83 @@
+{
+  "version": "1",
+  "assets": [
+    {
+      "filename": "bayan-pass-faith-01.md",
+      "sha256": "c731e89c35a43d64d2a5d38c6a423c53a97a1c9ff48b0b06eb52134c37d280e7",
+      "occurrence_id": "itqan:bukhari:1:1:bf026de7e155",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-faith-02.md",
+      "sha256": "c9f05be6c233d48cfb404cd13b0b5cb57ac0cc881782071aed0816d65b27e6f5",
+      "occurrence_id": "itqan:bukhari:2:2:43ab185c8834",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-mercy-01.md",
+      "sha256": "86579b620dc838d52fdf934ddeb5d4020613b75879251069881cc943261181be",
+      "occurrence_id": "itqan:tirmidhi:27:30:b5e57ce2441d",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-mercy-02.md",
+      "sha256": "0b5b32fc14df213d427caaf73143ef235d0c150cabe64093d8ea9221471ba317",
+      "occurrence_id": "itqan:bukhari:78:55:022c1dbdd753",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-mercy-03.md",
+      "sha256": "99d56765762806f855558cacd6478be8b220d264d6a393d4edf0ffb831d91ee4",
+      "occurrence_id": "itqan:bukhari:97:6:c70c14ec93c8",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-worship-01.md",
+      "sha256": "1a988db261f8be5b7cc10bf608e814713b3292740e411cd57b313c6a69ea6102",
+      "occurrence_id": "itqan:bukhari:9:7:b8de6739f520",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-worship-02.md",
+      "sha256": "1a500d988dcb1ffe7199ff93961ddb988e3755c13c949b3fb5aeeb88d5361f6d",
+      "occurrence_id": "itqan:bukhari:2:31:7d396864714a",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-family-01.md",
+      "sha256": "0c69ff4663eb51054b552ae938d5b92401dda5b71ab3c9701b88108508ab185e",
+      "occurrence_id": "itqan:bukhari:78:46:c2cf81c922d3",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-family-02.md",
+      "sha256": "424be7810c216155e5ad081f73886ed63b4147946700a76d103247225dfeabae",
+      "occurrence_id": "itqan:bukhari:34:20:6be328f32eca",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-fairness-01.md",
+      "sha256": "451529aa63591565eede12efb160b98ccc035b4e1b1d3afc95fcd3acd4b860c5",
+      "occurrence_id": "itqan:muslim:1:189:0ae114813da4",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-fairness-02.md",
+      "sha256": "0d0e11f52e8ff6343b6cd77e66bf66948833236841099767511ac797d572435c",
+      "occurrence_id": "itqan:bukhari:46:8:ea82d87c12e2",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-knowledge-01.md",
+      "sha256": "d12fd150fee4345204a6293f43d2dc2e8ec57c370d82d3d0ed603c4eaa4fa013",
+      "occurrence_id": "itqan:muslim:48:48:914dcfac86be",
+      "review_status": "needs_review"
+    },
+    {
+      "filename": "bayan-pass-knowledge-02.md",
+      "sha256": "a971af8800a8757b27cb620883300f71bd05dcde00c8d89d69934156b2121cbb",
+      "occurrence_id": "itqan:bukhari:3:11:7bca050e20fb",
+      "review_status": "needs_review"
+    }
+  ]
+}

@@ -45,5 +45,7 @@
 .editorconfig text eol=lf
 
 # Misc
+hadith/**/*.py text eol=lf
+hadith/**/*.ps1 text eol=lf
 *.env text eol=lf
 *.lock text eol=lf

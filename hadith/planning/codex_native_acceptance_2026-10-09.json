@@ -1,0 +1,1916 @@
+{
+  "checked_at": "2026-10-09T14:14:03.313195+00:00",
+  "scope": "local_native_openwebui_browser_and_recorded_tool_calls",
+  "cases": {
+    "native_search": {
+      "chat_id": "1805525b-e8b3-4088-aedb-eb63bb3df16a",
+      "message_id": "cdff1e61-dbe8-4c1b-82fa-fbb585608fc0",
+      "model": "bayan-unified-pilot",
+      "completed": true,
+      "tool_calls": {
+        "search_hadith_corpus": 1,
+        "get_hadith_by_number": 12
+      },
+      "tool_result_statuses": [
+        {
+          "tool": "search_hadith_corpus",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        }
+      ],
+      "assistant_sha256": "594db9888faf8b1de010a996f41cb88ae75e00e265521bfdd39a743838714be6"
+    },
+    "native_branched_family_graph": {
+      "chat_id": "3746ec7d-702f-44e3-9312-60513811c82f",
+      "message_id": "13ba1464-cd32-4774-b725-df995ebbd51c",
+      "model": "bayan-unified-pilot",
+      "completed": true,
+      "tool_calls": {
+        "get_hadith_by_number": 1,
+        "get_hadith_isnad_tree": 1
+      },
+      "tool_result_statuses": [
+        {
+          "tool": "get_hadith_by_number",
+          "status": "ok"
+        },
+        {
+          "tool": "get_hadith_isnad_tree",
+          "status": "ok"
+        }
+      ],
+      "assistant_sha256": "eecb5c571c4dbaf573188beb9b89663341c4a0030822e633f5f9f8bcef0b86f8",
+      "graph": {
+        "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+        "paths_count": 3,
+        "paths": [
+          {
+            "path_id": "path_1",
+            "description": "طريق محمد بن عباد عن سعيد بن ابي برده",
+            "endpoint_type": "marfu",
+            "has_prophetic_endpoint": true,
+            "nodes_count": 8,
+            "edges_count": 7,
+            "nodes": [
+              {
+                "id": "P",
+                "name": "رسول الله ﷺ",
+                "canonical_name": "رسول الله ﷺ",
+                "grade": "نبي معصوم",
+                "status": "prophet",
+                "source_span": [
+                  309,
+                  324
+                ],
+                "identity_status": "resolved",
+                "kind": "prophet",
+                "metadata_only": false,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "NS_1",
+                "mention_id": "m_stem_2_1",
+                "raw_text": "جده",
+                "name": "جده",
+                "canonical_name": "أبو موسى الأشعري",
+                "narrator_id": null,
+                "grade": "صحابي جليل",
+                "status": "sahabi",
+                "identity_status": "resolved",
+                "evidence_source": "isnad_relative_map_lookup",
+                "resolution_rule": "مسجل في قاعدة العلاقات الإسنادية كجد لـ (أبو بردة)",
+                "candidates": null,
+                "source_span": [
+                  300,
+                  307
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "NS_2",
+                "mention_id": "m_stem_1_1",
+                "raw_text": "ابيه",
+                "name": "ابيه",
+                "canonical_name": "أبو بردة",
+                "narrator_id": 17671,
+                "grade": "استنباط من الأسانيد (15 إسناد)",
+                "status": "unknown",
+                "identity_status": "candidate",
+                "evidence_source": null,
+                "resolution_rule": "لم يتم العثور على قرينة حاسمة في قاعدة البيانات",
+                "candidates": null,
+                "source_span": [
+                  286,
+                  293
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "N_MADAR",
+                "mention_id": "m_stem_0_1",
+                "raw_text": "سعيد بن ابي برده",
+                "name": "سعيد بن ابي برده",
+                "canonical_name": "سعيد بن أبي بردة",
+                "narrator_id": 422,
+                "grade": "ثقة ثبت",
+                "status": "reliable",
+                "identity_status": "resolved",
+                "evidence_source": "hadith_rijal_db_exact_match",
+                "resolution_rule": null,
+                "candidates": null,
+                "source_span": [
+                  252,
+                  280
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "N1_1_1",
+                "mention_id": "m_b1_2_1",
+                "raw_text": "عمرو",
+                "name": "عمرو",
+                "canonical_name": "عمرو",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 4,
+                    "name": "عمرو بن دينار",
+                    "grade": "ثقة ثبت"
+                  },
+                  {
+                    "id": 11,
+                    "name": "عمرو بن محمد بن منصور",
+                    "grade": "صدوق حسن الحديث"
+                  },
+                  {
+                    "id": 51,
+                    "name": "عمرو بن عبد الله بن عبيد ،  ويقال",
+                    "grade": "ذكره ابن حبان في الثقات"
+                  },
+                  {
+                    "id": 73,
+                    "name": "عمرو بن أبي سلمة",
+                    "grade": "صدوق"
+                  },
+                  {
+                    "id": 93,
+                    "name": "عمرو بن شعيب بن محمد بن عبد الله بن عمرو بن العاص",
+                    "grade": "صدوق"
+                  }
+                ],
+                "source_span": [
+                  65,
+                  72
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "عن",
+                "_term_span": [
+                  60,
+                  64
+                ]
+              },
+              {
+                "id": "N1_2_1",
+                "mention_id": "m_b1_1_1",
+                "raw_text": "سفيان",
+                "name": "سفيان",
+                "canonical_name": "سفيان",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 192,
+                    "name": "سفيان بن عيينة بن أبي عمران",
+                    "grade": "ثقة حافظ"
+                  },
+                  {
+                    "id": 328,
+                    "name": "سفيان بن وكيع بن الجراح",
+                    "grade": "صدوق"
+                  },
+                  {
+                    "id": 402,
+                    "name": "سفيان بن أبي العوجاء",
+                    "grade": "ضعيف"
+                  },
+                  {
+                    "id": 434,
+                    "name": "سفيان بن سعيد بن مسروق",
+                    "grade": "ثقة حافظ"
+                  },
+                  {
+                    "id": 593,
+                    "name": "سفيان بن حسين بن الحسن",
+                    "grade": "ثقة"
+                  }
+                ],
+                "source_span": [
+                  49,
+                  58
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "حدثنا",
+                "_term_span": [
+                  38,
+                  48
+                ]
+              },
+              {
+                "id": "N1_3_1",
+                "mention_id": "m_b1_0_1",
+                "raw_text": "محمد بن عباد",
+                "name": "محمد بن عباد",
+                "canonical_name": "محمد بن عباد",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 8848,
+                    "name": "محمد بن عباد",
+                    "grade": "صدوق"
+                  },
+                  {
+                    "id": 52538,
+                    "name": "محمد بن عباد",
+                    "grade": "شيخ"
+                  }
+                ],
+                "source_span": [
+                  13,
+                  36
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "وحدثنا",
+                "_term_span": [
+                  0,
+                  12
+                ]
+              },
+              {
+                "id": "COMP",
+                "name": "صحيح مسلم",
+                "canonical_name": "صحيح مسلم",
+                "grade": "المصنف الإمام",
+                "status": "compiler",
+                "source_span": null,
+                "identity_status": "resolved",
+                "kind": "collection",
+                "metadata_only": true,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              }
+            ],
+            "edges": [
+              {
+                "edge_id": "e_P_NS_1",
+                "source": "P",
+                "target": "NS_1",
+                "transmission_term": "عن",
+                "source_span": [
+                  295,
+                  299
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_NS_1_NS_2",
+                "source": "NS_1",
+                "target": "NS_2",
+                "transmission_term": "عن",
+                "source_span": [
+                  281,
+                  285
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_NS_2_N_MADAR",
+                "source": "NS_2",
+                "target": "N_MADAR",
+                "transmission_term": "عن",
+                "source_span": [
+                  252,
+                  252
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_N_MADAR_N1_1_1",
+                "source": "N_MADAR",
+                "target": "N1_1_1",
+                "transmission_term": "كلاهما عن",
+                "source_span": [
+                  60,
+                  64
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b1"
+              },
+              {
+                "edge_id": "e_N1_1_1_N1_2_1",
+                "source": "N1_1_1",
+                "target": "N1_2_1",
+                "transmission_term": "عن",
+                "source_span": [
+                  60,
+                  64
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b1"
+              },
+              {
+                "edge_id": "e_N1_2_1_N1_3_1",
+                "source": "N1_2_1",
+                "target": "N1_3_1",
+                "transmission_term": "حدثنا",
+                "source_span": [
+                  38,
+                  48
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b1"
+              },
+              {
+                "edge_id": "e_N1_3_1_COMP",
+                "source": "N1_3_1",
+                "target": "COMP",
+                "transmission_term": "أخرجه في مصنفه",
+                "source_span": null,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b1"
+              }
+            ]
+          },
+          {
+            "path_id": "path_2",
+            "description": "طريق اسحاق بن ابراهيم عن سعيد بن ابي برده",
+            "endpoint_type": "marfu",
+            "has_prophetic_endpoint": true,
+            "nodes_count": 9,
+            "edges_count": 8,
+            "nodes": [
+              {
+                "id": "P",
+                "name": "رسول الله ﷺ",
+                "canonical_name": "رسول الله ﷺ",
+                "grade": "نبي معصوم",
+                "status": "prophet",
+                "source_span": [
+                  309,
+                  324
+                ],
+                "identity_status": "resolved",
+                "kind": "prophet",
+                "metadata_only": false,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "NS_1",
+                "mention_id": "m_stem_2_1",
+                "raw_text": "جده",
+                "name": "جده",
+                "canonical_name": "أبو موسى الأشعري",
+                "narrator_id": null,
+                "grade": "صحابي جليل",
+                "status": "sahabi",
+                "identity_status": "resolved",
+                "evidence_source": "isnad_relative_map_lookup",
+                "resolution_rule": "مسجل في قاعدة العلاقات الإسنادية كجد لـ (أبو بردة)",
+                "candidates": null,
+                "source_span": [
+                  300,
+                  307
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "NS_2",
+                "mention_id": "m_stem_1_1",
+                "raw_text": "ابيه",
+                "name": "ابيه",
+                "canonical_name": "أبو بردة",
+                "narrator_id": 17671,
+                "grade": "استنباط من الأسانيد (15 إسناد)",
+                "status": "unknown",
+                "identity_status": "candidate",
+                "evidence_source": null,
+                "resolution_rule": "لم يتم العثور على قرينة حاسمة في قاعدة البيانات",
+                "candidates": null,
+                "source_span": [
+                  286,
+                  293
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "N_MADAR",
+                "mention_id": "m_stem_0_1",
+                "raw_text": "سعيد بن ابي برده",
+                "name": "سعيد بن ابي برده",
+                "canonical_name": "سعيد بن أبي بردة",
+                "narrator_id": 422,
+                "grade": "ثقة ثبت",
+                "status": "reliable",
+                "identity_status": "resolved",
+                "evidence_source": "hadith_rijal_db_exact_match",
+                "resolution_rule": null,
+                "candidates": null,
+                "source_span": [
+                  252,
+                  280
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "N2_1_1",
+                "mention_id": "m_b2_3_1",
+                "raw_text": "زيد بن ابي انيسه",
+                "name": "زيد بن ابي انيسه",
+                "canonical_name": "زيد بن ابي انيسه",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 421,
+                    "name": "زيد بن أبي أنيسة",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 50923,
+                    "name": "زيد بن أبي أنيسة",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 75486,
+                    "name": "زيد بن أبي أنيسة",
+                    "grade": "ثقة"
+                  }
+                ],
+                "source_span": [
+                  206,
+                  234
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "عن",
+                "_term_span": [
+                  201,
+                  205
+                ]
+              },
+              {
+                "id": "N2_2_1",
+                "mention_id": "m_b2_2_1",
+                "raw_text": "عبيد الله",
+                "name": "عبيد الله",
+                "canonical_name": "عبيد الله",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 6,
+                    "name": "عبيد الله بن العيزار",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 166,
+                    "name": "عبيد الله بن محمد بن شنبة",
+                    "grade": ""
+                  },
+                  {
+                    "id": 334,
+                    "name": "عبيد الله بن معاذ بن معاذ بن نصر بن حسان بن الحر بن مالك بن الخشخاش",
+                    "grade": "ثقة حافظ"
+                  },
+                  {
+                    "id": 408,
+                    "name": "عبيد الله بن محمد بن محمد بن حمدان ابن بطة",
+                    "grade": ""
+                  },
+                  {
+                    "id": 431,
+                    "name": "عبيد الله بن موسى بن أبي المختار",
+                    "grade": "ثقة"
+                  }
+                ],
+                "source_span": [
+                  183,
+                  199
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "اخبرنا",
+                "_term_span": [
+                  171,
+                  182
+                ]
+              },
+              {
+                "id": "N2_3_1",
+                "mention_id": "m_b2_1_1",
+                "raw_text": "زكرياء بن عدي",
+                "name": "زكرياء بن عدي",
+                "canonical_name": "زكرياء بن عدي",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 2118,
+                    "name": "زكريا بن عدي بن رزيق بن إسماعيل ، ويقال",
+                    "grade": "ضعيف"
+                  },
+                  {
+                    "id": 39907,
+                    "name": "يوسف بن عدى اخو زكريا بن عدى",
+                    "grade": "مجهول"
+                  },
+                  {
+                    "id": 40957,
+                    "name": "يوسف بن عدى أخو زكريا بن عدى",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 45939,
+                    "name": "زكريا بن عدى أبو يحيى الكوفي الرقى سكن مصر",
+                    "grade": "ذكره ابن حبان في الثقات"
+                  },
+                  {
+                    "id": 68180,
+                    "name": "زكريا بن عدي الحبطي",
+                    "grade": ""
+                  }
+                ],
+                "source_span": [
+                  144,
+                  169
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "عن",
+                "_term_span": [
+                  139,
+                  143
+                ]
+              },
+              {
+                "id": "N2_4_A",
+                "mention_id": "m_b2_0_1",
+                "raw_text": "اسحاق بن ابراهيم",
+                "name": "اسحاق بن ابراهيم",
+                "canonical_name": "اسحاق بن ابراهيم",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 6796,
+                    "name": "إسحاق بن إبراهيم",
+                    "grade": "استنباط من الأسانيد (659 إسناد)"
+                  },
+                  {
+                    "id": 6918,
+                    "name": "إسحاق بن إبراهيم",
+                    "grade": "ضعيف"
+                  },
+                  {
+                    "id": 7684,
+                    "name": "إسحاق بن إبراهيم",
+                    "grade": "فيه ضعف"
+                  },
+                  {
+                    "id": 9124,
+                    "name": "إسحاق بن إبراهيم",
+                    "grade": "ذكره ابن حبان في الثقات"
+                  },
+                  {
+                    "id": 9198,
+                    "name": "إسحاق بن إبراهيم",
+                    "grade": "ثقه"
+                  }
+                ],
+                "source_span": [
+                  89,
+                  116
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "وحدثنا",
+                "_term_span": [
+                  76,
+                  88
+                ]
+              },
+              {
+                "id": "COMP",
+                "name": "صحيح مسلم",
+                "canonical_name": "صحيح مسلم",
+                "grade": "المصنف الإمام",
+                "status": "compiler",
+                "source_span": null,
+                "identity_status": "resolved",
+                "kind": "collection",
+                "metadata_only": true,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              }
+            ],
+            "edges": [
+              {
+                "edge_id": "e_P_NS_1",
+                "source": "P",
+                "target": "NS_1",
+                "transmission_term": "عن",
+                "source_span": [
+                  295,
+                  299
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_NS_1_NS_2",
+                "source": "NS_1",
+                "target": "NS_2",
+                "transmission_term": "عن",
+                "source_span": [
+                  281,
+                  285
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_NS_2_N_MADAR",
+                "source": "NS_2",
+                "target": "N_MADAR",
+                "transmission_term": "عن",
+                "source_span": [
+                  252,
+                  252
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_N_MADAR_N2_1_1",
+                "source": "N_MADAR",
+                "target": "N2_1_1",
+                "transmission_term": "كلاهما عن",
+                "source_span": [
+                  201,
+                  205
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_1_1_N2_2_1",
+                "source": "N2_1_1",
+                "target": "N2_2_1",
+                "transmission_term": "عن",
+                "source_span": [
+                  201,
+                  205
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_2_1_N2_3_1",
+                "source": "N2_2_1",
+                "target": "N2_3_1",
+                "transmission_term": "اخبرنا",
+                "source_span": [
+                  171,
+                  182
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_3_1_N2_4_A",
+                "source": "N2_3_1",
+                "target": "N2_4_A",
+                "transmission_term": "عن",
+                "source_span": [
+                  139,
+                  143
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_4_A_COMP",
+                "source": "N2_4_A",
+                "target": "COMP",
+                "transmission_term": "أخرجه في مصنفه",
+                "source_span": null,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              }
+            ]
+          },
+          {
+            "path_id": "path_3",
+            "description": "طريق ابن ابي خلف عن سعيد بن ابي برده",
+            "endpoint_type": "marfu",
+            "has_prophetic_endpoint": true,
+            "nodes_count": 9,
+            "edges_count": 8,
+            "nodes": [
+              {
+                "id": "P",
+                "name": "رسول الله ﷺ",
+                "canonical_name": "رسول الله ﷺ",
+                "grade": "نبي معصوم",
+                "status": "prophet",
+                "source_span": [
+                  309,
+                  324
+                ],
+                "identity_status": "resolved",
+                "kind": "prophet",
+                "metadata_only": false,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "NS_1",
+                "mention_id": "m_stem_2_1",
+                "raw_text": "جده",
+                "name": "جده",
+                "canonical_name": "أبو موسى الأشعري",
+                "narrator_id": null,
+                "grade": "صحابي جليل",
+                "status": "sahabi",
+                "identity_status": "resolved",
+                "evidence_source": "isnad_relative_map_lookup",
+                "resolution_rule": "مسجل في قاعدة العلاقات الإسنادية كجد لـ (أبو بردة)",
+                "candidates": null,
+                "source_span": [
+                  300,
+                  307
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "NS_2",
+                "mention_id": "m_stem_1_1",
+                "raw_text": "ابيه",
+                "name": "ابيه",
+                "canonical_name": "أبو بردة",
+                "narrator_id": 17671,
+                "grade": "استنباط من الأسانيد (15 إسناد)",
+                "status": "unknown",
+                "identity_status": "candidate",
+                "evidence_source": null,
+                "resolution_rule": "لم يتم العثور على قرينة حاسمة في قاعدة البيانات",
+                "candidates": null,
+                "source_span": [
+                  286,
+                  293
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "N_MADAR",
+                "mention_id": "m_stem_0_1",
+                "raw_text": "سعيد بن ابي برده",
+                "name": "سعيد بن ابي برده",
+                "canonical_name": "سعيد بن أبي بردة",
+                "narrator_id": 422,
+                "grade": "ثقة ثبت",
+                "status": "reliable",
+                "identity_status": "resolved",
+                "evidence_source": "hadith_rijal_db_exact_match",
+                "resolution_rule": null,
+                "candidates": null,
+                "source_span": [
+                  252,
+                  280
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "id": "N2_1_1",
+                "mention_id": "m_b2_3_1",
+                "raw_text": "زيد بن ابي انيسه",
+                "name": "زيد بن ابي انيسه",
+                "canonical_name": "زيد بن ابي انيسه",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 421,
+                    "name": "زيد بن أبي أنيسة",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 50923,
+                    "name": "زيد بن أبي أنيسة",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 75486,
+                    "name": "زيد بن أبي أنيسة",
+                    "grade": "ثقة"
+                  }
+                ],
+                "source_span": [
+                  206,
+                  234
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "عن",
+                "_term_span": [
+                  201,
+                  205
+                ]
+              },
+              {
+                "id": "N2_2_1",
+                "mention_id": "m_b2_2_1",
+                "raw_text": "عبيد الله",
+                "name": "عبيد الله",
+                "canonical_name": "عبيد الله",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 6,
+                    "name": "عبيد الله بن العيزار",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 166,
+                    "name": "عبيد الله بن محمد بن شنبة",
+                    "grade": ""
+                  },
+                  {
+                    "id": 334,
+                    "name": "عبيد الله بن معاذ بن معاذ بن نصر بن حسان بن الحر بن مالك بن الخشخاش",
+                    "grade": "ثقة حافظ"
+                  },
+                  {
+                    "id": 408,
+                    "name": "عبيد الله بن محمد بن محمد بن حمدان ابن بطة",
+                    "grade": ""
+                  },
+                  {
+                    "id": 431,
+                    "name": "عبيد الله بن موسى بن أبي المختار",
+                    "grade": "ثقة"
+                  }
+                ],
+                "source_span": [
+                  183,
+                  199
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "اخبرنا",
+                "_term_span": [
+                  171,
+                  182
+                ]
+              },
+              {
+                "id": "N2_3_1",
+                "mention_id": "m_b2_1_1",
+                "raw_text": "زكرياء بن عدي",
+                "name": "زكرياء بن عدي",
+                "canonical_name": "زكرياء بن عدي",
+                "narrator_id": null,
+                "grade": "متعدد المرشحين يحتاج تمييزاً",
+                "status": "ambiguous",
+                "identity_status": "candidate",
+                "evidence_source": "hadith_rijal_db_multiple_candidates",
+                "resolution_rule": null,
+                "candidates": [
+                  {
+                    "id": 2118,
+                    "name": "زكريا بن عدي بن رزيق بن إسماعيل ، ويقال",
+                    "grade": "ضعيف"
+                  },
+                  {
+                    "id": 39907,
+                    "name": "يوسف بن عدى اخو زكريا بن عدى",
+                    "grade": "مجهول"
+                  },
+                  {
+                    "id": 40957,
+                    "name": "يوسف بن عدى أخو زكريا بن عدى",
+                    "grade": "ثقة"
+                  },
+                  {
+                    "id": 45939,
+                    "name": "زكريا بن عدى أبو يحيى الكوفي الرقى سكن مصر",
+                    "grade": "ذكره ابن حبان في الثقات"
+                  },
+                  {
+                    "id": 68180,
+                    "name": "زكريا بن عدي الحبطي",
+                    "grade": ""
+                  }
+                ],
+                "source_span": [
+                  144,
+                  169
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "عن",
+                "_term_span": [
+                  139,
+                  143
+                ]
+              },
+              {
+                "id": "N2_4_B",
+                "mention_id": "m_b2_0_2",
+                "raw_text": "ابن ابي خلف",
+                "name": "ابن ابي خلف",
+                "canonical_name": "ابن ابي خلف",
+                "narrator_id": null,
+                "grade": "غير محدد في المصدر",
+                "status": "unknown",
+                "identity_status": "unresolved",
+                "evidence_source": null,
+                "resolution_rule": null,
+                "candidates": null,
+                "source_span": [
+                  120,
+                  138
+                ],
+                "kind": "mention",
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "_term": "وحدثنا",
+                "_term_span": [
+                  76,
+                  88
+                ]
+              },
+              {
+                "id": "COMP",
+                "name": "صحيح مسلم",
+                "canonical_name": "صحيح مسلم",
+                "grade": "المصنف الإمام",
+                "status": "compiler",
+                "source_span": null,
+                "identity_status": "resolved",
+                "kind": "collection",
+                "metadata_only": true,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              }
+            ],
+            "edges": [
+              {
+                "edge_id": "e_P_NS_1",
+                "source": "P",
+                "target": "NS_1",
+                "transmission_term": "عن",
+                "source_span": [
+                  295,
+                  299
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_NS_1_NS_2",
+                "source": "NS_1",
+                "target": "NS_2",
+                "transmission_term": "عن",
+                "source_span": [
+                  281,
+                  285
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_NS_2_N_MADAR",
+                "source": "NS_2",
+                "target": "N_MADAR",
+                "transmission_term": "عن",
+                "source_span": [
+                  252,
+                  252
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+              },
+              {
+                "edge_id": "e_N_MADAR_N2_1_1",
+                "source": "N_MADAR",
+                "target": "N2_1_1",
+                "transmission_term": "كلاهما عن",
+                "source_span": [
+                  201,
+                  205
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_1_1_N2_2_1",
+                "source": "N2_1_1",
+                "target": "N2_2_1",
+                "transmission_term": "عن",
+                "source_span": [
+                  201,
+                  205
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_2_1_N2_3_1",
+                "source": "N2_2_1",
+                "target": "N2_3_1",
+                "transmission_term": "اخبرنا",
+                "source_span": [
+                  171,
+                  182
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_3_1_N2_4_B",
+                "source": "N2_3_1",
+                "target": "N2_4_B",
+                "transmission_term": "عن",
+                "source_span": [
+                  139,
+                  143
+                ],
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              },
+              {
+                "edge_id": "e_N2_4_B_COMP",
+                "source": "N2_4_B",
+                "target": "COMP",
+                "transmission_term": "أخرجه في مصنفه",
+                "source_span": null,
+                "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+                "branch_id": "b2"
+              }
+            ]
+          }
+        ],
+        "nodes": [
+          {
+            "id": "COMP",
+            "name": "صحيح مسلم",
+            "canonical_name": "صحيح مسلم",
+            "grade": "المصنف الإمام",
+            "status": "compiler",
+            "source_span": null,
+            "identity_status": "resolved",
+            "kind": "collection",
+            "metadata_only": true,
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "id": "P",
+            "name": "رسول الله ﷺ",
+            "canonical_name": "رسول الله ﷺ",
+            "grade": "نبي معصوم",
+            "status": "prophet",
+            "source_span": [
+              309,
+              324
+            ],
+            "identity_status": "resolved",
+            "kind": "prophet",
+            "metadata_only": false,
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "id": "NS_1",
+            "mention_id": "m_stem_2_1",
+            "raw_text": "جده",
+            "name": "جده",
+            "canonical_name": "أبو موسى الأشعري",
+            "narrator_id": null,
+            "grade": "صحابي جليل",
+            "status": "sahabi",
+            "identity_status": "resolved",
+            "evidence_source": "isnad_relative_map_lookup",
+            "resolution_rule": "مسجل في قاعدة العلاقات الإسنادية كجد لـ (أبو بردة)",
+            "candidates": null,
+            "source_span": [
+              300,
+              307
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "id": "NS_2",
+            "mention_id": "m_stem_1_1",
+            "raw_text": "ابيه",
+            "name": "ابيه",
+            "canonical_name": "أبو بردة",
+            "narrator_id": 17671,
+            "grade": "استنباط من الأسانيد (15 إسناد)",
+            "status": "unknown",
+            "identity_status": "candidate",
+            "evidence_source": null,
+            "resolution_rule": "لم يتم العثور على قرينة حاسمة في قاعدة البيانات",
+            "candidates": null,
+            "source_span": [
+              286,
+              293
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "id": "N_MADAR",
+            "mention_id": "m_stem_0_1",
+            "raw_text": "سعيد بن ابي برده",
+            "name": "سعيد بن ابي برده",
+            "canonical_name": "سعيد بن أبي بردة",
+            "narrator_id": 422,
+            "grade": "ثقة ثبت",
+            "status": "reliable",
+            "identity_status": "resolved",
+            "evidence_source": "hadith_rijal_db_exact_match",
+            "resolution_rule": null,
+            "candidates": null,
+            "source_span": [
+              252,
+              280
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "id": "N1_1_1",
+            "mention_id": "m_b1_2_1",
+            "raw_text": "عمرو",
+            "name": "عمرو",
+            "canonical_name": "عمرو",
+            "narrator_id": null,
+            "grade": "متعدد المرشحين يحتاج تمييزاً",
+            "status": "ambiguous",
+            "identity_status": "candidate",
+            "evidence_source": "hadith_rijal_db_multiple_candidates",
+            "resolution_rule": null,
+            "candidates": [
+              {
+                "id": 4,
+                "name": "عمرو بن دينار",
+                "grade": "ثقة ثبت"
+              },
+              {
+                "id": 11,
+                "name": "عمرو بن محمد بن منصور",
+                "grade": "صدوق حسن الحديث"
+              },
+              {
+                "id": 51,
+                "name": "عمرو بن عبد الله بن عبيد ،  ويقال",
+                "grade": "ذكره ابن حبان في الثقات"
+              },
+              {
+                "id": 73,
+                "name": "عمرو بن أبي سلمة",
+                "grade": "صدوق"
+              },
+              {
+                "id": 93,
+                "name": "عمرو بن شعيب بن محمد بن عبد الله بن عمرو بن العاص",
+                "grade": "صدوق"
+              }
+            ],
+            "source_span": [
+              65,
+              72
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "عن",
+            "_term_span": [
+              60,
+              64
+            ]
+          },
+          {
+            "id": "N1_2_1",
+            "mention_id": "m_b1_1_1",
+            "raw_text": "سفيان",
+            "name": "سفيان",
+            "canonical_name": "سفيان",
+            "narrator_id": null,
+            "grade": "متعدد المرشحين يحتاج تمييزاً",
+            "status": "ambiguous",
+            "identity_status": "candidate",
+            "evidence_source": "hadith_rijal_db_multiple_candidates",
+            "resolution_rule": null,
+            "candidates": [
+              {
+                "id": 192,
+                "name": "سفيان بن عيينة بن أبي عمران",
+                "grade": "ثقة حافظ"
+              },
+              {
+                "id": 328,
+                "name": "سفيان بن وكيع بن الجراح",
+                "grade": "صدوق"
+              },
+              {
+                "id": 402,
+                "name": "سفيان بن أبي العوجاء",
+                "grade": "ضعيف"
+              },
+              {
+                "id": 434,
+                "name": "سفيان بن سعيد بن مسروق",
+                "grade": "ثقة حافظ"
+              },
+              {
+                "id": 593,
+                "name": "سفيان بن حسين بن الحسن",
+                "grade": "ثقة"
+              }
+            ],
+            "source_span": [
+              49,
+              58
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "حدثنا",
+            "_term_span": [
+              38,
+              48
+            ]
+          },
+          {
+            "id": "N1_3_1",
+            "mention_id": "m_b1_0_1",
+            "raw_text": "محمد بن عباد",
+            "name": "محمد بن عباد",
+            "canonical_name": "محمد بن عباد",
+            "narrator_id": null,
+            "grade": "متعدد المرشحين يحتاج تمييزاً",
+            "status": "ambiguous",
+            "identity_status": "candidate",
+            "evidence_source": "hadith_rijal_db_multiple_candidates",
+            "resolution_rule": null,
+            "candidates": [
+              {
+                "id": 8848,
+                "name": "محمد بن عباد",
+                "grade": "صدوق"
+              },
+              {
+                "id": 52538,
+                "name": "محمد بن عباد",
+                "grade": "شيخ"
+              }
+            ],
+            "source_span": [
+              13,
+              36
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "وحدثنا",
+            "_term_span": [
+              0,
+              12
+            ]
+          },
+          {
+            "id": "N2_1_1",
+            "mention_id": "m_b2_3_1",
+            "raw_text": "زيد بن ابي انيسه",
+            "name": "زيد بن ابي انيسه",
+            "canonical_name": "زيد بن ابي انيسه",
+            "narrator_id": null,
+            "grade": "متعدد المرشحين يحتاج تمييزاً",
+            "status": "ambiguous",
+            "identity_status": "candidate",
+            "evidence_source": "hadith_rijal_db_multiple_candidates",
+            "resolution_rule": null,
+            "candidates": [
+              {
+                "id": 421,
+                "name": "زيد بن أبي أنيسة",
+                "grade": "ثقة"
+              },
+              {
+                "id": 50923,
+                "name": "زيد بن أبي أنيسة",
+                "grade": "ثقة"
+              },
+              {
+                "id": 75486,
+                "name": "زيد بن أبي أنيسة",
+                "grade": "ثقة"
+              }
+            ],
+            "source_span": [
+              206,
+              234
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "عن",
+            "_term_span": [
+              201,
+              205
+            ]
+          },
+          {
+            "id": "N2_2_1",
+            "mention_id": "m_b2_2_1",
+            "raw_text": "عبيد الله",
+            "name": "عبيد الله",
+            "canonical_name": "عبيد الله",
+            "narrator_id": null,
+            "grade": "متعدد المرشحين يحتاج تمييزاً",
+            "status": "ambiguous",
+            "identity_status": "candidate",
+            "evidence_source": "hadith_rijal_db_multiple_candidates",
+            "resolution_rule": null,
+            "candidates": [
+              {
+                "id": 6,
+                "name": "عبيد الله بن العيزار",
+                "grade": "ثقة"
+              },
+              {
+                "id": 166,
+                "name": "عبيد الله بن محمد بن شنبة",
+                "grade": ""
+              },
+              {
+                "id": 334,
+                "name": "عبيد الله بن معاذ بن معاذ بن نصر بن حسان بن الحر بن مالك بن الخشخاش",
+                "grade": "ثقة حافظ"
+              },
+              {
+                "id": 408,
+                "name": "عبيد الله بن محمد بن محمد بن حمدان ابن بطة",
+                "grade": ""
+              },
+              {
+                "id": 431,
+                "name": "عبيد الله بن موسى بن أبي المختار",
+                "grade": "ثقة"
+              }
+            ],
+            "source_span": [
+              183,
+              199
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "اخبرنا",
+            "_term_span": [
+              171,
+              182
+            ]
+          },
+          {
+            "id": "N2_3_1",
+            "mention_id": "m_b2_1_1",
+            "raw_text": "زكرياء بن عدي",
+            "name": "زكرياء بن عدي",
+            "canonical_name": "زكرياء بن عدي",
+            "narrator_id": null,
+            "grade": "متعدد المرشحين يحتاج تمييزاً",
+            "status": "ambiguous",
+            "identity_status": "candidate",
+            "evidence_source": "hadith_rijal_db_multiple_candidates",
+            "resolution_rule": null,
+            "candidates": [
+              {
+                "id": 2118,
+                "name": "زكريا بن عدي بن رزيق بن إسماعيل ، ويقال",
+                "grade": "ضعيف"
+              },
+              {
+                "id": 39907,
+                "name": "يوسف بن عدى اخو زكريا بن عدى",
+                "grade": "مجهول"
+              },
+              {
+                "id": 40957,
+                "name": "يوسف بن عدى أخو زكريا بن عدى",
+                "grade": "ثقة"
+              },
+              {
+                "id": 45939,
+                "name": "زكريا بن عدى أبو يحيى الكوفي الرقى سكن مصر",
+                "grade": "ذكره ابن حبان في الثقات"
+              },
+              {
+                "id": 68180,
+                "name": "زكريا بن عدي الحبطي",
+                "grade": ""
+              }
+            ],
+            "source_span": [
+              144,
+              169
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "عن",
+            "_term_span": [
+              139,
+              143
+            ]
+          },
+          {
+            "id": "N2_4_A",
+            "mention_id": "m_b2_0_1",
+            "raw_text": "اسحاق بن ابراهيم",
+            "name": "اسحاق بن ابراهيم",
+            "canonical_name": "اسحاق بن ابراهيم",
+            "narrator_id": null,
+            "grade": "متعدد المرشحين يحتاج تمييزاً",
+            "status": "ambiguous",
+            "identity_status": "candidate",
+            "evidence_source": "hadith_rijal_db_multiple_candidates",
+            "resolution_rule": null,
+            "candidates": [
+              {
+                "id": 6796,
+                "name": "إسحاق بن إبراهيم",
+                "grade": "استنباط من الأسانيد (659 إسناد)"
+              },
+              {
+                "id": 6918,
+                "name": "إسحاق بن إبراهيم",
+                "grade": "ضعيف"
+              },
+              {
+                "id": 7684,
+                "name": "إسحاق بن إبراهيم",
+                "grade": "فيه ضعف"
+              },
+              {
+                "id": 9124,
+                "name": "إسحاق بن إبراهيم",
+                "grade": "ذكره ابن حبان في الثقات"
+              },
+              {
+                "id": 9198,
+                "name": "إسحاق بن إبراهيم",
+                "grade": "ثقه"
+              }
+            ],
+            "source_span": [
+              89,
+              116
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "وحدثنا",
+            "_term_span": [
+              76,
+              88
+            ]
+          },
+          {
+            "id": "N2_4_B",
+            "mention_id": "m_b2_0_2",
+            "raw_text": "ابن ابي خلف",
+            "name": "ابن ابي خلف",
+            "canonical_name": "ابن ابي خلف",
+            "narrator_id": null,
+            "grade": "غير محدد في المصدر",
+            "status": "unknown",
+            "identity_status": "unresolved",
+            "evidence_source": null,
+            "resolution_rule": null,
+            "candidates": null,
+            "source_span": [
+              120,
+              138
+            ],
+            "kind": "mention",
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "_term": "وحدثنا",
+            "_term_span": [
+              76,
+              88
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "edge_id": "e_P_NS_1",
+            "source": "P",
+            "target": "NS_1",
+            "transmission_term": "عن",
+            "source_span": [
+              295,
+              299
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "edge_id": "e_NS_1_NS_2",
+            "source": "NS_1",
+            "target": "NS_2",
+            "transmission_term": "عن",
+            "source_span": [
+              281,
+              285
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "edge_id": "e_NS_2_N_MADAR",
+            "source": "NS_2",
+            "target": "N_MADAR",
+            "transmission_term": "عن",
+            "source_span": [
+              252,
+              252
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27"
+          },
+          {
+            "edge_id": "e_N_MADAR_N1_1_1",
+            "source": "N_MADAR",
+            "target": "N1_1_1",
+            "transmission_term": "كلاهما عن",
+            "source_span": [
+              60,
+              64
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b1"
+          },
+          {
+            "edge_id": "e_N1_1_1_N1_2_1",
+            "source": "N1_1_1",
+            "target": "N1_2_1",
+            "transmission_term": "عن",
+            "source_span": [
+              60,
+              64
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b1"
+          },
+          {
+            "edge_id": "e_N1_2_1_N1_3_1",
+            "source": "N1_2_1",
+            "target": "N1_3_1",
+            "transmission_term": "حدثنا",
+            "source_span": [
+              38,
+              48
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b1"
+          },
+          {
+            "edge_id": "e_N1_3_1_COMP",
+            "source": "N1_3_1",
+            "target": "COMP",
+            "transmission_term": "أخرجه في مصنفه",
+            "source_span": null,
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b1"
+          },
+          {
+            "edge_id": "e_N_MADAR_N2_1_1",
+            "source": "N_MADAR",
+            "target": "N2_1_1",
+            "transmission_term": "كلاهما عن",
+            "source_span": [
+              201,
+              205
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b2"
+          },
+          {
+            "edge_id": "e_N2_1_1_N2_2_1",
+            "source": "N2_1_1",
+            "target": "N2_2_1",
+            "transmission_term": "عن",
+            "source_span": [
+              201,
+              205
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b2"
+          },
+          {
+            "edge_id": "e_N2_2_1_N2_3_1",
+            "source": "N2_2_1",
+            "target": "N2_3_1",
+            "transmission_term": "اخبرنا",
+            "source_span": [
+              171,
+              182
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b2"
+          },
+          {
+            "edge_id": "e_N2_3_1_N2_4_A",
+            "source": "N2_3_1",
+            "target": "N2_4_A",
+            "transmission_term": "عن",
+            "source_span": [
+              139,
+              143
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b2"
+          },
+          {
+            "edge_id": "e_N2_3_1_N2_4_B",
+            "source": "N2_3_1",
+            "target": "N2_4_B",
+            "transmission_term": "عن",
+            "source_span": [
+              139,
+              143
+            ],
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b2"
+          },
+          {
+            "edge_id": "e_N2_4_A_COMP",
+            "source": "N2_4_A",
+            "target": "COMP",
+            "transmission_term": "أخرجه في مصنفه",
+            "source_span": null,
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b2"
+          },
+          {
+            "edge_id": "e_N2_4_B_COMP",
+            "source": "N2_4_B",
+            "target": "COMP",
+            "transmission_term": "أخرجه في مصنفه",
+            "source_span": null,
+            "occurrence_id": "itqan:muslim:32:8:6900c9057c27",
+            "branch_id": "b2"
+          }
+        ]
+      },
+      "relative_source_excerpts": [
+        {
+          "node_id": "NS_1",
+          "identity_status": "resolved",
+          "source_span": [
+            300,
+            307
+          ],
+          "source_excerpt": "جَدِّهِ",
+          "evidence_source": "isnad_relative_map_lookup",
+          "resolution_rule": "مسجل في قاعدة العلاقات الإسنادية كجد لـ (أبو بردة)"
+        },
+        {
+          "node_id": "NS_2",
+          "identity_status": "candidate",
+          "source_span": [
+            286,
+            293
+          ],
+          "source_excerpt": "أَبِيهِ",
+          "evidence_source": null,
+          "resolution_rule": "لم يتم العثور على قرينة حاسمة في قاعدة البيانات"
+        }
+      ],
+      "browser_observations": {
+        "all_paths_and_path_2_selected": true,
+        "unselected_nodes_observed_opacity": 0.22,
+        "father_drawer_kept_candidate_and_withheld_grade": true,
+        "grandfather_drawer_displayed_relation_evidence": true,
+        "original_theme_restored_svg_styles_and_removed_route_controls": true,
+        "navigation_to_new_chat_cleared_previous_graph": true
+      }
+    },
+    "native_topic_card_corrected": {
+      "chat_id": "7f721748-b015-4151-917d-c83c09f6a0a7",
+      "message_id": "09e38d9a-c72a-48c7-b566-ea4d0e18fd42",
+      "model": "bayan-unified-pilot",
+      "completed": true,
+      "tool_calls": {
+        "get_topic_evidence": 1,
+        "get_reviewed_lesson": 1
+      },
+      "tool_result_statuses": [
+        {
+          "tool": "get_topic_evidence",
+          "status": "ok"
+        },
+        {
+          "tool": "get_reviewed_lesson",
+          "status": "needs_review"
+        }
+      ],
+      "assistant_sha256": "4c21d0681c800bd8e4517b812d55618a736367fc3f69b7f70541e5d194018a3c",
+      "selected_sources": [
+        {
+          "occurrence_id": "itqan:tirmidhi:27:30:b5e57ce2441d",
+          "source_locator": {
+            "numbering_system": "itqan_local_position",
+            "source_position": 30,
+            "source_entry_id": "30",
+            "source_url": "https://github.com/R3GENESI5/Itqan/blob/199d870da5b726356b4a8dbaa096140cffb7d0ab/app/data/sunni/tirmidhi/27.json",
+            "display_label": "موضع المصدر المحلي: 30",
+            "numbering_note": "هذا موضع السجل في بيانات إتقان، وليس رقم الحديث في جميع الطبعات. أرقام attributed_judgment إحالات مستقلة ولا تحل محله."
+          },
+          "exact_quote": {
+            "arabic": "الرَّاحِمُونَ يَرْحَمُهُمُ الرَّحْمَنُ ارْحَمُوا مَنْ فِي الأَرْضِ يَرْحَمْكُمْ مَنْ فِي السَّمَاءِ",
+            "source_span": [
+              188,
+              287
+            ],
+            "display_text": "الرَّاحِمُونَ يَرْحَمُهُمُ الرَّحْمَنُ ارْحَمُوا مَنْ فِي الأَرْضِ يَرْحَمْكُمْ مَنْ فِي السَّمَاءِ"
+          }
+        },
+        {
+          "occurrence_id": "itqan:bukhari:78:55:022c1dbdd753",
+          "source_locator": {
+            "numbering_system": "itqan_local_position",
+            "source_position": 55,
+            "source_entry_id": "55",
+            "source_url": "https://github.com/R3GENESI5/Itqan/blob/199d870da5b726356b4a8dbaa096140cffb7d0ab/app/data/sunni/bukhari/78.json",
+            "display_label": "موضع المصدر المحلي: 55",
+            "numbering_note": "هذا موضع السجل في بيانات إتقان، وليس رقم الحديث في جميع الطبعات. أرقام attributed_judgment إحالات مستقلة ولا تحل محله."
+          },
+          "exact_quote": {
+            "arabic": "إِنَّ اللَّهَ يُحِبُّ الرِّفْقَ فِي الأَمْرِ كُلِّهِ",
+            "source_span": [
+              494,
+              546
+            ],
+            "display_text": "إِنَّ اللَّهَ يُحِبُّ الرِّفْقَ فِي الأَمْرِ كُلِّهِ"
+          }
+        }
+      ],
+      "checks": {
+        "exact_quotes_match": true,
+        "local_positions_match": true,
+        "legacy_html_absent": true,
+        "review_state_visible": true
+      }
+    }
+  },
+  "tests": {
+    "python_acceptance": {
+      "passed": 147,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 45.38
+    },
+    "theme_contracts": {
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "external_vps": "not_run",
+  "scholarly_approval": "needs_review",
+  "ordinary_user_access": "not_tested_with_a_non_admin_account",
+  "screenshots": [
+    {
+      "file": "native_evidence_2026-10-09/all-paths.jpg",
+      "sha256": "d63d0d7701fac9e2c92d08e8edf9a3ecfdbcde6dfd7c1397416b1de4a3038b6e",
+      "size_bytes": 48560,
+      "capture_surface": "native_openwebui_cua_browser"
+    },
+    {
+      "file": "native_evidence_2026-10-09/path-two.jpg",
+      "sha256": "2ae189918252bbfb53f1d1b98b25f293dfa1e57a85108b7a1c731fe88b33bc02",
+      "size_bytes": 41722,
+      "capture_surface": "native_openwebui_cua_browser"
+    },
+    {
+      "file": "native_evidence_2026-10-09/father-drawer.jpg",
+      "sha256": "3fbbc33bc61be517c64ddb7e586159792a142f0696eb72e9b4682b5f719a83f8",
+      "size_bytes": 43274,
+      "capture_surface": "native_openwebui_cua_browser"
+    },
+    {
+      "file": "native_evidence_2026-10-09/grandfather-drawer.jpg",
+      "sha256": "1aab9cadbc3bcb421b35c2d7475dacc8d8e6acf44103c9ea5099bd4a8039b8c2",
+      "size_bytes": 42647,
+      "capture_surface": "native_openwebui_cua_browser"
+    },
+    {
+      "file": "native_evidence_2026-10-09/original-restored.jpg",
+      "sha256": "8354ecd3bb3ae41ff62f5fd57abeb4b04eca27a0a2568c5a80b93e267e397c3f",
+      "size_bytes": 37302,
+      "capture_surface": "native_openwebui_cua_browser"
+    },
+    {
+      "file": "native_evidence_2026-10-09/topic-card-corrected.jpg",
+      "sha256": "8675f5ce0a16fe88503649d6a7bcfa95a4529c6651d82c8d39a5889893d53e72",
+      "size_bytes": 53507,
+      "capture_surface": "native_openwebui_cua_browser"
+    },
+    {
+      "file": "native_evidence_2026-10-09/topic-card-local-source.jpg",
+      "sha256": "b4dfad4377ed80d3e0e4942d0c203a6c1ffc5fc7e5bc9f55a2b5c89970554775",
+      "size_bytes": 48444,
+      "capture_surface": "native_openwebui_cua_browser"
+    }
+  ]
+}

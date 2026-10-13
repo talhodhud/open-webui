@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-08T23:06:18.001516+00:00",
+  "timestamp": "2026-10-10T03:25:21.977400+00:00",
   "webui_url": "http://127.0.0.1:8080",
   "collection_id": "bayan-islam-guide-v1",
   "file_ids": [
@@ -31,26 +31,30 @@
   "retrieval_queries": {
     "faith_intention": {
       "desc": "درس النية الموضوعي",
-      "docs_count": 1,
+      "docs_count": 2,
       "sources": [
+        "islam_topic_taxonomy_v1.json",
         "bayan_lesson_packs_v1.json"
       ],
       "keyword_checked": "النية",
       "keyword_matched": true,
       "snippets": [
-        "{\n\"schema_version\": \"1.1\",\n\"track\": \"Bayan al-Sunnah: Introduction to Islam\",\n\"review_status\": \"needs_review\",\n\"description\": \"Six curated lesson packs for introducing Islam through authentic Propheti"
+        "\"subtopics\": [\n{\n\"id\": \"faith_intention\",\n\"title_ar\": \"النية والإخلاص وتجريد القصد لله\",\n\"learning_objective\": \"فهم أن الأعمال في الإسلام لا تُقاس بظاهرها المادي فحسب، بل بصدق القصد الباطني ونقاء الني",
+        "\"source_span\": [\n691,\n789\n],\n\"citation\": \"Muslim — كتاب الذكر والدعاء والتوبة والاستغفار\"\n},\n{\n\"quote_id\": \"quote-bayan-pass-knowledge-02\",\n\"occurrence_id\": \"itqan:bukhari:3:11:7bca050e20fb\",\n\"passage"
       ]
     },
     "bukhari:1:1:bf026de7e155": {
       "desc": "شاهد حديث النية الصحيح",
-      "docs_count": 1,
+      "docs_count": 2,
       "sources": [
-        "bayan_lesson_packs_v1.json"
+        "bayan_lesson_packs_v1.json",
+        "islam_topic_taxonomy_v1.json"
       ],
       "keyword_checked": "الْأَعْمَالُ بِالنِّيَّاتِ",
-      "keyword_matched": true,
+      "keyword_matched": false,
       "snippets": [
-        "\"exact_text\": \"إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى\",\n\"source_span\": [\n438,\n511\n],\n\"citation\": \"Bukhari — كتاب بدء الوحى\"\n},\n{\n\"quote_id\": \"quote-bayan-pass-faith-"
+        "\"source_span\": [\n691,\n789\n],\n\"citation\": \"Muslim — كتاب الذكر والدعاء والتوبة والاستغفار\"\n},\n{\n\"quote_id\": \"quote-bayan-pass-knowledge-02\",\n\"occurrence_id\": \"itqan:bukhari:3:11:7bca050e20fb\",\n\"passage",
+        "\"subtopics\": [\n{\n\"id\": \"faith_intention\",\n\"title_ar\": \"النية والإخلاص وتجريد القصد لله\",\n\"learning_objective\": \"فهم أن الأعمال في الإسلام لا تُقاس بظاهرها المادي فحسب، بل بصدق القصد الباطني ونقاء الني"
       ]
     },
     "HadeethEnc 4560": {
@@ -60,48 +64,53 @@
         "bayan_lesson_packs_v1.json"
       ],
       "keyword_checked": "النية الخالصة",
-      "keyword_matched": true,
+      "keyword_matched": false,
       "snippets": [
-        "\"explanation_reference\": {\n\"provider\": \"HadeethEnc\",\n\"provider_id\": \"4560\",\n\"source_url\": \"https://hadeethenc.com/ar/browse/hadith/4560\",\n\"summary\": \"الأعمال لا تصح ولا تثاب إلا بالنية الخالصة لله تعا"
+        "{\n\"schema_version\": \"1.1\",\n\"track\": \"Bayan al-Sunnah: Introduction to Islam\",\n\"review_status\": \"needs_review\",\n\"description\": \"Six curated lesson packs for introducing Islam through authentic Propheti"
       ]
     },
     "topic-mercy": {
       "desc": "موضوع الرحمة وحسن الخلق",
-      "docs_count": 1,
+      "docs_count": 2,
       "sources": [
-        "islam_topic_taxonomy_v1.json"
+        "islam_topic_taxonomy_v1.json",
+        "bayan_lesson_packs_v1.json"
       ],
       "keyword_checked": "topic-mercy",
-      "keyword_matched": true,
+      "keyword_matched": false,
       "snippets": [
-        "},\n{\n\"pattern\": \"أبواب الردة والقتال التفصيلية\",\n\"reason\": \"Juristic dispute texts that require historical context and lead to misunderstanding if introduced to basic seekers without foundational fait"
+        "\"subtopics\": [\n{\n\"id\": \"faith_intention\",\n\"title_ar\": \"النية والإخلاص وتجريد القصد لله\",\n\"learning_objective\": \"فهم أن الأعمال في الإسلام لا تُقاس بظاهرها المادي فحسب، بل بصدق القصد الباطني ونقاء الني",
+        "\"source_span\": [\n691,\n789\n],\n\"citation\": \"Muslim — كتاب الذكر والدعاء والتوبة والاستغفار\"\n},\n{\n\"quote_id\": \"quote-bayan-pass-knowledge-02\",\n\"occurrence_id\": \"itqan:bukhari:3:11:7bca050e20fb\",\n\"passage"
       ]
     },
     "b5e57ce2441d": {
       "desc": "شاهد درس الرحمة المقيد",
-      "docs_count": 1,
+      "docs_count": 2,
       "sources": [
-        "bayan_lesson_packs_v1.json"
+        "bayan_lesson_packs_v1.json",
+        "islam_topic_taxonomy_v1.json"
       ],
       "keyword_checked": "66132",
-      "keyword_matched": true,
+      "keyword_matched": false,
       "snippets": [
-        "\"provider_id\": \"66132\",\n\"source_url\": \"https://hadeethenc.com/ar/browse/hadith/66132\",\n\"summary\": \"مسودة تلخيص مقترحة: النهي الجازم عن الغش بلفظ 'ومن غشنا فليس منا' وقرنه بالعدوان على المجتمع، مبيناً "
+        "\"source_span\": [\n691,\n789\n],\n\"citation\": \"Muslim — كتاب الذكر والدعاء والتوبة والاستغفار\"\n},\n{\n\"quote_id\": \"quote-bayan-pass-knowledge-02\",\n\"occurrence_id\": \"itqan:bukhari:3:11:7bca050e20fb\",\n\"passage",
+        "\"subtopics\": [\n{\n\"id\": \"faith_intention\",\n\"title_ar\": \"النية والإخلاص وتجريد القصد لله\",\n\"learning_objective\": \"فهم أن الأعمال في الإسلام لا تُقاس بظاهرها المادي فحسب، بل بصدق القصد الباطني ونقاء الني"
       ]
     },
     "negative_exclusion_rules": {
       "desc": "قواعد الاستبعاد السلبي",
-      "docs_count": 1,
+      "docs_count": 2,
       "sources": [
+        "islam_topic_taxonomy_v1.json",
         "bayan_lesson_packs_v1.json"
       ],
       "keyword_checked": "negative_exclusion",
       "keyword_matched": true,
       "snippets": [
-        "\"review_decision\": \"pending_external_scholarly_signoff\",\n\"negative_exclusion_record\": {\n\"excluded_query_or_chapter\": \"أدعية الطهارة والوضوء المحتوية على عبارات الاسترحام\",\n\"reason\": \"استبعاد الشواهد ا"
+        "\"subtopics\": [\n{\n\"id\": \"faith_intention\",\n\"title_ar\": \"النية والإخلاص وتجريد القصد لله\",\n\"learning_objective\": \"فهم أن الأعمال في الإسلام لا تُقاس بظاهرها المادي فحسب، بل بصدق القصد الباطني ونقاء الني",
+        "\"source_span\": [\n691,\n789\n],\n\"citation\": \"Muslim — كتاب الذكر والدعاء والتوبة والاستغفار\"\n},\n{\n\"quote_id\": \"quote-bayan-pass-knowledge-02\",\n\"occurrence_id\": \"itqan:bukhari:3:11:7bca050e20fb\",\n\"passage"
       ]
     }
   },
-  "status": "verified",
-  "verified_at": "2026-10-08T23:06:35.339314+00:00"
+  "status": "partial_or_failed"
 }

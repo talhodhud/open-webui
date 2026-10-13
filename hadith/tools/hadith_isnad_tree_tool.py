@@ -74,6 +74,11 @@ class Tools:
             "/root/open-webui/hadith",
             "/root",
         ]
+        if os.name == 'nt':
+            search_roots.extend([
+                r"c:\Users\mhdal\OneDrive\AI\Hadith KSA",
+                r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\open-webui",
+            ])
         if "__file__" in globals():
             tool_dir = os.path.dirname(os.path.abspath(__file__))
             search_roots.extend([
@@ -104,6 +109,77 @@ class Tools:
         except Exception:
             return False
 
+    def _ensure_isnad_imported(self):
+        try:
+            import hadith.isnad.parser
+            return
+        except ImportError:
+            pass
+
+        import sys
+        candidate_roots = []
+        if os.environ.get("HADITH_PACKAGE_PATH"):
+            candidate_roots.append(os.environ["HADITH_PACKAGE_PATH"])
+        if hasattr(self, 'valves') and getattr(self.valves, 'DB_PATH', None):
+            db_dir = os.path.dirname(os.path.abspath(self.valves.DB_PATH))
+            candidate_roots.extend([
+                db_dir,
+                os.path.abspath(os.path.join(db_dir, "..")),
+                os.path.abspath(os.path.join(db_dir, "../..")),
+                os.path.abspath(os.path.join(db_dir, "open-webui")),
+            ])
+        if hasattr(self, 'valves') and getattr(self.valves, 'SEARCH_INDEX_PATH', None):
+            s_dir = os.path.dirname(os.path.abspath(self.valves.SEARCH_INDEX_PATH))
+            candidate_roots.extend([
+                s_dir,
+                os.path.abspath(os.path.join(s_dir, "..")),
+                os.path.abspath(os.path.join(s_dir, "../..")),
+                os.path.abspath(os.path.join(s_dir, "../../..")),
+            ])
+        candidate_roots.extend([
+            r"c:\Users\mhdal\OneDrive\AI\Hadith KSA",
+            r"c:\Users\mhdal\OneDrive\AI\Hadith KSA\open-webui",
+            os.getcwd(),
+            os.path.abspath(os.path.join(os.getcwd(), "..")),
+            os.path.abspath(os.path.join(os.getcwd(), "../..")),
+            os.path.abspath(os.path.join(os.getcwd(), "open-webui")),
+            os.path.abspath(os.path.join(os.getcwd(), "hadith")),
+            "/app/backend",
+            "/app/backend/data",
+            "/app",
+            "/root/open-webui",
+            "/root",
+        ])
+        if "__file__" in globals():
+            tool_dir = os.path.dirname(os.path.abspath(__file__))
+            candidate_roots.extend([
+                tool_dir,
+                os.path.abspath(os.path.join(tool_dir, "..")),
+                os.path.abspath(os.path.join(tool_dir, "../..")),
+                os.path.abspath(os.path.join(tool_dir, "../../..")),
+            ])
+
+        for cand in candidate_roots:
+            if not cand or not os.path.exists(cand):
+                continue
+            if os.path.exists(os.path.join(cand, "hadith", "isnad")):
+                if cand not in sys.path:
+                    sys.path.insert(0, cand)
+                try:
+                    import hadith.isnad.parser
+                    return
+                except ImportError:
+                    pass
+            if os.path.basename(os.path.normpath(cand)) == "hadith" and os.path.exists(os.path.join(cand, "isnad")):
+                parent = os.path.dirname(os.path.normpath(cand))
+                if parent not in sys.path:
+                    sys.path.insert(0, parent)
+                try:
+                    import hadith.isnad.parser
+                    return
+                except ImportError:
+                    pass
+
     def _resolve_all_paths(self):
         self.valves.DB_PATH = self._resolve_path(
             "HADITH_DB_PATH",
@@ -127,6 +203,7 @@ class Tools:
                 "data/search_index.sqlite"
             ]
         )
+        self._ensure_isnad_imported()
 
     def __init__(self):
         self.valves = self.Valves()
@@ -320,20 +397,8 @@ class Tools:
 
             if record_text:
                 try:
-                    try:
-                        from hadith.isnad.parser import IsnadParser
-                    except ImportError:
-                        import sys
-                        _cur = os.path.dirname(os.path.abspath(__file__))
-                        for root_cand in [
-                            os.path.abspath(os.path.join(_cur, "..", "..")),
-                            os.path.abspath(os.path.join(_cur, "..")),
-                            os.path.abspath(os.path.join(_cur, "..", "open-webui")),
-                            os.path.abspath(os.path.join(_cur, "..", "..", "open-webui")),
-                        ]:
-                            if os.path.exists(os.path.join(root_cand, "hadith", "isnad")) and root_cand not in sys.path:
-                                sys.path.insert(0, root_cand)
-                        from hadith.isnad.parser import IsnadParser
+                    self._ensure_isnad_imported()
+                    from hadith.isnad.parser import IsnadParser
                     p = IsnadParser().parse(record_text)
                     if p.common_link and p.stem_stages:
                         for s_idx, stage in enumerate(p.stem_stages):
@@ -374,22 +439,9 @@ class Tools:
                 "warning": f"طلب تمييز القرابة المبهمة '{name}' يتطلب تمرير اسم الراوي صاحب الضمير (anchor_name) أو سياق السجل occurrence_id لحل الهوية بدليل وتجنب التخمين."
             }, ensure_ascii=False)
 
-        try:
-            from hadith.isnad.parser import ExtractedMention, IsnadParser
-            from hadith.isnad.resolver import NarratorResolver
-        except ImportError:
-            import sys
-            _cur = os.path.dirname(os.path.abspath(__file__))
-            for root_cand in [
-                os.path.abspath(os.path.join(_cur, "..", "..")),
-                os.path.abspath(os.path.join(_cur, "..")),
-                os.path.abspath(os.path.join(_cur, "..", "open-webui")),
-                os.path.abspath(os.path.join(_cur, "..", "..", "open-webui")),
-            ]:
-                if os.path.exists(os.path.join(root_cand, "hadith", "isnad")) and root_cand not in sys.path:
-                    sys.path.insert(0, root_cand)
-            from hadith.isnad.parser import ExtractedMention, IsnadParser
-            from hadith.isnad.resolver import NarratorResolver
+        self._ensure_isnad_imported()
+        from hadith.isnad.parser import ExtractedMention, IsnadParser
+        from hadith.isnad.resolver import NarratorResolver
 
         resolver = NarratorResolver(self.valves.DB_PATH)
 
@@ -609,28 +661,12 @@ class Tools:
             ))
 
         # 4. Modular Evidence-Based Isnad Parsing, Resolution, and Graph Construction
-        try:
-            from hadith.isnad.parser import IsnadParser
-            from hadith.isnad.resolver import NarratorResolver
-            from hadith.isnad.graph import IsnadGraphBuilder
-            from hadith.isnad.render_mermaid import MermaidRenderer
-            from hadith.isnad.validation import validate_isnad_graph
-        except ImportError:
-            import sys
-            _cur = os.path.dirname(os.path.abspath(__file__))
-            for root_cand in [
-                os.path.abspath(os.path.join(_cur, "..", "..")),
-                os.path.abspath(os.path.join(_cur, "..")),
-                os.path.abspath(os.path.join(_cur, "..", "open-webui")),
-                os.path.abspath(os.path.join(_cur, "..", "..", "open-webui")),
-            ]:
-                if os.path.exists(os.path.join(root_cand, "hadith", "isnad")) and root_cand not in sys.path:
-                    sys.path.insert(0, root_cand)
-            from hadith.isnad.parser import IsnadParser
-            from hadith.isnad.resolver import NarratorResolver
-            from hadith.isnad.graph import IsnadGraphBuilder
-            from hadith.isnad.render_mermaid import MermaidRenderer
-            from hadith.isnad.validation import validate_isnad_graph
+        self._ensure_isnad_imported()
+        from hadith.isnad.parser import IsnadParser
+        from hadith.isnad.resolver import NarratorResolver
+        from hadith.isnad.graph import IsnadGraphBuilder
+        from hadith.isnad.render_mermaid import MermaidRenderer
+        from hadith.isnad.validation import validate_isnad_graph
 
         resolver = NarratorResolver(self.valves.DB_PATH)
         parser = IsnadParser()

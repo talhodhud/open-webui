@@ -46,6 +46,7 @@ export interface JourneyContract {
   anchorName?: string;
   caseId?: string;
   topicId?: string;
+  subtopicId?: string;
   task: string;
   primarySkillId: string;
   optionalSkillIds?: string[];
@@ -219,7 +220,7 @@ export const TOPIC_JOURNEYS: Journey[] = TOPICS.map(topic => ({
       prompt: 'جهّز من المادة المسترجعة بطاقة تعريفية قصيرة، وافصل النص النبوي عن التلخيص الأولي وأبقِ المصادر وحدود المراجعة ظاهرة.',
       modelId: 'hadith-islam-guide',
       unifiedSkillId: 'hadith-islam-guide',
-      task: 'introductory_material'
+      task: 'card'
     }
   ]
 }));
@@ -236,6 +237,7 @@ const FOLLOWUP_MODELS: Record<string, string[]> = {
 
 export interface GraphPath {
   path_id: string;
+  nodes?: Array<{ id?: string; name?: string; raw_text?: string; canonical_name?: string }>;
   teacher_name?: string;
   narrator_sequence?: Array<{ raw_name?: string; name?: string; grade?: string }>;
   narrators?: Array<{ raw_name?: string; name?: string; grade?: string }>;
@@ -256,6 +258,8 @@ export interface NarratorNodeDetails {
   ibn_hajar?: string;
   dhahabi?: string;
   anchor_name?: string;
+  identity_evidence?: string;
+  resolution_rule?: string;
 }
 
 export function buildRouteSelectorItems(paths?: GraphPath[]): Array<{ id: string; label: string; route: string }> | null {
@@ -312,6 +316,7 @@ export function formatNarratorEvidenceDetails(details: NarratorNodeDetails): {
 }
 
 export interface RouteOptions {
+  subtopicId?: string;
   mode?: 'legacy' | 'unified';
   submit?: boolean;
   audience?: string;
@@ -354,6 +359,7 @@ export function buildJourneyContract(id: string, options: RouteOptions = {}): Jo
     anchorName: options.anchorName,
     caseId: journey.id,
     topicId: journey.topic ? journey.id : undefined,
+    subtopicId: options.subtopicId || undefined,
     task: journey.task,
     primarySkillId: journey.primarySkillId,
     audience: normAud,
@@ -389,6 +395,7 @@ export function buildFollowupContract(id: string, index: number, options: RouteO
     anchorName: options.anchorName,
     caseId: journey.id,
     topicId: journey.topic ? journey.id : undefined,
+    subtopicId: options.subtopicId || undefined,
     task: action.task || 'followup',
     primarySkillId: primarySkill,
     audience: options.audience ? normalizeAudience(options.audience).code : undefined,
@@ -412,7 +419,7 @@ export function buildFollowupURL(origin: string, id: string, index: number, opti
   const occText = options.occurrenceIds && options.occurrenceIds.length > 0 ? `\nالسجل المحدد: ${options.occurrenceIds.join(', ')}` : '';
   const pathText = options.selectedPathId ? `\nمسار الإسناد المحدد: ${options.selectedPathId}` : '';
   const anchorText = options.anchorName ? `\nالراوي المستهدف للتحقيق (صاحب الضمير): ${options.anchorName}` : (options.mentionId ? `\nالراوي المستهدف: ${options.mentionId}` : '');
-  const prompt = `${skillTag}الموضوع: ${journey.title}. سؤال الحالة الأصلي: ${journey.question}\nالمطلوب الآن: ${action.prompt}${occText}${pathText}${anchorText}\nهذه مسودة مستقلة ولا تتضمن نتائج المحادثة السابقة. استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم. إذا لم يتحدد النص المقصود فاعرض المرشحين للاختيار. اعرض ما استرجعته فقط، وأبقِ الفجوات والالتباس وحالة المراجعة ظاهرة، ولا تفترض منتهى نبويًا لكل أثر.`;
+  const prompt = journey.topic && action.task === 'card' ? topicQuestion(journey, options.audience || 'newcomer', 'card', options.subtopicId || '') : `${skillTag}الموضوع: ${journey.title}. سؤال الحالة الأصلي: ${journey.question}\nالمطلوب الآن: ${action.prompt}${occText}${pathText}${anchorText}\nهذه مسودة مستقلة ولا تتضمن نتائج المحادثة السابقة. استرجع النصوص بالأدوات وحدد occurrence_id قبل الشرح أو الرسم. إذا لم يتحدد النص المقصود فاعرض المرشحين للاختيار. اعرض ما استرجعته فقط، وأبقِ الفجوات والالتباس وحالة المراجعة ظاهرة، ولا تفترض منتهى نبويًا لكل أثر.`;
   
   const url = new URL(buildJourneyURL(origin, id, options.submit ?? false, prompt, options));
   url.searchParams.set('model', modelId);
@@ -422,25 +429,18 @@ export function buildFollowupURL(origin: string, id: string, index: number, opti
 export function topicQuestion(
   journey: Journey,
   audience: string = 'newcomer',
-  format: string = 'card'
+  format: string = 'card',
+  subtopicId: string = ''
 ): string {
   const normAudience = normalizeAudience(audience);
   const normFormat = normalizeFormat(format);
-  const seeds = journey.topic?.seedQueries?.join('، ') || '';
-
-  let formatInstruction = '';
-  if (normFormat.code === 'card') {
-    formatInstruction = 'المطلوب: بطاقة تعريفية قصيرة: النص المختار، مصدره في كتب السنة، ومعناه الإنساني والروحي المبسط؛ دون استطراد بحثي طويل.';
-  } else if (normFormat.code === 'qa') {
-    formatInstruction = 'المطلوب: حوار هادئ بصيغة سؤال وجواب يوضح الإشكال أو المفهوم بلغة عصرية مستندة إلى الشاهد، دون تعقيد مصطلحي.';
-  } else if (normFormat.code === 'two_minute') {
-    formatInstruction = 'المطلوب: كلمة تعريفية مركزة من دقيقتين (نحو 200 كلمة) يلقيها المعرّف، تنطلق من الشاهد النبوي إلى أثره في حياة الإنسان.';
-  }
-
-  return `أريد إعداد ${normFormat.label} لجمهور: ${normAudience.label}. الموضوع: ${journey.title}. السؤال: ${journey.question}
-ابدأ بجمع شاهدين مناسبين من نطاق الكتب الستة بأداة البحث. كلمات بداية مقترحة: ${seeds}. اختر شاهدين يدلان على الموضوع في سياقهما؛ استبعد المصادفة اللفظية والدعاء العارض، وبيّن سبب اختيار كل شاهد. اعرض النصوص المسترجعة ومصادرها، ثم تلخيصًا تعريفيًا واضحًا منفصلًا عنها.
-${formatInstruction}
-بيّن حدود البحث وما يحتاج إلى مراجعة (needs_review)، ولا تفترض وجود الموضوع في جميع الكتب أو صحة كل نتيجة.`;
+  const subtopic = journey.topic?.subtopics.find(s => s.id === subtopicId);
+  if(subtopicId && !subtopic) throw new Error('Unknown subtopic');
+  // The user states intent and scope; the native Islam-guide skill owns execution.
+  const subject = subtopic ? `${subtopic.title} ضمن ${journey.title}` : journey.title;
+  const request = normFormat.code === 'card' ? 'أنشئ بطاقة تعريفية قصيرة مرئية'
+    : normFormat.code === 'qa' ? 'أعد حوار سؤال وجواب' : 'أعد كلمة تعريفية من دقيقتين';
+  return `${request} عن ${subject}، لجمهور ${normAudience.label}.`;
 }
 
 export function buildJourneyURL(
@@ -457,7 +457,7 @@ export function buildJourneyURL(
 
   const model = options.mode === 'unified' ? journey.unifiedModelId : journey.modelId;
   const q = question || (journey.topic && (options.audience || options.format)
-    ? topicQuestion(journey, options.audience || 'newcomer', options.format || 'card')
+    ? topicQuestion(journey, options.audience || 'newcomer', options.format || 'card', options.subtopicId || '')
     : journey.question);
 
   const searchParams = new URLSearchParams({
@@ -469,6 +469,7 @@ export function buildJourneyURL(
   });
   if (options.audience) searchParams.set('audience', options.audience);
   if (options.format) searchParams.set('format', options.format);
+  if (options.subtopicId) searchParams.set('subtopic', options.subtopicId);
   if (options.occurrenceIds && options.occurrenceIds.length > 0) {
     searchParams.set('occurrenceIds', options.occurrenceIds.join(','));
   }

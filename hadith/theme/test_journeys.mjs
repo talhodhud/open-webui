@@ -133,10 +133,10 @@ test('54 combinations of topic x audience x format satisfy the typed contract wi
         // Prompt test
         const qPrompt = topicQuestion(item, aud, fmt);
         assert.ok(qPrompt.includes(item.title));
-        assert.ok(qPrompt.includes(item.question));
         assert.ok(qPrompt.includes(AUDIENCE_MAP[aud].label));
         assert.ok(qPrompt.includes(FORMAT_MAP[fmt].label));
-        assert.ok(qPrompt.includes('needs_review'));
+        assert.ok(qPrompt.length < 200);
+        assert.equal(/get_topic_evidence|get_reviewed_lesson|topic_id|occurrence_id|needs_review|HTML|SVG|presentation/.test(qPrompt), false);
 
         // Format variation check (U06): no forced tree or 7-section report
         assert.equal(qPrompt.includes('شجرة أسانيد شاملة للجميع'), false);
@@ -145,9 +145,9 @@ test('54 combinations of topic x audience x format satisfy the typed contract wi
         if (fmt === 'card') {
           assert.ok(qPrompt.includes('بطاقة تعريفية قصيرة'));
         } else if (fmt === 'qa') {
-          assert.ok(qPrompt.includes('حوار هادئ بصيغة سؤال وجواب'));
+          assert.ok(qPrompt.includes('حوار سؤال وجواب'));
         } else if (fmt === 'two_minute') {
-          assert.ok(qPrompt.includes('كلمة تعريفية مركزة من دقيقتين'));
+          assert.ok(qPrompt.includes('كلمة تعريفية من دقيقتين'));
         }
       }
     }

@@ -49,7 +49,7 @@ if (!document.getElementById(HOST_ID)) {
  function updateSwitch(){launcher.textContent=`الواجهات · ${labels[variant]} ▾`;for(const button of menu.querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.variant===variant));}
  function setVariant(next:typeof variant){
    closeOverlay();variant=next;nativeVariant.setEnabled(next==='chat');
-   try{sessionStorage.setItem('hadith-view',next);}catch{}
+   try{sessionStorage.setItem('hadith-view',next);localStorage.setItem('hadith-view',next);}catch{}
    menu.hidden=true;launcher.setAttribute('aria-expanded','false');updateSwitch();
    if(next==='journey')open(location.pathname.startsWith('/auth')||PREVIEW?'landing':'workspace');
  }
@@ -74,5 +74,10 @@ if (!document.getElementById(HOST_ID)) {
  const observer = new MutationObserver(placeLauncher);observer.observe(document.body,{childList:true,subtree:true});
  window.addEventListener('popstate',placeLauncher);placeLauncher();
  if(PREVIEW) setVariant('journey');
- else {let saved='';try{saved=sessionStorage.getItem('hadith-view')||'';}catch{}if(new URLSearchParams(location.search).get('athar')==='chat'||saved==='chat')setVariant('chat');}
+ else {
+   let saved='';try{saved=sessionStorage.getItem('hadith-view')||localStorage.getItem('hadith-view')||'';}catch{}
+   const requested=new URLSearchParams(location.search).get('athar');
+   if(requested==='original')setVariant('original');
+   else if(requested==='chat'||saved==='chat')setVariant('chat');
+ }
 }

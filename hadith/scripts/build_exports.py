@@ -94,11 +94,21 @@ ISNAD_MODULE_FILES = [
 
 THEME_ASSET_FILES = [
     "package.json",
+    "build_topics.py",
+    "src/main.ts",
     "test_journeys.mjs",
     "src/journeys.ts",
     "src/nativeVariant.ts",
+    "src/nativeGraph.ts",
+    "src/nativeLesson.ts",
+    "src/nativeCardUI.ts",
+    "src/topics.ts",
+    "src/topics.json",
+    "test_native_lesson.mjs",
+    "test_native_graph.mjs",
     "src/nativeVariant.css",
-    "src/topicEvidence.ts"
+    "src/topicEvidence.ts",
+    "dist/hadith-theme.js"
 ]
 
 
@@ -278,7 +288,9 @@ def load_canonical_models() -> list:
     islam_guide = next((m for m in models if m["id"] == "hadith-islam-guide"), None)
     if islam_guide:
         islam_guide.setdefault("meta", {})["knowledge"] = bayan_knowledge
+        islam_guide["meta"]["arabic_knowledge_profile"] = "source-preserving-arabic-v1"
     pilot.setdefault("meta", {})["knowledge"] = bayan_knowledge
+    pilot["meta"]["arabic_knowledge_profile"] = "source-preserving-arabic-v1"
 
     for m in models:
         print(f"  + Verified model: {m['id']} (name: '{m.get('name')}')")
@@ -371,6 +383,8 @@ def check_manifest_integrity() -> bool:
     # 5. Verify UI theme assets
     print("\n[5/6] Verifying UI Theme Assets...")
     theme_assets = manifest.get("theme_assets", {})
+    if "dist/hadith-theme.js" not in theme_assets:
+        errors.append("Compiled theme bundle is missing from the delivery manifest; build the theme and regenerate exports.")
     for aname, ainfo in theme_assets.items():
         expected_sha = ainfo.get("sha256")
         target = THEME_DIR / aname
@@ -380,6 +394,8 @@ def check_manifest_integrity() -> bool:
                 errors.append(f"SHA mismatch for theme asset {aname}: manifest={expected_sha[:12]}, disk={actual_sha[:12]}")
             else:
                 print(f"  ✅ Verified theme asset: {aname} (SHA: {actual_sha[:12]}...)")
+        else:
+            errors.append(f"Theme asset missing: {target}")
 
     # 6. Verify in-repo planning assets
     print("\n[6/6] Verifying In-Repo Planning Assets...")
@@ -536,6 +552,8 @@ def build_all(check_only: bool = False):
     # Hash UI theme assets
     for asset_fname in THEME_ASSET_FILES:
         asset_p = THEME_DIR / asset_fname
+        if not asset_p.exists():
+            raise FileNotFoundError(f"Missing required theme asset: {asset_p}. Build the theme before exporting.")
         if asset_p.exists():
             manifest["theme_assets"][asset_fname] = {
                 "file": f"hadith/theme/{asset_fname}",
@@ -562,7 +580,11 @@ def build_all(check_only: bool = False):
 
     # Hash canonical in-repo planning assets
     in_repo_planning = REPO_HADITH_DIR / "planning"
-    for pname in ["islam_topic_taxonomy_v1.json", "bayan_lesson_packs_v1.json"]:
+    from deploy_arabic_knowledge import build_documents
+    _, arabic_assets = build_documents()
+    planning_names = ["islam_topic_taxonomy_v1.json", "bayan_lesson_packs_v1.json", "six_book_chapter_inventory.json", "knowledge_arabic/manifest.json"]
+    planning_names += ["knowledge_arabic/" + a["filename"] for a in arabic_assets]
+    for pname in planning_names:
         ap = in_repo_planning / pname
         if not ap.exists():
             raise FileNotFoundError(f"Missing canonical planning asset in repo: {ap}")

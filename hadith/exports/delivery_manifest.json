@@ -1,12 +1,12 @@
 {
   "manifest_version": "2.0.0",
   "release_tag": "v2.0.0-rc1",
-  "generated_at": "2026-10-08T11:11:45Z",
+  "generated_at": "2026-10-12T06:52:04Z",
   "description": "Bayan Al-Sunnah Canonical Delivery Manifest with Cryptographic Integrity Checksums",
   "components": {
     "tools_export": {
       "file": "hadith_tools_vps_export.json",
-      "sha256": "b2d730e3a314f28a3573be321ddcc36f18d244b6b5188f5b64d23a773b2c218e",
+      "sha256": "2ea49fd6a4e016c5f1da629a80b5392d3afdcbfa424a1483fb5c9c4b232211ea",
       "count": 6,
       "items": [
         "hadith_corpus_search",
@@ -19,7 +19,7 @@
     },
     "skills_export": {
       "file": "hadith_skills_vps_export.json",
-      "sha256": "7e5bbf6d2d45f91c23e1ad9657bad065505c589c2cd9bd7fc839fe97b50732f4",
+      "sha256": "be5f131561c458e448f957b1934facb8dc285261d6aab35ea828d879f61e535c",
       "count": 8,
       "items": [
         "hadith-mermaid-architect",
@@ -34,7 +34,7 @@
     },
     "models_export": {
       "file": "hadith_models_vps_export.json",
-      "sha256": "0214a49cf4ebb5eea4c552ded7dfa2443fbe17413d445a34e1aca931a1320425",
+      "sha256": "14023e936a0fb80ef14e6c903f6f71a9ca0154b8383a698d65744abcfe7c542b",
       "count": 8,
       "items": [
         "hadith-model-1",
@@ -51,8 +51,8 @@
   "tool_sources": {
     "hadith_corpus_search": {
       "file": "hadith_corpus_search_tool.py",
-      "sha256": "cf3e687098aab6a0ba459faf24bdbac8c8c230563968f86a053ba25606e835d1",
-      "size_bytes": 31128
+      "sha256": "e23e06940cc4f6c53a85353cabadb7a8c0d2f569835a69f16adc86bef79c8d53",
+      "size_bytes": 30482
     },
     "hadith_takhrij": {
       "file": "hadith_takhrij_tool.py",
@@ -61,23 +61,23 @@
     },
     "hadith_sharh_vocab": {
       "file": "hadith_sharh_vocab_tool.py",
-      "sha256": "553912f05872abb4e77feea315ef946c55aaa4c3fb78a5acba71f7f76824ac5b",
-      "size_bytes": 26731
+      "sha256": "0764cb932eee3923639e9edad14176a0e486c025edcef94827fc9d27444d3a6a",
+      "size_bytes": 26174
     },
     "hadith_isnad_tree": {
       "file": "hadith_isnad_tree_tool.py",
-      "sha256": "fc10ecf7aa7c4da8a3ba6e7f00959ff2b3da20cd8af10bbbefde41d98aaeb51f",
-      "size_bytes": 36771
+      "sha256": "a567362093c48d3b3ab3b20ea03f6803db52d4d0b9be1caf9be3726c9d8ce296",
+      "size_bytes": 37658
     },
     "hadith_narrator": {
       "file": "hadith_narrator_tool.py",
-      "sha256": "1d18e1082a632ffbe9b5686a68496ab72dfb6e9ec32a18501e61e8f56fb43d48",
-      "size_bytes": 86445
+      "sha256": "5aa1014c76780cf1766c7b7c5e666a7b764529446218dde49031c098ffa3ecbf",
+      "size_bytes": 84861
     },
     "hadith_bayan_topics": {
       "file": "hadith_bayan_topics_tool.py",
-      "sha256": "3cd68ca768ce2f8e940e3a0d6cf1ae351426f53aa496141f8c5ef96a48585d7e",
-      "size_bytes": 21262
+      "sha256": "c16522d5750815fc0a1bdaccb6ebeb587540eb9776e4c7a69cdaf2944033bac0",
+      "size_bytes": 27335
     },
     "hadith_contract_helper": {
       "file": "hadith_contract_helper.py",
@@ -93,8 +93,8 @@
     },
     "hadith_takhrij": {
       "file": "hadith_takhrij.json",
-      "sha256": "e9862969a7b5d9729026f0916ca1b36ff13fca07c3c7209dbbb35654c9b3123c",
-      "size_bytes": 10544
+      "sha256": "cf76816dacfac3a544fc15e24f4ff4cb777963147179c423067225fc91586d77",
+      "size_bytes": 10491
     },
     "hadith_sharh_vocab": {
       "file": "hadith_sharh_vocab.json",
@@ -103,8 +103,8 @@
     },
     "hadith_isnad_tree": {
       "file": "hadith_isnad_tree.json",
-      "sha256": "4e4359c2f352f55ffa6edf43cae7d5ca4c070d74f6f6e2919c3af78bc4d96dda",
-      "size_bytes": 40583
+      "sha256": "46ddcd961184812a212bd5e4ccc6addb182884241354a6b7b1d08e6457963b95",
+      "size_bytes": 41572
     },
     "hadith_narrator": {
       "file": "hadith_narrator.json",
@@ -113,8 +113,8 @@
     },
     "hadith_bayan_topics": {
       "file": "hadith_bayan_topics.json",
-      "sha256": "e829d6d54df98d06f7d075955ed04ad1e7d96d8344e5f8be183025588ee1e637",
-      "size_bytes": 24763
+      "sha256": "99a5e7a9ab434cf51c194164ada5fea40de43b72d03bf59b82f7f71e83bad71a",
+      "size_bytes": 31420
     }
   },
   "isnad_modules": {
@@ -155,30 +155,80 @@
       "sha256": "bda8c33fa4f8e6edd5ebf5354f4bfcf97b9f50964fe410306c40869cb579d0ad",
       "size_bytes": 570
     },
+    "build_topics.py": {
+      "file": "hadith/theme/build_topics.py",
+      "sha256": "b0f3843264c82e3d20c192fc1355297c70aca115bc72e49962308e4f379e2f94",
+      "size_bytes": 4135
+    },
+    "src/main.ts": {
+      "file": "hadith/theme/src/main.ts",
+      "sha256": "dd864e0bce30f05d30771368806eeb7514292e3f4d0dfd34e3d87e295cf009cf",
+      "size_bytes": 8067
+    },
     "test_journeys.mjs": {
       "file": "hadith/theme/test_journeys.mjs",
-      "sha256": "5c1bdcbb7e89aa043d7d54228c1d729569f941839e8d481bfddd880a295679e7",
-      "size_bytes": 21760
+      "sha256": "95efb506fd5fbfa587dbb5ca1e39dacb23b4f6ba69bfd4e415cc3b9199f8de02",
+      "size_bytes": 21808
     },
     "src/journeys.ts": {
       "file": "hadith/theme/src/journeys.ts",
-      "sha256": "039186109b8618c52445a967dab96874759b0a2f82416bc79e08b49b88aa184b",
-      "size_bytes": 25875
+      "sha256": "4e184fded7a2fbcdbbc5c943a4dc050595a5e2aa4c5916e0bca13183d534e4a9",
+      "size_bytes": 25271
     },
     "src/nativeVariant.ts": {
       "file": "hadith/theme/src/nativeVariant.ts",
-      "sha256": "8fe06cdc10e137c5ec041dd9f6d4e184dcc6b1f6b9934293f029172fd053c7a8",
-      "size_bytes": 35698
+      "sha256": "b57dbc6fd963b3cbc77d0edfc4e57ad631f4c7eae58b8bb59b5cdd4cd3be62f7",
+      "size_bytes": 43792
+    },
+    "src/nativeGraph.ts": {
+      "file": "hadith/theme/src/nativeGraph.ts",
+      "sha256": "bb96b2d3de20004603d95d840f05e9708c217881e15ce85d928563d5c1c6ffe4",
+      "size_bytes": 2032
+    },
+    "src/nativeLesson.ts": {
+      "file": "hadith/theme/src/nativeLesson.ts",
+      "sha256": "6ac85b1982b69a359ef7f8daf2289c34e88da127537be849390bd78b3f0348e8",
+      "size_bytes": 6513
+    },
+    "src/nativeCardUI.ts": {
+      "file": "hadith/theme/src/nativeCardUI.ts",
+      "sha256": "6112de47e127dc77a7e29b20bbe400407b87d5bcd8857ea7e2b180f3dd3323b7",
+      "size_bytes": 4369
+    },
+    "src/topics.ts": {
+      "file": "hadith/theme/src/topics.ts",
+      "sha256": "f9a7e3d9d576c02fc0cfb82149f19c2cbac3492cec3e85a5be5e010045861b84",
+      "size_bytes": 15382
+    },
+    "src/topics.json": {
+      "file": "hadith/theme/src/topics.json",
+      "sha256": "98624edf1d309efe24c344f48cfa15724ade0a8716da9200f228ea7928639652",
+      "size_bytes": 15179
+    },
+    "test_native_lesson.mjs": {
+      "file": "hadith/theme/test_native_lesson.mjs",
+      "sha256": "091c1790c8ad5659186635e3dfd265a74318c53f5d188bee244fa4923310e7db",
+      "size_bytes": 4711
+    },
+    "test_native_graph.mjs": {
+      "file": "hadith/theme/test_native_graph.mjs",
+      "sha256": "f87c2dc9d9b44af52f6175ae1e3b650d9b5a40e36077316ebb4f7b22ca8ccd0b",
+      "size_bytes": 2517
     },
     "src/nativeVariant.css": {
       "file": "hadith/theme/src/nativeVariant.css",
-      "sha256": "75357f69355b6981cfa309c0e2f0eed15f17c1277972a0fc32fc781281cd3cea",
-      "size_bytes": 22248
+      "sha256": "19a10e2743e42a0d72d7e291d1b783f0877abfe33b4b658bafe1d65ff472c5a3",
+      "size_bytes": 25620
     },
     "src/topicEvidence.ts": {
       "file": "hadith/theme/src/topicEvidence.ts",
-      "sha256": "a12f78b3551833baeca15166e7797d9886fbb5c2bd31a3d5c2ba570e36f7625f",
-      "size_bytes": 18295
+      "sha256": "2f25f54c87a142ed972403386b652d391f65eba20ef9cbdd5ec2b3025458017e",
+      "size_bytes": 18112
+    },
+    "dist/hadith-theme.js": {
+      "file": "hadith/theme/dist/hadith-theme.js",
+      "sha256": "455e8fd70652ab1e8f7825daa24dae042cda2af77c6e33e17e604d7371e5f31f",
+      "size_bytes": 555072
     }
   },
   "databases": {
@@ -288,13 +338,88 @@
   "planning_assets": {
     "islam_topic_taxonomy_v1.json": {
       "file": "hadith/planning/islam_topic_taxonomy_v1.json",
-      "sha256": "ff0ab4072618c453a8e10671b41b409186c938fdcaa43b106ded80c73cad04da",
-      "size_bytes": 13979
+      "sha256": "4c7071e18fb7f2757fd33e59aeb8e25a66383ff95589949de3e6380c07e12ed7",
+      "size_bytes": 13700
     },
     "bayan_lesson_packs_v1.json": {
       "file": "hadith/planning/bayan_lesson_packs_v1.json",
-      "sha256": "8b19f51e4a03e85c7461aef0f78fe7f8a8f53530d12c96dfc4e051be5dac70aa",
-      "size_bytes": 128889
+      "sha256": "9267da4d17d7a0eacf0b26d03ff90e2d57325d73ea831c18112c6b01bc7c0d33",
+      "size_bytes": 136828
+    },
+    "six_book_chapter_inventory.json": {
+      "file": "hadith/planning/six_book_chapter_inventory.json",
+      "sha256": "606820bb8e6b4d2028d2048bc61c667b42f4994b0275022b5e33542b521c5ff8",
+      "size_bytes": 58279
+    },
+    "knowledge_arabic/manifest.json": {
+      "file": "hadith/planning/knowledge_arabic/manifest.json",
+      "sha256": "76e1bbbac72a5e1ce21a104987974fc4ef5a094019a58aedcd78790c212683d7",
+      "size_bytes": 3141
+    },
+    "knowledge_arabic/bayan-pass-faith-01.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-faith-01.md",
+      "sha256": "c731e89c35a43d64d2a5d38c6a423c53a97a1c9ff48b0b06eb52134c37d280e7",
+      "size_bytes": 943
+    },
+    "knowledge_arabic/bayan-pass-faith-02.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-faith-02.md",
+      "sha256": "c9f05be6c233d48cfb404cd13b0b5cb57ac0cc881782071aed0816d65b27e6f5",
+      "size_bytes": 837
+    },
+    "knowledge_arabic/bayan-pass-mercy-01.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-mercy-01.md",
+      "sha256": "86579b620dc838d52fdf934ddeb5d4020613b75879251069881cc943261181be",
+      "size_bytes": 1102
+    },
+    "knowledge_arabic/bayan-pass-mercy-02.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-mercy-02.md",
+      "sha256": "0b5b32fc14df213d427caaf73143ef235d0c150cabe64093d8ea9221471ba317",
+      "size_bytes": 883
+    },
+    "knowledge_arabic/bayan-pass-mercy-03.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-mercy-03.md",
+      "sha256": "99d56765762806f855558cacd6478be8b220d264d6a393d4edf0ffb831d91ee4",
+      "size_bytes": 873
+    },
+    "knowledge_arabic/bayan-pass-worship-01.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-worship-01.md",
+      "sha256": "1a988db261f8be5b7cc10bf608e814713b3292740e411cd57b313c6a69ea6102",
+      "size_bytes": 1523
+    },
+    "knowledge_arabic/bayan-pass-worship-02.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-worship-02.md",
+      "sha256": "1a500d988dcb1ffe7199ff93961ddb988e3755c13c949b3fb5aeeb88d5361f6d",
+      "size_bytes": 971
+    },
+    "knowledge_arabic/bayan-pass-family-01.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-family-01.md",
+      "sha256": "0c69ff4663eb51054b552ae938d5b92401dda5b71ab3c9701b88108508ab185e",
+      "size_bytes": 945
+    },
+    "knowledge_arabic/bayan-pass-family-02.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-family-02.md",
+      "sha256": "424be7810c216155e5ad081f73886ed63b4147946700a76d103247225dfeabae",
+      "size_bytes": 979
+    },
+    "knowledge_arabic/bayan-pass-fairness-01.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-fairness-01.md",
+      "sha256": "451529aa63591565eede12efb160b98ccc035b4e1b1d3afc95fcd3acd4b860c5",
+      "size_bytes": 800
+    },
+    "knowledge_arabic/bayan-pass-fairness-02.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-fairness-02.md",
+      "sha256": "0d0e11f52e8ff6343b6cd77e66bf66948833236841099767511ac797d572435c",
+      "size_bytes": 835
+    },
+    "knowledge_arabic/bayan-pass-knowledge-01.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-knowledge-01.md",
+      "sha256": "d12fd150fee4345204a6293f43d2dc2e8ec57c370d82d3d0ed603c4eaa4fa013",
+      "size_bytes": 1050
+    },
+    "knowledge_arabic/bayan-pass-knowledge-02.md": {
+      "file": "hadith/planning/knowledge_arabic/bayan-pass-knowledge-02.md",
+      "sha256": "a971af8800a8757b27cb620883300f71bd05dcde00c8d89d69934156b2121cbb",
+      "size_bytes": 887
     }
   }
 }

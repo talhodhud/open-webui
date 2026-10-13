@@ -1,0 +1,50 @@
+{
+  "chat_id": "d85e4010-7200-4139-8097-77d5e0d0f43f",
+  "model": "bayan-unified-pilot",
+  "prompt": "أنشئ بطاقة تعريفية قصيرة مرئية عن العبادة والحياة، لجمهور مهتم يتعرف على الإسلام.",
+  "tool_calls": [
+    {
+      "name": "view_skill",
+      "arguments": {
+        "id": "hadith-islam-guide"
+      }
+    },
+    {
+      "name": "get_topic_evidence",
+      "arguments": {
+        "topic_id": "topic-worship",
+        "audience": "newcomer",
+        "language": "ar"
+      }
+    },
+    {
+      "name": "get_reviewed_lesson",
+      "arguments": {
+        "topic_id": "topic-worship",
+        "audience": "newcomer",
+        "format": "card",
+        "language": "ar"
+      }
+    }
+  ],
+  "tool_results": [
+    {
+      "status": "ok",
+      "topic_id": "topic-worship",
+      "audience": "newcomer",
+      "format": null,
+      "subtopic_id": null,
+      "presentation": false
+    },
+    {
+      "status": "needs_review",
+      "topic_id": "topic-worship",
+      "audience": "newcomer",
+      "format": "card",
+      "subtopic_id": null,
+      "presentation": true
+    }
+  ],
+  "assistant_confirmation": "استرجعت بطاقة «العبادة في الإسلام: محطات يومية للنقاء والسكينة»؛ وهي مسودة تحتاج مراجعة علمية.",
+  "done": true
+}

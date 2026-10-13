@@ -275,6 +275,30 @@
             }
           ]
         }
+      },
+      "subtopic_cards": {
+        "faith_intention": {
+          "headline": "النية والإخلاص",
+          "takeaway": "يبدأ العمل الصالح بصدق القصد؛ يدعو الحديث إلى استحضار النية في أعمالنا.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-faith-01"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
+        },
+        "faith_conduct": {
+          "headline": "الحياء شعبة من الإيمان",
+          "takeaway": "يربط الحديث الإيمان بخلق الحياء، فيجمع بين الاعتقاد والسلوك.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-faith-02"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
+        }
       }
     },
     {
@@ -632,6 +656,31 @@
             }
           ]
         }
+      },
+      "subtopic_cards": {
+        "mercy_universal": {
+          "headline": "رحمة الناس",
+          "takeaway": "يدعو الحديث إلى الرحمة بمن في الأرض، ويربط رحمة الناس برحمة الله.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-mercy-01",
+            "bayan-pass-mercy-03"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
+        },
+        "mercy_gentleness": {
+          "headline": "الرفق في التعامل",
+          "takeaway": "يعلّمنا الحديث أن الله يحب الرفق في الأمور، وهو مدخل للتعامل بلين.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-mercy-02"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
+        }
       }
     },
     {
@@ -900,6 +949,30 @@
               "citation": "Bukhari — كتاب الإيمان"
             }
           ]
+        }
+      },
+      "subtopic_cards": {
+        "worship_prayer": {
+          "headline": "الصلاة وتجدد الصلة بالله",
+          "takeaway": "يشبّه الحديث الصلوات الخمس بنهر يغسل الأدران، ويبيّن أثرها في محو الخطايا.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-worship-01"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
+        },
+        "worship_fasting": {
+          "headline": "الصيام بإيمان واحتساب",
+          "takeaway": "يربط الحديث صيام رمضان بالإيمان وطلب الأجر من الله، ويذكر مغفرة ما تقدم من الذنب.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-worship-02"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
         }
       }
     },
@@ -1174,6 +1247,19 @@
             }
           ]
         }
+      },
+      "subtopic_cards": {
+        "family_neighbors": {
+          "headline": "مكانة الجار",
+          "takeaway": "تكرار الوصية بالجار في الحديث يبرز عناية الإسلام بحقوق الجوار.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-family-01"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
+        }
       }
     },
     {
@@ -1444,6 +1530,30 @@
               "citation": "Bukhari — كتاب المظالم"
             }
           ]
+        }
+      },
+      "subtopic_cards": {
+        "fairness_trade": {
+          "headline": "النزاهة وترك الغش",
+          "takeaway": "ينهى الحديث عن الغش، ويؤكد مسؤولية الإنسان عن الصدق في تعامله.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-fairness-01"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
+        },
+        "fairness_justice": {
+          "headline": "التحذير من الظلم",
+          "takeaway": "يحذر الحديث من الظلم وعاقبته يوم القيامة، ويدعو إلى حفظ حقوق الآخرين.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-fairness-02"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
         }
       }
     },
@@ -1725,6 +1835,20 @@
               "citation": "Bukhari — كتاب العلم"
             }
           ]
+        }
+      },
+      "subtopic_cards": {
+        "knowledge_seeking": {
+          "headline": "طلب العلم وتيسير التعليم",
+          "takeaway": "يرغّب الحديث في طلب العلم، ويوجه المعلّم إلى التيسير والتبشير.",
+          "learning_objective": "فهم المعنى الذي يدل عليه الشاهد، وحدود ما يمكن الاستدلال به منه.",
+          "passage_ids": [
+            "bayan-pass-knowledge-01",
+            "bayan-pass-knowledge-02"
+          ],
+          "mapping_method": "explicit_passage_selection",
+          "review_status": "needs_review",
+          "scope_note": "يغطي هذا الدرس معنى الشواهد المختارة فقط، ولا يزعم تغطية جميع جوانب المحور الفرعي."
         }
       }
     }

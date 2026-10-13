@@ -2,6 +2,24 @@
 
 This directory contains the custom Hadith intelligence modules, tools, documentation, scripts, tests, deliverables, and UI themes developed for Open WebUI.
 
+## Local closure verified on 12 October 2026
+
+The compiled theme is shipped at `theme/dist/hadith-theme.js` and fingerprinted in the delivery manifest. Install it into an existing Open WebUI frontend with `python hadith/scripts/install_theme_bundle.py` (or supply `--frontend-dir`). The installer backs up the existing loader and asset; `--check-only` verifies the installed version.
+
+The native theme reads recorded `get_hadith_isnad_tree` results through the authenticated same-origin chat API. Route buttons and narrator evidence refer to the originating message and occurrence, including real Open WebUI Mermaid node prefixes. Returning to the original theme restores graph styles. Topic cards launch `bayan-unified-pilot` and request the curated topic skill before any fallback search.
+
+Arabic knowledge uses 13 source-preserving passage documents generated from the canonical lesson packs, with exact quotes, source spans, and stable occurrence IDs. `scripts/deploy_arabic_knowledge.py` verifies natural Arabic questions, enables native BM25 candidate retrieval with embedding reranking, and resolves the knowledge collection ID into the unified and Islam-guide models. The archival JSON collection remains available. Full `vps_deploy_all.py` acceptance now also requires this Arabic verification; an explicit unverified installation does not satisfy that gate. Standalone installation accepts a short-lived existing admin token through `BAYAN_WEBUI_TOKEN`, never in a command argument or evidence log.
+
+The topic tool now returns explicit local source locators and citations for every occurrence and lesson quote. Local positions remain separate from numbers in attributed edition references. The unified and Islam-guide models use Markdown output and the same source-numbering contract; no HTML controls are requested from the model.
+
+Native learning cards render directly from the recorded topic tool's `data.presentation`. Their public face and copy action use Arabic source labels; stable IDs, local positions and verification hashes remain in the closed source drawer. Cards support enlarged viewing, copying and standalone HTML download. Ten of the eighteen taxonomy subtopics have explicitly scoped draft cards; the other eight show unavailable rather than silently falling back to a general lesson. The audience, subtopic and format selections route to `bayan-unified-pilot`.
+
+Topic buttons now send one natural-language sentence describing the subject, audience and format. The native `hadith-islam-guide` skill owns tool sequencing, taxonomy mapping, source handling and card confirmation; the model loads it through `view_skill` when needed. Live tests verified both a general worship card and a prayer subtopic card for an educator, including the actual audience arguments. See `docs/minimal_topic_prompts_and_skill_contract_AR_2026-10-12.md` for the implementation and evidence.
+
+If a package update replaces the frontend loader, tools may still return a card while only its confirmation sentence appears. Reinstall the theme with the installer above and reload the page. The local workspace launcher verifies the theme before its health check. The selected chat theme is remembered across tabs; choosing the original interface remains available.
+
+The local acceptance suite passed **151 Python tests** and **27 theme tests**; Svelte checks found no errors or warnings. This is technical evidence; educational material remains `needs_review` with `scholarly_approved: false`. The updated deployment has not been executed on the external VPS. Native screenshots and the dated closure report are in `planning/native_evidence_2026-10-10/` and `planning/native_cards_and_taxonomy_closure_AR_2026-10-10.md`; older harness screenshots are component-test evidence, not native Open WebUI browser proof.
+
 ---
 
 ## Directory Structure
@@ -23,7 +41,7 @@ hadith/
 │   ├── islam_topic_taxonomy_v1.json           # Pedagogical taxonomy
 │   └── unified_six_skills_execution_audit.json# Cryptographic release fingerprints
 ├── exports/                # One-click Open WebUI JSON packages
-│   ├── hadith_skills_vps_export.json          # 7 unified Hadith skills
+│   ├── hadith_skills_vps_export.json          # 8 unified Hadith skills
 │   └── hadith_models_vps_export.json          # bayan-unified-pilot model definition
 ├── theme/                  # Athar theme POC (Svelte / Vite)
 │   ├── src/
@@ -44,7 +62,7 @@ hadith/
 │   └── narrator_drawer_evidence.json
 ├── migrations/             # Database schema migrations
 │   └── 001_add_link_provenance.sql
-├── tests/                  # Verification test suites (39 tests, 100% pass)
+├── tests/                  # Unit and acceptance suites; see dated evidence for counts
 │   ├── run_all_tests.py    # Master runner for AI evaluators and CI/CD
 │   ├── test_unified_u01_u08.py # U01-U08 architectural acceptance tests
 │   ├── test_bayan_topics.py    # 12 pedagogical & exclusion tests

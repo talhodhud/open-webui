@@ -1,0 +1,33 @@
+{
+  "chat_id": "64f6cd02-034c-44f1-aebf-aa18959cf326",
+  "expected_audience": "educator",
+  "observed_audience": "newcomer",
+  "prompt": "أنشئ بطاقة تعريفية قصيرة مرئية عن الصلاة: معراج الروح ومحطة السكينة اليومية ضمن العبادة والحياة، لجمهور معرّف بالإسلام.",
+  "tool_calls": [
+    {
+      "name": "view_skill",
+      "arguments": {
+        "id": "hadith-islam-guide"
+      }
+    },
+    {
+      "name": "get_topic_evidence",
+      "arguments": {
+        "topic_id": "topic-worship",
+        "audience": "newcomer",
+        "language": "ar"
+      }
+    },
+    {
+      "name": "get_reviewed_lesson",
+      "arguments": {
+        "topic_id": "topic-worship",
+        "audience": "newcomer",
+        "format": "card",
+        "language": "ar",
+        "subtopic_id": "worship_prayer"
+      }
+    }
+  ],
+  "status": "audience_mismatch_reproduced"
+}

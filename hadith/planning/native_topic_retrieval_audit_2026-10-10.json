@@ -1,0 +1,158 @@
+{
+  "checked_at": "2026-10-10T05:02:47.344769+00:00",
+  "model": "bayan-unified-pilot",
+  "knowledge": [
+    {
+      "id": "edc4c3e3-31ef-4f9e-b50c-791de4520169",
+      "name": "بيان السنة — الشواهد العربية الموثقة (13 شاهدًا)",
+      "type": "collection",
+      "review_status": "needs_review",
+      "scholarly_approved": false
+    }
+  ],
+  "collection_file_ids": [
+    "4afc8786-8955-4ce5-970f-3053b8755849",
+    "2c52b991-9515-458c-9d28-ca3fc23d95b9",
+    "498337f7-a8f3-47e9-b7fa-e1ab4207ece6",
+    "ba5547d6-22c5-4d2b-8617-dc8c908ebe20",
+    "ee37d94c-644e-4780-b63b-b852fddf69f4",
+    "bb3e3300-c4ad-4947-b919-c7682af8766b",
+    "a959fe08-4e7c-4d96-8ffb-e45190333481",
+    "2236e5b1-f506-47ea-affd-1c82bd484b6a",
+    "952f2126-da0c-4e11-aec4-26470ffba621",
+    "5ff03c6b-e73d-4dec-9905-5206b760f5ec",
+    "392f6fc9-a6e3-4c77-ac2e-604828782fe9",
+    "c7372ae2-87b8-475a-9d3f-5b2e33810f2d",
+    "0d5ac55c-75db-42e8-9844-3117ad14fbcd"
+  ],
+  "retrieval_settings": {
+    "ENABLE_RAG_HYBRID_SEARCH": true,
+    "HYBRID_BM25_WEIGHT": 1,
+    "TOP_K_RERANKER": 3
+  },
+  "queries": [
+    {
+      "query": "ما معنى الأعمال بالنيات والإخلاص في الإسلام؟",
+      "docs_count": 2,
+      "expected_occurrence_id": "itqan:bukhari:1:1:bf026de7e155",
+      "expected_record_matched": true,
+      "keyword_checked": "الْأَعْمَالُ بِالنِّيَّاتِ",
+      "keyword_matched": true,
+      "documents": [
+        "# الإيمان والمعنى\noccurrence_id: itqan:bukhari:1:1:bf026de7e155\nالشاهد الحرفي من المصدر: «إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى»\nالمصدر: bukhari — كتاب بدء الوحى\nكلمات البحث (ليست نص الحديث): الإيمان والمعنى كيف يربط الإسلام الإيمان بالنية والعمل  إنما الأعمال بالنيات  وإنما لكل امرئ ما نوى\nرقم الموضع المحلي: 1؛ لا يمثل ترقيم كل الطبعات.\nsource_span: [438, 511]\nsource_url: https://github.com/R3GENESI5/Itqan/blob/199d870da5b726356b4a8dbaa096140cffb7d0ab/app/data/sunni/bukhari/1.json\nحالة المادة التعليمية: needs_review؛ scholarly_approved: false. التحقق من النص لا يعني اعتماد الشرح.",
+        "# العبادة والحياة\noccurrence_id: itqan:bukhari:2:31:7d396864714a\nالشاهد الحرفي من المصدر: «مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ»\nالمصدر: bukhari — كتاب الإيمان\nكلمات البحث (ليست نص الحديث): العبادة والحياة ما الصلة بين العبادة والحياة اليومية  من صام رمضان إيمانا واحتسابا غفر له ما تقدم من ذنبه\nرقم الموضع المحلي: 31؛ لا يمثل ترقيم كل الطبعات.\nsource_span: [204, 288]\nsource_url: https://github.com/R3GENESI5/Itqan/blob/199d870da5b726356b4a8dbaa096140cffb7d0ab/app/data/sunni/bukhari/2.json\nحالة المادة التعليمية: needs_review؛ scholarly_approved: false. التحقق من النص لا يعني اعتماد الشرح."
+      ],
+      "snippets": [
+        "# الإيمان والمعنى\noccurrence_id: itqan:bukhari:1:1:bf026de7e155\nالشاهد الحرفي من المصدر: «إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى»\nالمصدر: bukhari",
+        "# العبادة والحياة\noccurrence_id: itqan:bukhari:2:31:7d396864714a\nالشاهد الحرفي من المصدر: «مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ»\nالم"
+      ],
+      "metadatas": [
+        [
+          {
+            "source": "bayan-pass-faith-01.md",
+            "content_type": "text/markdown; charset=utf-8",
+            "collection_name": "edc4c3e3-31ef-4f9e-b50c-791de4520169",
+            "review_status": "needs_review",
+            "file_id": "0d5ac55c-75db-42e8-9844-3117ad14fbcd",
+            "file_hash": "4b1a5d6c24bf66735cbec298b15c625e801c32a5930de0d4a79ba3af923db7d4",
+            "size": 960,
+            "embedding_config": "{'engine': '', 'model': 'sentence-transformers/all-MiniLM-L6-v2'}",
+            "name": "bayan-pass-faith-01.md",
+            "hash": "c731e89c35a43d64d2a5d38c6a423c53a97a1c9ff48b0b06eb52134c37d280e7",
+            "created_by": "059a9be7-b5a5-4be9-88d1-7e0e0fa2548d",
+            "bayan_asset_sha256": "c731e89c35a43d64d2a5d38c6a423c53a97a1c9ff48b0b06eb52134c37d280e7",
+            "start_index": 0,
+            "_chunk_hash": "86caa02f6209e4723259cd5b80663e2c122bff4d4c80dd1d0e82f11855c6773a",
+            "score": 0.39429533853558113
+          },
+          {
+            "content_type": "text/markdown; charset=utf-8",
+            "hash": "1a500d988dcb1ffe7199ff93961ddb988e3755c13c949b3fb5aeeb88d5361f6d",
+            "name": "bayan-pass-worship-02.md",
+            "bayan_asset_sha256": "1a500d988dcb1ffe7199ff93961ddb988e3755c13c949b3fb5aeeb88d5361f6d",
+            "start_index": 0,
+            "source": "bayan-pass-worship-02.md",
+            "size": 988,
+            "file_hash": "36a1ffa67b99c024712df888c62dc082098ba3787281dba3b2988d7a2ad94868",
+            "file_id": "a959fe08-4e7c-4d96-8ffb-e45190333481",
+            "review_status": "needs_review",
+            "created_by": "059a9be7-b5a5-4be9-88d1-7e0e0fa2548d",
+            "embedding_config": "{'engine': '', 'model': 'sentence-transformers/all-MiniLM-L6-v2'}",
+            "_chunk_hash": "be28746fd3859ce8b29626c746dcce4842168f2564cfa707fdfe8515d0fb3427",
+            "score": 0.18734661889038107
+          }
+        ]
+      ]
+    },
+    {
+      "query": "كيف يعلّم الإسلام الرحمة والرفق بالناس؟",
+      "docs_count": 3,
+      "expected_occurrence_id": "itqan:tirmidhi:27:30:b5e57ce2441d",
+      "expected_record_matched": true,
+      "keyword_checked": "الرَّاحِمُونَ",
+      "keyword_matched": true,
+      "documents": [
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:bukhari:78:55:022c1dbdd753\nالشاهد الحرفي من المصدر: «إِنَّ اللَّهَ يُحِبُّ الرِّفْقَ فِي الأَمْرِ كُلِّهِ»\nالمصدر: bukhari — كتاب الأدب\nكلمات البحث (ليست نص الحديث): الرحمة وحسن الخلق كيف تظهر الرحمة في تعامل المسلم مع الناس  إن الله يحب الرفق في الأمر كله\nرقم الموضع المحلي: 55؛ لا يمثل ترقيم كل الطبعات.\nsource_span: [494, 546]\nsource_url: https://github.com/R3GENESI5/Itqan/blob/199d870da5b726356b4a8dbaa096140cffb7d0ab/app/data/sunni/bukhari/78.json\nحالة المادة التعليمية: needs_review؛ scholarly_approved: false. التحقق من النص لا يعني اعتماد الشرح.",
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:bukhari:97:6:c70c14ec93c8\nالشاهد الحرفي من المصدر: «لاَ يَرْحَمُ اللَّهُ مَنْ لاَ يَرْحَمُ النَّاسَ»\nالمصدر: bukhari — كتاب التوحيد\nكلمات البحث (ليست نص الحديث): الرحمة وحسن الخلق كيف تظهر الرحمة في تعامل المسلم مع الناس  لا يرحم الله من لا يرحم الناس\nرقم الموضع المحلي: 6؛ لا يمثل ترقيم كل الطبعات.\nsource_span: [200, 247]\nsource_url: https://github.com/R3GENESI5/Itqan/blob/199d870da5b726356b4a8dbaa096140cffb7d0ab/app/data/sunni/bukhari/97.json\nحالة المادة التعليمية: needs_review؛ scholarly_approved: false. التحقق من النص لا يعني اعتماد الشرح.",
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:tirmidhi:27:30:b5e57ce2441d\nالشاهد الحرفي من المصدر: «الرَّاحِمُونَ يَرْحَمُهُمُ الرَّحْمَنُ ارْحَمُوا مَنْ فِي الأَرْضِ يَرْحَمْكُمْ مَنْ فِي السَّمَاءِ»\nالمصدر: tirmidhi — كتاب البر والصلة عن رسول الله صلى الله عليه وسلم\nكلمات البحث (ليست نص الحديث): الرحمة وحسن الخلق كيف تظهر الرحمة في تعامل المسلم مع الناس  الراحمون يرحمهم الرحمن ارحموا من في الأرض يرحمكم من في السماء\nرقم الموضع المحلي: 30؛ لا يمثل ترقيم كل الطبعات.\nsource_span: [188, 287]\nsource_url: https://github.com/R3GENESI5/Itqan/blob/199d870da5b726356b4a8dbaa096140cffb7d0ab/app/data/sunni/tirmidhi/27.json\nحالة المادة التعليمية: needs_review؛ scholarly_approved: false. التحقق من النص لا يعني اعتماد الشرح."
+      ],
+      "snippets": [
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:bukhari:78:55:022c1dbdd753\nالشاهد الحرفي من المصدر: «إِنَّ اللَّهَ يُحِبُّ الرِّفْقَ فِي الأَمْرِ كُلِّهِ»\nالمصدر: bukhari — كتاب الأدب\nكلم",
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:bukhari:97:6:c70c14ec93c8\nالشاهد الحرفي من المصدر: «لاَ يَرْحَمُ اللَّهُ مَنْ لاَ يَرْحَمُ النَّاسَ»\nالمصدر: bukhari — كتاب التوحيد\nكلمات ا",
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:tirmidhi:27:30:b5e57ce2441d\nالشاهد الحرفي من المصدر: «الرَّاحِمُونَ يَرْحَمُهُمُ الرَّحْمَنُ ارْحَمُوا مَنْ فِي الأَرْضِ يَرْحَمْكُمْ مَنْ "
+      ],
+      "metadatas": [
+        [
+          {
+            "file_id": "5ff03c6b-e73d-4dec-9905-5206b760f5ec",
+            "name": "bayan-pass-mercy-02.md",
+            "created_by": "059a9be7-b5a5-4be9-88d1-7e0e0fa2548d",
+            "hash": "0b5b32fc14df213d427caaf73143ef235d0c150cabe64093d8ea9221471ba317",
+            "file_hash": "2c41d995a8369498c9031479de8dad49ce89075f90c4a2867e8cad24633c5330",
+            "review_status": "needs_review",
+            "size": 900,
+            "source": "bayan-pass-mercy-02.md",
+            "start_index": 0,
+            "embedding_config": "{'engine': '', 'model': 'sentence-transformers/all-MiniLM-L6-v2'}",
+            "content_type": "text/markdown; charset=utf-8",
+            "bayan_asset_sha256": "0b5b32fc14df213d427caaf73143ef235d0c150cabe64093d8ea9221471ba317",
+            "_chunk_hash": "c6065ca5e8417a835ac8e08e15950b377dc52d301f7a46431e4ee92c314d0c68",
+            "score": 0.3830982156542798
+          },
+          {
+            "source": "bayan-pass-mercy-03.md",
+            "review_status": "needs_review",
+            "file_hash": "a2bf4ca42a4d980b299d9535b12907b227db6cfdb723dbbf77659e1aae633703",
+            "size": 890,
+            "embedding_config": "{'engine': '', 'model': 'sentence-transformers/all-MiniLM-L6-v2'}",
+            "created_by": "059a9be7-b5a5-4be9-88d1-7e0e0fa2548d",
+            "start_index": 0,
+            "bayan_asset_sha256": "99d56765762806f855558cacd6478be8b220d264d6a393d4edf0ffb831d91ee4",
+            "file_id": "2236e5b1-f506-47ea-affd-1c82bd484b6a",
+            "content_type": "text/markdown; charset=utf-8",
+            "hash": "99d56765762806f855558cacd6478be8b220d264d6a393d4edf0ffb831d91ee4",
+            "name": "bayan-pass-mercy-03.md",
+            "_chunk_hash": "dbe1be109cbe5cf013e861a7762a7de82a893746580b8c0ecd0c2c67babf6702",
+            "score": 0.3656887450007198
+          },
+          {
+            "name": "bayan-pass-mercy-01.md",
+            "created_by": "059a9be7-b5a5-4be9-88d1-7e0e0fa2548d",
+            "file_id": "392f6fc9-a6e3-4c77-ac2e-604828782fe9",
+            "content_type": "text/markdown; charset=utf-8",
+            "source": "bayan-pass-mercy-01.md",
+            "start_index": 0,
+            "hash": "86579b620dc838d52fdf934ddeb5d4020613b75879251069881cc943261181be",
+            "embedding_config": "{'engine': '', 'model': 'sentence-transformers/all-MiniLM-L6-v2'}",
+            "file_hash": "f0f2bb23e545f6095b72a6325b57bc510398b98df74a1d3e9d626f9842b90d06",
+            "review_status": "needs_review",
+            "bayan_asset_sha256": "86579b620dc838d52fdf934ddeb5d4020613b75879251069881cc943261181be",
+            "size": 1119,
+            "_chunk_hash": "e61338d6f6588284369017703540370bdc5e78ba5f79b7ab4c5a81d7e1cf0889",
+            "score": 0.28672905726420833
+          }
+        ]
+      ]
+    }
+  ]
+}

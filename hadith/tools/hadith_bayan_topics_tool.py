@@ -1,12 +1,13 @@
 """
 title: Bayan al-Sunnah: Islamic Topics & Introductory Evidence Tool
 author: Hadith Project
-version: 1.1.0
+version: 1.2.0
 description: Read-only access to six reviewed introductory Islamic topics, scriptural evidence occurrences, and audience-tailored lesson formats with strict contract validation.
 """
 
 import os
 import json
+import hashlib
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 from pydantic import BaseModel, Field
@@ -34,6 +35,26 @@ except ImportError:
 
 
 class Tools:
+    @staticmethod
+    def _source_locator(occ: Dict[str, Any]) -> Dict[str, Any]:
+        """Keep dataset positions separate from numbers mentioned in attributed rulings."""
+        position = occ.get("source_position")
+        label = (f"موضع المصدر المحلي: {position}" if position is not None
+                 else "موضع المصدر المحلي: غير متاح في المصدر المسترجع")
+        return {
+            "numbering_system": "itqan_local_position",
+            "source_position": position,
+            "source_entry_id": occ.get("source_entry_id"),
+            "source_url": occ.get("source_url"),
+            "display_label": label,
+            "numbering_note": "هذا موضع السجل في بيانات إتقان، وليس رقم الحديث في جميع الطبعات. أرقام attributed_judgment إحالات مستقلة ولا تحل محله."
+        }
+
+    @classmethod
+    def _source_citation(cls, occ: Dict[str, Any]) -> str:
+        return (f"{occ['collection'].title()} — {occ['chapter_title']} — "
+                f"{cls._source_locator(occ)['display_label']} ({occ['occurrence_id']})")
+
     @staticmethod
     def _verify_json_file(path: str) -> bool:
         if not path or not os.path.exists(path):
@@ -211,7 +232,7 @@ class Tools:
                 "title_en": t["title_en"],
                 "initial_question_ar": t["initial_question_ar"],
                 "subtopics_count": len(t.get("subtopics", [])),
-                "subtopics": [st["title_ar"] for st in t.get("subtopics", [])]
+                "subtopics": [{**st, "card_available": st["id"] in next((p.get("subtopic_cards", {}) for p in (self._lesson_packs_cache or {}).get("topics", []) if p["topic_id"] == t["id"]), {})} for st in t.get("subtopics", [])]
             })
 
         return to_json_str(build_response(
@@ -297,6 +318,10 @@ class Tools:
 
             evidence_occurrences.append({
                 "occurrence_id": occ_id,
+                "source_position": occ.get("source_position"),
+                "source_entry_id": occ.get("source_entry_id"),
+                "source_locator": self._source_locator(occ),
+                "source_citation": self._source_citation(occ),
                 "passage_id": occ.get("passage_id"),
                 "collection": occ["collection"],
                 "chapter_title": occ["chapter_title"],
@@ -336,12 +361,13 @@ class Tools:
             }
         ))
 
-    def get_reviewed_lesson(self, topic_id: str, audience: str = "newcomer", format: str = "card", language: str = "ar") -> str:
+    def get_reviewed_lesson(self, topic_id: str, audience: str = "newcomer", format: str = "card", language: str = "ar", subtopic_id: str = "") -> str:
         """
         Retrieve audience-tailored educational lesson content: 'card' (short card), 'qa' (Q&A), or 'two_minute' (narrative).
         
         :param topic_id: Unique topic ID: 'topic-faith', 'topic-mercy', 'topic-worship', 'topic-family', 'topic-fairness', 'topic-knowledge'.
         :param audience: Target audience: 'newcomer', 'new_muslim', or 'educator'. Default: 'newcomer'.
+        :param subtopic_id: Optional taxonomy subtopic ID. Only explicitly mapped short cards are available; no silent fallback to the parent lesson.
         :param format: Output format: 'card', 'qa', or 'two_minute'. Default: 'card'.
         :param language: Output language ('ar'). Other languages return status: unavailable until reviewed.
         :return: Standardized JSON envelope with discrete quotes, takeaway, citations, and review status.
@@ -403,17 +429,30 @@ class Tools:
         else:
             format_content = format_dict
 
-        occurrence_ids = [occ["occurrence_id"] for occ in matched_topic.get("occurrences", [])]
-        citations = [
-            f"{occ['collection'].title()} — {occ['chapter_title']} ({occ['occurrence_id']})"
-            for occ in matched_topic.get("occurrences", [])
-        ]
+        clean_subtopic = subtopic_id.strip().lower()
+        selected_occurrences = matched_topic.get("occurrences", [])
+        subtopic = None
+        if clean_subtopic:
+            tax_topic = next((t for t in (self._taxonomy_cache or {}).get("topics", []) if t["id"] == clean_topic_id), {})
+            subtopic = next((s for s in tax_topic.get("subtopics", []) if s["id"] == clean_subtopic), None)
+            scoped = matched_topic.get("subtopic_cards", {}).get(clean_subtopic)
+            if not subtopic:
+                return to_json_str(build_response(status="invalid_reference", data={"topic_id": clean_topic_id, "subtopic_id": clean_subtopic}, warnings=["المحور الفرعي لا ينتمي إلى هذا الموضوع."]))
+            if not scoped or clean_format != "card":
+                return to_json_str(build_response(status="unavailable", data={"topic_id": clean_topic_id, "subtopic_id": clean_subtopic, "available_formats": ["card"] if scoped else []}, warnings=["لم تُجهز مادة بهذه الصيغة لهذا المحور بعد؛ لا نستبدلها بالدرس العام دون اختيارك."]))
+            wanted = set(scoped["passage_ids"])
+            selected_occurrences = [o for o in selected_occurrences if o.get("passage_id") in wanted]
+            learning_objective = scoped["learning_objective"]
+            format_content = {**format_content, "headline": scoped["headline"], "takeaway": scoped["takeaway"], "quotes": [q for q in format_content.get("quotes", []) if q.get("passage_id") in wanted]}
+
+        occurrence_ids = [occ["occurrence_id"] for occ in selected_occurrences]
+        citations = [self._source_citation(occ) for occ in selected_occurrences]
 
         quotes = []
         if clean_format == "card":
-            quotes = format_content.get("quotes", [])
+            quotes = [dict(q) for q in format_content.get("quotes", [])]
         else:
-            for occ in matched_topic.get("occurrences", []):
+            for occ in selected_occurrences:
                 quotes.append({
                     "occurrence_id": occ["occurrence_id"],
                     "passage_id": occ.get("passage_id"),
@@ -422,7 +461,33 @@ class Tools:
                     "citation": f"{occ['collection'].title()} — {occ['chapter_title']}"
                 })
 
-        collections_found = set(occ["collection"] for occ in matched_topic.get("occurrences", []))
+        by_id = {occ["occurrence_id"]: occ for occ in selected_occurrences}
+        for quote in quotes:
+            occurrence = by_id.get(quote.get("occurrence_id"))
+            if occurrence is not None:
+                quote["source_locator"] = self._source_locator(occurrence)
+                quote["citation"] = self._source_citation(occurrence)
+        # Do not mutate the cached pack, including its audience-specific card data.
+        if clean_format == "card":
+            format_content = {**format_content, "quotes": quotes}
+
+        presentation = None
+        if clean_format == "card":
+            names = {"bukhari": "صحيح البخاري", "muslim": "صحيح مسلم", "tirmidhi": "جامع الترمذي", "abudawud": "سنن أبي داود", "nasai": "سنن النسائي", "ibnmajah": "سنن ابن ماجه"}
+            visual_quotes = []
+            for q in quotes:
+                o = by_id.get(q.get("occurrence_id"))
+                exact = q.get("exact_text") or (o or {}).get("exact_quote", {}).get("arabic", "")
+                span = q.get("source_span", [])
+                raw = (o or {}).get("arabic_text", "")
+                if not o or len(span) != 2 or not all(isinstance(x, int) for x in span) or not (0 <= span[0] < span[1] <= len(raw)) or raw[span[0]:span[1]] != exact or hashlib.sha256(raw.encode()).hexdigest() != o.get("text_sha256"):
+                    return to_json_str(build_response(status="unavailable", warnings=["تعذر التحقق الحرفي من شاهد البطاقة؛ لم يتم إنشاء بطاقة غير موثقة."]))
+                visual_quotes.append({"exact_text": exact, "source_label": names.get(o["collection"], o["collection"]) + " · " + o["chapter_title"], "occurrence_id": o["occurrence_id"], "source_url": o["source_url"], "source_span": span, "text_sha256": o["text_sha256"], "source_locator": self._source_locator(o), "attributed_judgment": o.get("attributed_judgment"), "selection_rationale": o.get("selection_rationale", "")})
+            if not visual_quotes:
+                return to_json_str(build_response(status="unavailable", warnings=["لا تتوفر شواهد قابلة للتحقق لهذه البطاقة."]))
+            presentation = {"schema_version": "1", "type": "hadith_card", "headline": format_content["headline"], "takeaway": format_content["takeaway"], "quotes": visual_quotes, "source_details_collapsed": True, "review_status": "needs_review"}
+
+        collections_found = set(occ["collection"] for occ in selected_occurrences)
 
         return to_json_str(build_response(
             status="needs_review",
@@ -434,6 +499,10 @@ class Tools:
                 "learning_objective": learning_objective,
                 "format": clean_format,
                 "lesson_content": format_content,
+                "presentation": presentation,
+                "subtopic_id": clean_subtopic or None,
+                "subtopic_title": subtopic["title_ar"] if subtopic else None,
+                "scope_note": scoped["scope_note"] if clean_subtopic else "هذه شواهد منتقاة للموضوع، وليست حصرًا لجميع أحاديثه.",
                 "quotes": quotes,
                 "occurrence_ids": occurrence_ids,
                 "citations": citations,

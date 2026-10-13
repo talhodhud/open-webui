@@ -1028,6 +1028,23 @@ def deploy_and_verify(
                 elif not allow_unverified_install:
                     raise ValueError(f"Verification Failed: Knowledge retrieval status is '{retrieval_evidence.get('status')}', expected 'verified'!")
 
+        # A successful alias/ID query is insufficient for an Arabic-facing product.
+        # Resolve the native knowledge ID per installation rather than exporting a local UUID.
+        if not allow_unverified_install:
+            scripts_path = str(REPO_HADITH_DIR / "scripts")
+            if scripts_path not in sys.path:
+                sys.path.insert(0, scripts_path)
+            from deploy_arabic_knowledge import install as install_arabic_knowledge
+            if not secret_key:
+                raise ValueError("Cannot verify natural Arabic retrieval without the existing WebUI secret.")
+            arabic_evidence = install_arabic_knowledge(
+                resolved_webui_url, create_internal_jwt_token(admin_id, secret_key),
+                REPO_HADITH_DIR / "planning/arabic_knowledge_live_evidence.json"
+            )
+            if arabic_evidence.get("status") != "verified":
+                raise ValueError("Natural Arabic retrieval verification failed.")
+            print("  ✅ Natural Arabic retrieval and resolved model-knowledge bindings verified.")
+
     except Exception as e:
         print(f"\n❌ CRITICAL DEPLOYMENT FAILURE: {e}")
         conn.rollback()

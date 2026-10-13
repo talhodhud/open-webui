@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-10-10T04:42:33.659028+00:00",
+  "status": "verified",
+  "records": [
+    {
+      "kind": "model",
+      "id": "hadith-islam-guide",
+      "sha256": "e3bd94fe974a531ea60ef55d9316d56133066ea09363da6d31c67a2a34e4b8fa",
+      "saved_exactly": true,
+      "effective_access_preserved": true
+    },
+    {
+      "kind": "model",
+      "id": "bayan-unified-pilot",
+      "sha256": "861c7f818af20ad8c8cc0867fa762d457e91da94b44808b94d1c8be630df708a",
+      "saved_exactly": true,
+      "effective_access_preserved": true
+    },
+    {
+      "kind": "skill",
+      "id": "hadith-islam-guide",
+      "sha256": "aa9068cc91e36ffd1af4110470f903eafeb8d1b381184089db41fc2c8749d284",
+      "saved_exactly": true,
+      "effective_access_preserved": true
+    },
+    {
+      "kind": "skill",
+      "id": "hadith-source-provenance",
+      "sha256": "50ae9b9756ed1da7dcbe6103164dddee968502e6d15fa39c12da70e1256b4fd9",
+      "saved_exactly": true,
+      "effective_access_preserved": true
+    },
+    {
+      "kind": "skill",
+      "id": "hadith-bayan-maestro",
+      "sha256": "b98511fcaadadf1981c1772220444cda421f339684d420de853f6f4bd111aed5",
+      "saved_exactly": true,
+      "effective_access_preserved": true
+    },
+    {
+      "kind": "tool",
+      "id": "hadith_bayan_topics",
+      "sha256": "604fe81fc8a5b451b020fed978c4772e5ec64c6d0e8b6105c09c8967c51fb2db",
+      "saved_exactly": true,
+      "effective_access_preserved": true,
+      "valves_preserved": true
+    }
+  ]
+}

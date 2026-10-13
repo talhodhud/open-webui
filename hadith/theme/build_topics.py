@@ -6,7 +6,9 @@ from pathlib import Path
 import json, sys
 sys.stdout.reconfigure(encoding='utf-8')
 
-ROOT = Path(__file__).resolve().parents[2]
+THEME_DIR = Path(__file__).resolve().parent
+# The same generator runs in the POC workspace and in the delivered hadith tree.
+ROOT = THEME_DIR.parent if THEME_DIR.parent.name == 'hadith' else THEME_DIR.parents[1]
 
 taxonomy = json.loads((ROOT / 'planning/islam_topic_taxonomy_v1.json').read_text(encoding='utf-8'))
 packs = json.loads((ROOT / 'planning/bayan_lesson_packs_v1.json').read_text(encoding='utf-8'))
@@ -45,7 +47,9 @@ for t in taxonomy['topics']:
         {
             'id': st['id'],
             'title': st['title_ar'],
-            'objective': st['learning_objective']
+            'objective': st['learning_objective'],
+            'cardAvailable': st['id'] in pack.get('subtopic_cards', {}),
+            'scopeNote': pack.get('subtopic_cards', {}).get(st['id'], {}).get('scope_note', 'لم تُجهز شواهد هذا المحور الفرعي بعد.')
         }
         for st in t.get('subtopics', [])
     ]
@@ -75,8 +79,8 @@ for t in taxonomy['topics']:
     }
     topics_out.append(topic_entry)
 
-target_json = ROOT / 'poc/theme/src/topics.json'
-target_ts = ROOT / 'poc/theme/src/topics.ts'
+target_json = THEME_DIR / 'src/topics.json'
+target_ts = THEME_DIR / 'src/topics.ts'
 
 target_json.write_text(json.dumps(topics_out, ensure_ascii=False, indent=2), encoding='utf-8')
 

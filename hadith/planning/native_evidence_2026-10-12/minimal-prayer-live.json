@@ -1,0 +1,42 @@
+{
+  "chat_id": "4ad48a42-f557-4785-ad1a-7bc6e7f083fe",
+  "model": "bayan-unified-pilot",
+  "prompt": "أنشئ بطاقة تعريفية قصيرة مرئية عن الصلاة: معراج الروح ومحطة السكينة اليومية ضمن العبادة والحياة، لجمهور معرّف بالإسلام.",
+  "tool_calls": [
+    {
+      "name": "view_skill",
+      "arguments": {
+        "id": "hadith-islam-guide"
+      }
+    },
+    {
+      "name": "get_topic_evidence",
+      "arguments": {
+        "topic_id": "topic-worship",
+        "audience": "educator",
+        "language": "ar"
+      }
+    },
+    {
+      "name": "get_reviewed_lesson",
+      "arguments": {
+        "topic_id": "topic-worship",
+        "audience": "educator",
+        "format": "card",
+        "language": "ar",
+        "subtopic_id": "worship_prayer"
+      }
+    }
+  ],
+  "lesson": {
+    "topic_id": "topic-worship",
+    "subtopic_id": "worship_prayer",
+    "audience": "educator",
+    "format": "card",
+    "headline": "الصلاة وتجدد الصلة بالله",
+    "quotes_count": 1,
+    "review_status": "needs_review"
+  },
+  "assistant_confirmation": "استرجعت بطاقة «الصلاة وتجدد الصلة بالله»؛ وهي مسودة تحتاج مراجعة علمية.",
+  "done": true
+}

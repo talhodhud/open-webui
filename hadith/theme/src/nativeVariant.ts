@@ -1,4 +1,6 @@
 import css from './nativeVariant.css?inline';
+import { lessonsFromNativeChat } from './nativeLesson';
+import { createLessonCard } from './nativeCardUI';
 import {
   BRAND,
   JOURNEYS,
@@ -16,6 +18,7 @@ import {
 } from './journeys';
 import { TOPIC_EVIDENCE } from './topicEvidence';
 import { localizeAuthPage } from './authLocalizer';
+import { graphFromNativeChat, nativeMermaidNodeId } from './nativeGraph';
 
 type Audience='topics'|'learn'|'research';
 
@@ -48,12 +51,43 @@ export function createNativeVariant(){
   const authFeatures=element('div','athar-v2-auth-features');for(const [i,t]of [['book','تعلّم وعرّف'],['branch','توسّع وتحقّق']]){const item=element('span','');item.append(icon(i),document.createTextNode(t));authFeatures.append(item);}authIntro.append(authFeatures);
   const authCases=element('div','bayan-auth-cases');for(const item of JOURNEYS){const b=button('','',()=>openDemo(item));b.append(icon(item.icon),document.createTextNode(item.title),icon('arrow'));authCases.append(b);}authIntro.append(authCases,element('small','','مشروع بيان السنة'));
   const authTopic=button('bayan-auth-topic','رحلة التعريف بالإسلام · استكشف الموضوعات',()=>openGallery(true));authIntro.insertBefore(authTopic,authCases);
+  const lessonNodes = new Map<string, {node:HTMLElement, signature:string, prose:HTMLElement|null}>();
+  let nativeLessons:any[]=[];
+  function clearLessonCards(){
+    for(const {node,prose} of lessonNodes.values()){node.remove();if(prose)delete prose.dataset.bayanProseHidden;}
+    lessonNodes.clear();nativeLessons=[];
+    document.querySelectorAll('.bayan-card-dialog').forEach(d=>d.remove());
+  }
+  function renderLessonCards(){
+    const current=new Set(nativeLessons.map(l=>l.message_id));
+    for(const [id,item] of lessonNodes){if(!current.has(id)||!item.node.isConnected){item.node.remove();if(item.prose)delete item.prose.dataset.bayanProseHidden;lessonNodes.delete(id);}}
+    for(const lesson of nativeLessons){
+      const message=document.getElementById(`message-${lesson.message_id}`);if(!message)continue;
+      const signature=JSON.stringify(lesson),old=lessonNodes.get(lesson.message_id);
+      if(old?.signature===signature)continue;
+      if(old){old.node.remove();if(old.prose)delete old.prose.dataset.bayanProseHidden;}
+      const prose=message.querySelector<HTMLElement>('#response-content-container');
+      const card=createLessonCard(lesson,()=>openGallery(true),prose?()=>{prose.dataset.bayanProseHidden=prose.dataset.bayanProseHidden==='true'?'false':'true';}:undefined);
+      if(prose){prose.dataset.bayanProseHidden='true';prose.before(card);}else message.append(card);
+      lessonNodes.set(lesson.message_id,{node:card,signature,prose});
+    }
+  }
   let enabled=false;let audience:Audience='topics';const marked=new Set<HTMLElement>();
   let selectedPathId: string | undefined = undefined;
   let routeKind: 'all_paths' | 'specific_path' = 'all_paths';
   let activeMentionId: string | undefined = undefined;
   let activeAnchorName: string | undefined = undefined;
   let activeGraphData: ActiveGraphData | null = null;
+  let nativeGraphData: ActiveGraphData | null = null;
+  let graphRequest: AbortController | null = null;
+  let lastGraphFetch = 0;
+  let graphTimer: ReturnType<typeof setInterval> | undefined;
+  const graphStyles = new Map<SVGElement, { opacity: string; filter: string }>();
+  function restoreGraphStyles(){
+    for(const [node,original] of graphStyles){node.style.opacity=original.opacity;node.style.filter=original.filter;}
+    graphStyles.clear();
+    document.querySelectorAll('#chat-pane svg[data-selected-path]').forEach(svg=>svg.removeAttribute('data-selected-path'));
+  }
   let active=getJourney(new URLSearchParams(location.search).get('case'));
   let pendingLaunch=!!active;let lastPath=location.pathname;let lastContextCase='';let lastContextSignature='';
   const caseMap:Record<string,string>=readCaseMap();if(!active)active=getJourney(caseMap[location.pathname]);
@@ -68,8 +102,8 @@ export function createNativeVariant(){
     const inserted=document.execCommand('insertText',false,(input.innerText.trim()?'\n\n':'')+prompt);
     followupPanel.dataset.notice=inserted?'أضيف السؤال إلى المسودة.':'يمكنك كتابة السؤال في مربع المحادثة.';
   }
-  function launch(journey:Journey,submit:boolean,question?:string){
-    launchDestination(buildJourneyURL(location.origin,journey.id,submit,question,{mode:'unified'}));
+  function launch(journey:Journey,submit:boolean,question?:string,options:{audience?:string;format?:string;subtopicId?:string}={}){
+    launchDestination(buildJourneyURL(location.origin,journey.id,submit,question,{mode:'unified',...options}));
   }
   function launchDestination(destination:string){
     if(location.pathname.startsWith('/auth'))destination='/auth?'+new URLSearchParams({redirect:new URL(destination).pathname+new URL(destination).search,athar:'chat'});
@@ -115,15 +149,18 @@ export function createNativeVariant(){
           occurrence_id: occurrence_id || n.occurrence_id,
           mention_id: n.mention_id,
           source_span: n.source_span,
-          source_span_text: n.source_span_text,
+          source_span_text: n.source_span_text || (Array.isArray(n.source_span) && typeof d.isnad_text==='string'
+            ? d.isnad_text.slice(n.source_span[0],n.source_span[1]) : undefined),
           canonical_name: n.canonical_name,
           identity_status: n.identity_status || n.status,
           candidates: n.candidates,
-          grade_text: n.grade || n.grade_ar,
+          grade_text: n.identity_status === 'resolved' ? (n.grade || n.grade_ar) : undefined,
           grade_source: n.grade_source,
           ibn_hajar: n.ibn_hajar,
           dhahabi: n.dhahabi,
-          anchor_name: n.anchor_name
+          anchor_name: n.anchor_name,
+          identity_evidence: n.evidence_source,
+          resolution_rule: n.resolution_rule
         };
         if (raw) nodes.set(raw, details);
         if (n.id) nodeIdMap.set(String(n.id).toLowerCase(), details);
@@ -134,6 +171,7 @@ export function createNativeVariant(){
   }
 
   function extractActiveGraphData(): ActiveGraphData | null {
+    if (nativeGraphData) return nativeGraphData;
     if (typeof window !== 'undefined' && (window as any).__BAYAN_GRAPH__) {
       return normalizeGraphPayload((window as any).__BAYAN_GRAPH__);
     }
@@ -158,6 +196,30 @@ export function createNativeVariant(){
     return null;
   }
 
+  async function syncNativeGraph() {
+    const match = location.pathname.match(/^\/c\/([a-f\d-]{36})$/i);
+    if (!enabled || document.hidden || !match || graphRequest || Date.now() - lastGraphFetch < 2500) return;
+    const route = location.pathname;
+    const request = new AbortController(); graphRequest = request; lastGraphFetch = Date.now();
+    try {
+      const response = await fetch(`/api/v1/chats/${match[1]}`, {
+        credentials: 'same-origin', signal: request.signal, cache: 'no-store'
+      });
+      if (!response.ok) return;
+      const chat = await response.json();
+      if (!enabled || location.pathname !== route || request.signal.aborted) return;
+      const ids = [...document.querySelectorAll('#chat-pane [id^="message-"]')]
+        .filter(e => /^message-[a-f\d-]{36}$/i.test(e.id))
+        .map(e => e.id.replace(/^message-/, ''));
+      nativeLessons=lessonsFromNativeChat(chat,ids);renderLessonCards();
+      if(nativeLessons.length&&nativeLessons[0].message_id===ids.at(-1)&&active?.id!==nativeLessons[0].topic_id){active=getJourney(nativeLessons[0].topic_id);lastContextSignature="";}
+      const payload = graphFromNativeChat(chat, ids);
+      nativeGraphData = payload ? normalizeGraphPayload(payload) : null;
+      refresh();
+    } catch { /* Offline, unauthorized, or cancelled: do not invent graph data. */ }
+    finally { if (graphRequest === request) graphRequest = null; }
+  }
+
   function openNarratorDrawer(details: NarratorNodeDetails){
     if(!demoDialog.isConnected)document.body.append(demoDialog);demoDialog.replaceChildren();
     const formatted = formatNarratorEvidenceDetails(details);
@@ -169,7 +231,9 @@ export function createNativeVariant(){
     card.append(element('p','bayan-detail-row','معرف السجل (occurrence_id): '+formatted.occurrence_id));
     card.append(element('p','bayan-detail-row','معرف الورود (mention_id): '+formatted.mention_id));
     card.append(element('p','bayan-detail-row','النطاق النصي (source_span): '+formatted.source_span_display));
-    card.append(element('p','bayan-detail-row','التعيين المعتمد: '+formatted.canonical_name));
+    card.append(element('p','bayan-detail-row',(details.identity_status==='resolved'?'التعيين المدعوم بالدليل: ':'التعيين المقترح غير المحسوم: ')+formatted.canonical_name));
+    if(details.resolution_rule)card.append(element('p','bayan-detail-row','قاعدة التعيين: '+details.resolution_rule));
+    if(details.identity_evidence)card.append(element('p','bayan-detail-row','مصدر دليل الهوية: '+details.identity_evidence));
     if(details.anchor_name)card.append(element('p','bayan-detail-row','صاحب الضمير والسياق: '+details.anchor_name));
 
     const badgeWrap=element('div','bayan-badge-group');
@@ -214,9 +278,9 @@ export function createNativeVariant(){
 
     // 3. Exact lookup by Mermaid SVG element ID (e.g. flowchart-N1_1_A-123 or flowchart-NS_1-456)
     if(el.id&&activeGraphData?.nodeIdMap){
-      const m=el.id.match(/^flowchart-([a-zA-Z0-9_]+)(?:-\d+)?$/);
-      if(m&&activeGraphData.nodeIdMap.has(m[1].toLowerCase())){
-        return activeGraphData.nodeIdMap.get(m[1].toLowerCase())!;
+      const nid=nativeMermaidNodeId(el.id)?.toLowerCase();
+      if(nid&&activeGraphData.nodeIdMap.has(nid)){
+        return activeGraphData.nodeIdMap.get(nid)!;
       }
     }
 
@@ -255,6 +319,7 @@ export function createNativeVariant(){
     if(!chatPane)return;
     const target=(event.target as HTMLElement)?.closest('#chat-pane .node, #chat-pane g.node, #chat-pane [data-narrator-id], #chat-pane .bayan-narrator-node, #chat-pane g[id^="flowchart-"]');
     if(target&&!demoDialog.open){
+      if(activeGraphData?.message_id&&target.closest('[id^="message-"]')?.id!==`message-${activeGraphData.message_id}`)return;
       const text=target.textContent?.trim().replace(/\s+/g,' ')||'';
       if(text){
         const details=resolveNarratorDetailsFromDOM(text,target as HTMLElement);
@@ -270,16 +335,23 @@ export function createNativeVariant(){
     const close=button('bayan-close','',()=>demoDialog.close());close.setAttribute('aria-label','أغلق عرض الحالة');close.append(icon('close'));
     const content=element('div','bayan-demo-content');content.append(close,element('span','bayan-kicker','حالة تطبيقية · '+journey.category));
     const title=element('h2','',journey.title);title.id='bayan-demo-title';content.append(title,element('p','bayan-demo-intro',journey[audience==='research'?'research':'learn']));
-    let reader='newcomer';let format='card';let prepared=journey.topic?topicQuestion(journey,reader,format):journey.question;
+    let reader='newcomer';let format='card';let subtopicId='';let prepared=journey.topic?topicQuestion(journey,reader,format):journey.question;
     const question=element('blockquote','bayan-question',prepared);
     if(journey.topic){
       const choices=element('div','bayan-topic-options');
       for(const [label,values,key]of [['لمن تُعدّ المادة؟',[['مهتم يتعرف على الإسلام','newcomer'],['حديث العهد بالإسلام','new_muslim'],['معرّف بالإسلام','educator']],'reader'],['كيف تريد تقديمها؟',[['بطاقة تعريفية قصيرة','card'],['حوار سؤال وجواب','qa'],['كلمة تعريفية من دقيقتين','two_minute']],'format']] as const){
-        const field=element('label','',label);const select=element('select','');for(const [txt,val] of values){const option=element('option','',txt);option.value=val;select.append(option);}select.onchange=()=>{if(key==='reader')reader=select.value;else format=select.value;prepared=topicQuestion(journey,reader,format);question.textContent=prepared;};field.append(select);choices.append(field);
-      }content.append(choices);
+        const field=element('label','',label);const select=element('select','');for(const [txt,val] of values){const option=element('option','',txt);option.value=val;select.append(option);}select.onchange=()=>{if(key==='reader')reader=select.value;else format=select.value;if(format!=='card'){subtopicId='';subtopics.value='';}prepared=topicQuestion(journey,reader,format,subtopicId);question.textContent=prepared;updateObjective();};field.append(select);choices.append(field);
+      }
+      const subField=element('label','','اختر محورًا من تحليل المحتوى');const subtopics=element('select','');subtopics.setAttribute('aria-label','المحور الفرعي');subtopics.append(new Option('جولة عامة في الموضوع',''));
+      for(const sub of journey.topic.subtopics){const o=new Option(sub.title+(sub.cardAvailable?'':' · مادته قيد الإعداد'),sub.id);subtopics.append(o);}
+      const objective=element('p','bayan-learning-objective');objective.setAttribute('aria-live','polite');
+      const readiness=element('p','bayan-subtopic-readiness');readiness.setAttribute('role','status');
+      function updateObjective(){const selected=journey.topic?.subtopics.find(s=>s.id===subtopicId);objective.textContent=selected?'هدف المحور: '+selected.objective:'اختر محورًا أدق، أو ابدأ بجولة تضم الشواهد المنتقاة للموضوع.';readiness.textContent=selected?(selected.cardAvailable?selected.scopeNote:'هذا المحور موجود في التصنيف؛ لم تُجهز شواهده بعد. اختر محورًا آخر أو الجولة العامة.'):'٦ موضوعات مبنية على تحليل المحتوى؛ جميع المواد التعليمية تحتاج مراجعة علمية.';const ready=!selected||selected.cardAvailable;content.querySelectorAll<HTMLButtonElement>('.bayan-demo-actions button').forEach(b=>b.disabled=!ready);}
+      subtopics.onchange=()=>{subtopicId=subtopics.value;if(subtopicId){format='card';choices.querySelectorAll('select')[1].value='card';}prepared=topicQuestion(journey,reader,format,subtopicId);question.textContent=prepared;updateObjective();};
+      subField.append(subtopics);choices.append(subField);content.append(choices,objective,readiness);updateObjective();
       content.append(evidenceView(journey));
     }
-    const agentLabel=journey.topic?'دليل المعرّف بالإسلام':journey.id==='abu-hurairah'?'ناقد الأسانيد وخبير الرجال':journey.id==='hajj-arafah'?'محقق السنة · الروايات والشجرة':'محقق السنة · النص والتخريج';
+    const agentLabel='بيان السُّنَّة — المساعد الموحد · '+(journey.topic?'مهارة التعريف بالإسلام':journey.id==='abu-hurairah'?'مهارة الرجال':journey.id==='hajj-arafah'?'مهارة الأسانيد':'مهارة البحث والتخريج');
     content.append(element('p','bayan-agent','ينفّذها: '+agentLabel));
     if(journey.topic){const request=element('details','bayan-request');request.append(element('summary','','راجع السؤال الذي سيُرسل'),question);content.append(request);}else content.append(element('span','bayan-question-label','السؤال الذي تبدأ به'),question);
     content.append(element('h3','','ما الذي ستستكشفه؟'));
@@ -287,7 +359,7 @@ export function createNativeVariant(){
     const detail=element('p','bayan-step-detail',journey.outputs[0].description);detail.id='bayan-step-detail';detail.setAttribute('aria-live','polite');
     journey.outputs.forEach((step,index)=>{const b=button('','',()=>{detail.textContent=step.description;for(const other of steps.querySelectorAll('button'))other.setAttribute('aria-pressed',String(other===b));});b.setAttribute('aria-pressed',String(index===0));b.setAttribute('aria-controls',detail.id);b.append(element('span','',String(index+1).padStart(2,'0')),document.createTextNode(step.title));steps.append(b);});
     content.append(steps,detail,element('p','bayan-demo-note','تُنفّذ الحالة مباشرة بالأدوات المتاحة. افحص المصادر في الإجابة، وقد تختلف النتائج عند إعادة التجربة.'));
-    const actions=element('div','bayan-demo-actions');const run=button('bayan-primary',journey.topic?'ابدأ رحلة الموضوع':'ابدأ العرض المباشر',()=>launch(journey,true,prepared));run.append(icon('play'));actions.append(run,button('bayan-secondary','عدّل السؤال أولًا',()=>launch(journey,false,prepared)));content.append(actions);demoDialog.append(content);
+    const actions=element('div','bayan-demo-actions');const run=button('bayan-primary',journey.topic?'ابدأ رحلة الموضوع':'ابدأ العرض المباشر',()=>launch(journey,true,prepared,{audience:reader,format,subtopicId}));run.append(icon('play'));actions.append(run,button('bayan-secondary','عدّل السؤال أولًا',()=>launch(journey,false,prepared,{audience:reader,format,subtopicId})));content.append(actions);demoDialog.append(content);
     if(!demoDialog.open)demoDialog.showModal();close.focus();
   }
 
@@ -328,7 +400,8 @@ export function createNativeVariant(){
     if(pathBar)updatePathSelection(pathBar as HTMLElement);
 
     // Modify/filter visible SVG elements in DOM based on actual graph membership
-    const svgs=document.querySelectorAll<SVGElement>('#chat-pane svg, .mermaid svg');
+    const graphMessage=activeGraphData?.message_id?document.getElementById(`message-${activeGraphData.message_id}`):null;
+    const svgs=(graphMessage||document.getElementById('chat-pane'))?.querySelectorAll<SVGElement>('svg:has(.node)')||[];
     const selectedPath=selectedPathId?activeGraphData?.paths?.find(p=>p.path_id===selectedPathId):null;
     const pathNodeIds=new Set<string>();
     const pathNodeNames=new Set<string>();
@@ -344,14 +417,14 @@ export function createNativeVariant(){
       if(selectedPathId){
         svg.setAttribute('data-selected-path',selectedPathId);
         svg.querySelectorAll<SVGElement>('.node, g.node, g[id^="flowchart-"]').forEach(nodeEl=>{
+          if(!graphStyles.has(nodeEl))graphStyles.set(nodeEl,{opacity:nodeEl.style.opacity,filter:nodeEl.style.filter});
           let inPath=false;
-          const m=nodeEl.id?nodeEl.id.match(/^flowchart-([a-zA-Z0-9_]+)(?:-\d+)?$/):null;
-          const elNodeId=m?m[1].toLowerCase():'';
+          const elNodeId=nativeMermaidNodeId(nodeEl.id)?.toLowerCase()||'';
           const dataNodeId=(nodeEl.getAttribute('data-node-id')||nodeEl.getAttribute('data-path-id')||'').toLowerCase();
           const nodeText=(nodeEl.textContent||'').trim();
 
           if(elNodeId&&pathNodeIds.has(elNodeId))inPath=true;
-          else if(dataNodeId&&(pathNodeIds.has(dataNodeId)||dataNodeId===selectedPathId.toLowerCase()||dataNodeId==='shared'))inPath=true;
+          else if(dataNodeId&&(pathNodeIds.has(dataNodeId)||dataNodeId===selectedPathId?.toLowerCase()||dataNodeId==='shared'))inPath=true;
           else if(pathNodeNames.size>0){
             for(const name of pathNodeNames){
               if(nodeText.includes(name)){
@@ -371,10 +444,7 @@ export function createNativeVariant(){
         });
       }else{
         svg.removeAttribute('data-selected-path');
-        svg.querySelectorAll<SVGElement>('.node, g.node, g[id^="flowchart-"]').forEach(nodeEl=>{
-          nodeEl.style.opacity='1';
-          nodeEl.style.filter='';
-        });
+        restoreGraphStyles();
       }
     });
 
@@ -402,17 +472,17 @@ export function createNativeVariant(){
           }));
         }
       });
-      followupPanel.dataset.notice=selectedPathId
-        ?`اختير الطريق: ${selectedPathId}. انقر على أي مسودة لتحميل هذا الطريق.`
-        :'تم عرض جميع الطرق.';
     }
+    followupPanel.dataset.notice=selectedPathId
+      ?`اختير الطريق: ${selectedPathId}. العقد الأخرى مخففة في الرسم.`
+      :'تم عرض جميع الطرق.';
   }
 
   function getGraphSignature(graph:ActiveGraphData|null):string{
     if(!graph)return 'none';
     const occ=graph.occurrence_id||'no-occ';
     const pathsKey=graph.paths.map(p=>`${p.path_id}:${p.teacher_name||''}`).join('|');
-    return `${occ}:${graph.paths.length}:${pathsKey}:${graph.nodes.size}`;
+    return `${graph.message_id||''}:${occ}:${graph.paths.length}:${pathsKey}:${graph.nodes.size}`;
   }
 
   function renderContext(){
@@ -437,8 +507,8 @@ export function createNativeVariant(){
     activeGraphData=currentGraph;
 
     contextPanel.replaceChildren();followupPanel.replaceChildren();delete followupPanel.dataset.notice;
-    contextPanel.append(element('span','bayan-context-brand',BRAND.name));if(active)contextPanel.append(element('span','bayan-context-case',active.title));contextPanel.append(button('','الحالات التطبيقية',openGallery));
-    if(active){
+    contextPanel.append(element('span','bayan-context-brand',BRAND.name));if(active)contextPanel.append(element('span','bayan-context-case',active.title));contextPanel.append(button('',active?.track==='islam'?'موضوعات التعريف بالإسلام':'الحالات التطبيقية',()=>openGallery(active?.track==='islam')));
+    if(active||activeGraphData){
       const availablePaths=activeGraphData?.paths||[];
       const selectorItems=buildRouteSelectorItems(availablePaths);
       if(selectorItems){
@@ -453,6 +523,8 @@ export function createNativeVariant(){
         });
         followupPanel.append(pathBar);
       }
+    }
+    if(active){
       followupPanel.append(element('span','','افتح مسودة متخصصة لهذه الحالة'));
       const activeOccurrences=activeGraphData?.occurrence_id?[activeGraphData.occurrence_id]:[];
 
@@ -460,6 +532,9 @@ export function createNativeVariant(){
       followupsToRender.forEach((item,index)=>{
         const b=button('',item.label,()=>launchDestination(buildFollowupURL(location.origin,active!.id,index,{
           mode:'unified',
+          audience:nativeLessons[0]?.audience,
+          format:nativeLessons[0]?.format,
+          subtopicId:nativeLessons[0]?.subtopic_id,
           routeKind,
           selectedPathId,
           occurrenceIds:activeOccurrences,
@@ -477,6 +552,8 @@ export function createNativeVariant(){
     if(pendingLaunch&&/^\/c\//.test(location.pathname)&&active){caseMap[location.pathname]=active.id;try{sessionStorage.setItem('bayan-case-map',JSON.stringify(caseMap));}catch{}pendingLaunch=false;}
     else{active=getJourney(caseMap[location.pathname]);pendingLaunch=false;}
     lastPath=location.pathname;lastContextCase='';lastContextSignature='';
+    clearLessonCards();restoreGraphStyles();graphRequest?.abort();graphRequest=null;lastGraphFetch=0;nativeGraphData=null;activeGraphData=null;
+    selectedPathId=undefined;routeKind='all_paths';activeMentionId=undefined;activeAnchorName=undefined;
   }
 
   function refresh(){
@@ -487,7 +564,8 @@ export function createNativeVariant(){
     const composer=document.querySelector<HTMLElement>('#message-input-container');const form=composer?.closest('form');
     if(hasMessages()){
       audiencePanel.remove();cardsPanel.remove();clearMarks();renderContext();const pane=document.getElementById('chat-pane');if(pane&&contextPanel.parentElement!==pane)pane.prepend(contextPanel);
-      if(form&&active&&followupPanel.nextElementSibling!==form)form.before(followupPanel);else if(!active)followupPanel.remove();return;
+      if(form&&(active||activeGraphData)&&followupPanel.nextElementSibling!==form)form.before(followupPanel);else if(!active&&!activeGraphData)followupPanel.remove();
+      void syncNativeGraph();return;
     }
     contextPanel.remove();followupPanel.remove();if(!composer||!form){audiencePanel.remove();cardsPanel.remove();return;}
     let slot:HTMLElement|null=form.parentElement;while(slot&&slot.id!=='chat-pane'&&!(slot.classList.contains('text-base')&&slot.classList.contains('py-3')))slot=slot.parentElement;
@@ -498,5 +576,11 @@ export function createNativeVariant(){
     else if(!cardsPanel.isConnected&&slot)slot.after(cardsPanel);
   }
 
-  render();localizeAuthPage();return {setEnabled(value:boolean){enabled=value;refresh();},refresh};
+  render();localizeAuthPage();return {setEnabled(value:boolean){
+    enabled=value;
+    if(graphTimer)clearInterval(graphTimer);graphTimer=undefined;
+    if(value)graphTimer=setInterval(()=>void syncNativeGraph(),3000);
+    else {clearLessonCards();restoreGraphStyles();graphRequest?.abort();graphRequest=null;nativeGraphData=null;activeGraphData=null;lastContextSignature='';}
+    refresh();
+  },refresh};
 }

@@ -1,0 +1,182 @@
+{
+  "checked_at": "2026-10-09T07:22:16.207950+00:00",
+  "collection": "edc4c3e3-31ef-4f9e-b50c-791de4520169",
+  "previous_settings": {
+    "ENABLE_RAG_HYBRID_SEARCH": false,
+    "HYBRID_BM25_WEIGHT": 0.5,
+    "TOP_K_RERANKER": 3
+  },
+  "indexed_files": [
+    {
+      "filename": "bayan-pass-faith-01.md",
+      "sha256": "c731e89c35a43d64d2a5d38c6a423c53a97a1c9ff48b0b06eb52134c37d280e7",
+      "occurrence_id": "itqan:bukhari:1:1:bf026de7e155",
+      "review_status": "needs_review",
+      "file_id": "0d5ac55c-75db-42e8-9844-3117ad14fbcd"
+    },
+    {
+      "filename": "bayan-pass-faith-02.md",
+      "sha256": "c9f05be6c233d48cfb404cd13b0b5cb57ac0cc881782071aed0816d65b27e6f5",
+      "occurrence_id": "itqan:bukhari:2:2:43ab185c8834",
+      "review_status": "needs_review",
+      "file_id": "c7372ae2-87b8-475a-9d3f-5b2e33810f2d"
+    },
+    {
+      "filename": "bayan-pass-mercy-01.md",
+      "sha256": "86579b620dc838d52fdf934ddeb5d4020613b75879251069881cc943261181be",
+      "occurrence_id": "itqan:tirmidhi:27:30:b5e57ce2441d",
+      "review_status": "needs_review",
+      "file_id": "392f6fc9-a6e3-4c77-ac2e-604828782fe9"
+    },
+    {
+      "filename": "bayan-pass-mercy-02.md",
+      "sha256": "0b5b32fc14df213d427caaf73143ef235d0c150cabe64093d8ea9221471ba317",
+      "occurrence_id": "itqan:bukhari:78:55:022c1dbdd753",
+      "review_status": "needs_review",
+      "file_id": "5ff03c6b-e73d-4dec-9905-5206b760f5ec"
+    },
+    {
+      "filename": "bayan-pass-mercy-03.md",
+      "sha256": "99d56765762806f855558cacd6478be8b220d264d6a393d4edf0ffb831d91ee4",
+      "occurrence_id": "itqan:bukhari:97:6:c70c14ec93c8",
+      "review_status": "needs_review",
+      "file_id": "2236e5b1-f506-47ea-affd-1c82bd484b6a"
+    },
+    {
+      "filename": "bayan-pass-worship-01.md",
+      "sha256": "1a988db261f8be5b7cc10bf608e814713b3292740e411cd57b313c6a69ea6102",
+      "occurrence_id": "itqan:bukhari:9:7:b8de6739f520",
+      "review_status": "needs_review",
+      "file_id": "952f2126-da0c-4e11-aec4-26470ffba621"
+    },
+    {
+      "filename": "bayan-pass-worship-02.md",
+      "sha256": "1a500d988dcb1ffe7199ff93961ddb988e3755c13c949b3fb5aeeb88d5361f6d",
+      "occurrence_id": "itqan:bukhari:2:31:7d396864714a",
+      "review_status": "needs_review",
+      "file_id": "a959fe08-4e7c-4d96-8ffb-e45190333481"
+    },
+    {
+      "filename": "bayan-pass-family-01.md",
+      "sha256": "0c69ff4663eb51054b552ae938d5b92401dda5b71ab3c9701b88108508ab185e",
+      "occurrence_id": "itqan:bukhari:78:46:c2cf81c922d3",
+      "review_status": "needs_review",
+      "file_id": "bb3e3300-c4ad-4947-b919-c7682af8766b"
+    },
+    {
+      "filename": "bayan-pass-family-02.md",
+      "sha256": "424be7810c216155e5ad081f73886ed63b4147946700a76d103247225dfeabae",
+      "occurrence_id": "itqan:bukhari:34:20:6be328f32eca",
+      "review_status": "needs_review",
+      "file_id": "ee37d94c-644e-4780-b63b-b852fddf69f4"
+    },
+    {
+      "filename": "bayan-pass-fairness-01.md",
+      "sha256": "451529aa63591565eede12efb160b98ccc035b4e1b1d3afc95fcd3acd4b860c5",
+      "occurrence_id": "itqan:muslim:1:189:0ae114813da4",
+      "review_status": "needs_review",
+      "file_id": "ba5547d6-22c5-4d2b-8617-dc8c908ebe20"
+    },
+    {
+      "filename": "bayan-pass-fairness-02.md",
+      "sha256": "0d0e11f52e8ff6343b6cd77e66bf66948833236841099767511ac797d572435c",
+      "occurrence_id": "itqan:bukhari:46:8:ea82d87c12e2",
+      "review_status": "needs_review",
+      "file_id": "498337f7-a8f3-47e9-b7fa-e1ab4207ece6"
+    },
+    {
+      "filename": "bayan-pass-knowledge-01.md",
+      "sha256": "d12fd150fee4345204a6293f43d2dc2e8ec57c370d82d3d0ed603c4eaa4fa013",
+      "occurrence_id": "itqan:muslim:48:48:914dcfac86be",
+      "review_status": "needs_review",
+      "file_id": "2c52b991-9515-458c-9d28-ca3fc23d95b9"
+    },
+    {
+      "filename": "bayan-pass-knowledge-02.md",
+      "sha256": "a971af8800a8757b27cb620883300f71bd05dcde00c8d89d69934156b2121cbb",
+      "occurrence_id": "itqan:bukhari:3:11:7bca050e20fb",
+      "review_status": "needs_review",
+      "file_id": "4afc8786-8955-4ce5-970f-3053b8755849"
+    }
+  ],
+  "natural_queries": [
+    {
+      "query": "ما معنى الأعمال بالنيات والإخلاص في الإسلام؟",
+      "expected_occurrence_ids": [
+        "itqan:bukhari:1:1:bf026de7e155"
+      ],
+      "matched": true,
+      "sources": [
+        "bayan-pass-faith-01.md"
+      ],
+      "snippets": [
+        "# الإيمان والمعنى\noccurrence_id: itqan:bukhari:1:1:bf026de7e155\nالشاهد الحرفي من المصدر: «إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى»\nالمصدر: bukhari — كتاب بدء الوحى\nكلمات البحث (ليست نص الحديث): الإيمان والمعنى كيف ير"
+      ]
+    },
+    {
+      "query": "كيف يعلّم الإسلام الرحمة والرفق بالناس؟",
+      "expected_occurrence_ids": [
+        "itqan:tirmidhi:27:30:b5e57ce2441d",
+        "itqan:bukhari:78:55:022c1dbdd753",
+        "itqan:bukhari:97:6:c70c14ec93c8"
+      ],
+      "matched": true,
+      "sources": [
+        "bayan-pass-mercy-02.md",
+        "bayan-pass-mercy-03.md"
+      ],
+      "snippets": [
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:bukhari:78:55:022c1dbdd753\nالشاهد الحرفي من المصدر: «إِنَّ اللَّهَ يُحِبُّ الرِّفْقَ فِي الأَمْرِ كُلِّهِ»\nالمصدر: bukhari — كتاب الأدب\nكلمات البحث (ليست نص الحديث): الرحمة وحسن الخلق كيف تظهر الرحمة في تعامل ",
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:bukhari:97:6:c70c14ec93c8\nالشاهد الحرفي من المصدر: «لاَ يَرْحَمُ اللَّهُ مَنْ لاَ يَرْحَمُ النَّاسَ»\nالمصدر: bukhari — كتاب التوحيد\nكلمات البحث (ليست نص الحديث): الرحمة وحسن الخلق كيف تظهر الرحمة في تعامل المس"
+      ]
+    },
+    {
+      "query": "اشرح إن الله يحب الرفق في الأمر كله",
+      "expected_occurrence_ids": [
+        "itqan:bukhari:78:55:022c1dbdd753"
+      ],
+      "matched": true,
+      "sources": [
+        "bayan-pass-mercy-02.md",
+        "bayan-pass-mercy-01.md"
+      ],
+      "snippets": [
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:bukhari:78:55:022c1dbdd753\nالشاهد الحرفي من المصدر: «إِنَّ اللَّهَ يُحِبُّ الرِّفْقَ فِي الأَمْرِ كُلِّهِ»\nالمصدر: bukhari — كتاب الأدب\nكلمات البحث (ليست نص الحديث): الرحمة وحسن الخلق كيف تظهر الرحمة في تعامل ",
+        "# الرحمة وحسن الخلق\noccurrence_id: itqan:tirmidhi:27:30:b5e57ce2441d\nالشاهد الحرفي من المصدر: «الرَّاحِمُونَ يَرْحَمُهُمُ الرَّحْمَنُ ارْحَمُوا مَنْ فِي الأَرْضِ يَرْحَمْكُمْ مَنْ فِي السَّمَاءِ»\nالمصدر: tirmidhi — كتاب البر والصلة عن رسول الله صلى ا"
+      ]
+    }
+  ],
+  "status": "verified",
+  "retrieval_mode": "native_hybrid_bm25_candidates_with_embedding_rerank",
+  "bm25_weight": 1.0,
+  "previous_model_knowledge": {
+    "bayan-unified-pilot": [
+      {
+        "id": "bayan-islam-guide-v1",
+        "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
+        "type": "collection",
+        "description": "موارد المنهج التعليمي والتعريف بالإسلام للموضوعات الستة (مسودة استرشادية قيد المراجعة العلمية)",
+        "version": "1.0",
+        "review_status": "needs_review",
+        "scholarly_approved": false,
+        "source": "planning/islam_topic_taxonomy_v1.json"
+      }
+    ],
+    "hadith-islam-guide": [
+      {
+        "id": "bayan-islam-guide-v1",
+        "name": "بيان السنة — مدونة التعريف بالإسلام والموضوعات الستة",
+        "type": "collection",
+        "description": "موارد المنهج التعليمي والتعريف بالإسلام للموضوعات الستة (مسودة استرشادية قيد المراجعة العلمية)",
+        "version": "1.0",
+        "review_status": "needs_review",
+        "scholarly_approved": false,
+        "source": "planning/islam_topic_taxonomy_v1.json"
+      }
+    ]
+  },
+  "model_wiring": [
+    "bayan-unified-pilot",
+    "hadith-islam-guide"
+  ]
+}
